@@ -1,0 +1,129 @@
+# 🏗️ Architecture du Projet — Football IQ Assistant
+
+Ce document présente l'architecture globale de l'application **Football IQ Assistant**, détaillant l'organisation des modules et le flux de données entre l'interface utilisateur, le moteur de traitement et la base de connaissances.
+
+---
+
+## 🗺️ Schéma d'Architecture Global
+
+```mermaid
+graph TD
+    %% Styling & Theme Colors
+    classDef frontend fill:#3b82f6,stroke:#1d4ed8,stroke-width:2px,color:#fff;
+    classDef backend fill:#10b981,stroke:#047857,stroke-width:2px,color:#fff;
+    classDef data fill:#f59e0b,stroke:#b45309,stroke-width:2px,color:#fff;
+    classDef future fill:#8b5cf6,stroke:#6d28d9,stroke-width:2px,color:#fff;
+
+    %% Subgraphs and Components
+    subgraph Client ["🎨 FRONTEND (Interface Utilisateur)"]
+        Chat[Zone de Chat Principal]:::frontend
+        M_Coach[Mode Coach 📋]:::frontend
+        M_Analyst[Mode Analyste 📊]:::frontend
+        M_Fan[Mode Fan & Créateur 📱]:::frontend
+    end
+
+    subgraph Logic ["⚙️ BACKEND (Moteur Logique & IA)"]
+        PM[Prompt Manager]:::backend
+        RAG[RAG Engine]:::backend
+        LLM[LLM API Connector]:::backend
+        RG[Report Generator]:::backend
+    end
+
+    subgraph Storage ["📂 DATA (Base Documentaire & Événements)"]
+        KB[Football Knowledge Base]:::data
+        TC[Tactical Concepts]:::data
+        ME[Match Events JSON]:::data
+    end
+
+    subgraph Next ["🔮 FUTURE (Extensions de Périmètre)"]
+        VA[Video Analysis Module]:::future
+    end
+
+    %% Data Flows and Connections
+    Chat --> M_Coach
+    Chat --> M_Analyst
+    Chat --> M_Fan
+
+    M_Coach & M_Analyst & M_Fan --> PM
+    PM --> RAG
+    RAG --> KB & TC & ME
+    RAG --> LLM
+    LLM --> RG
+    RG --> Chat
+
+    %% Future Connections
+    VA -.-> |Extraction d'événements| ME
+
+    %% Legend
+    subgraph Légende
+        LF[Frontend]:::frontend
+        LB[Backend]:::backend
+        LD[Données]:::data
+        LE[Futur]:::future
+    end
+```
+
+---
+
+## 📂 Arborescence Structurelle
+
+```text
+Football IQ Assistant
+├── 🎨 Frontend
+│   ├── Chat (Zone de saisie, historique, cartes de réponses)
+│   ├── Coach Mode (Interface tactique terrain, exercices)
+│   ├── Analyst Mode (Visualisations avancées, comparaisons)
+│   └── Fan Mode (Générateur de threads, outils réseaux sociaux)
+│
+├── ⚙️ Backend
+│   ├── LLM (Connexion API, gestion des tokens et température)
+│   ├── RAG (Algorithme de recherche vectorielle et découpage sémantique)
+│   ├── Prompt Manager (Templates de prompts système : Coach, Analyste, Fan)
+│   └── Report Generator (Moteur de génération de PDF et rapports)
+│
+├── 📂 Data
+│   ├── Football Knowledge Base (Articles de référence, guides tactiques)
+│   ├── Tactical Concepts (Modèles de jeu : 4-4-2, 3-2-5, Gegenpressing)
+│   └── Future Match Events (Fichiers JSON simulant des faits de jeu)
+│
+└── 🔮 Future
+    └── Video Analysis (Détection automatique d'événements à partir de vidéos)
+```
+
+---
+
+## ⚙️ Description Détaillée des Composants
+
+### 1. 🎨 Frontend (Interface Utilisateur)
+* **Chat :** L'interface centrale de discussion permettant l'envoi de requêtes et l'affichage des réponses structurées sous forme de cartes avec affichage des sources.
+* **Coach Mode :** Configure l'interface pour mettre en avant la planification de séances et les consignes terrain.
+* **Analyst Mode :** Adapte l'UX pour afficher des données tactiques détaillées et des fiches de comparaison de joueurs.
+* **Fan Mode :** Propose des actions rapides de partage et de formatage de texte pour les réseaux sociaux (X, TikTok, Instagram).
+
+### 2. ⚙️ Backend (Moteur Applicatif)
+* **Prompt Manager :** Injecte les prompts système adéquats (`coach_prompt.txt`, `analyst_prompt.txt`, `fan_prompt.txt`) en fonction du mode actif pour guider la personnalité et la précision du LLM.
+* **RAG Engine :** Récupère les morceaux de documents les plus pertinents par rapport à la question de l'utilisateur (en cherchant dans la base documentaire locale).
+* **LLM :** Le modèle de langage qui combine le prompt système, le contexte du RAG et la question utilisateur pour générer la réponse finale.
+* **Report Generator :** Gère la mise en page et l'exportation des réponses IA en fichiers PDF structurés (séance de sport, analyse d'équipe, etc.).
+
+### 3. 📂 Data (Base de Connaissances & Faits)
+* **Football Knowledge Base :** Fichiers textes structurés contenant l'historique, les exercices types et la théorie de l'entraînement.
+* **Tactical Concepts :** Fichiers markdown décrivant en détail les animations tactiques de référence.
+* **Future Match Events :** Fichiers de données fictives simulant des logs d'événements de match (minutes, zones, actions) pour préparer le RAG à l'intégration de données vidéo.
+
+### 4. 🔮 Future (Analyses Vidéo)
+* **Video Analysis :** Module d'extension prévu pour analyser directement les séquences vidéo brutes d'un match (détection d'actions, tracking) et alimenter la base de données de match (`Match Events JSON`).
+
+---
+
+## 🔄 Flux d'Exécution Typique (Dataflow)
+
+```text
+[Utilisateur] ──(1. Question + Mode choisi)──> [Frontend]
+                                                     │
+[LLM] <──(4. Génération de réponse)── [Backend (RAG & Prompts)]
+  │                                                  ▲
+  │                                          (3. Contexte RAG)
+  ▼                                                  │
+[Report Generator] ──(5. Export/Affichage)──> [Base Data (Fichiers MD & JSON)]
+```

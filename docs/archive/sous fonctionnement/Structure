@@ -1,0 +1,176 @@
+# ⚽ Football IQ Assistant — Structure & Roadmap
+
+Ce document définit la vision, l'architecture et les étapes de développement pour transformer le projet RAG football en un assistant d'intelligence artificielle structuré pour le terrain.
+
+---
+
+## 🎯 Étape 1 : Définition du Produit
+
+> [!NOTE]
+> **Décision claire :** Ce n’est pas un simple "LLM de football" généraliste, mais une **interface IA football** sur-mesure pour les coachs, analystes et fans.
+> 
+> * **Nom provisoire :** `Football IQ Assistant`
+> * **Objectif V1 :** L’utilisateur pose une question football, l’IA répond avec une analyse claire, structurée, sourcée et orientée terrain.
+
+---
+
+## ⚙️ Étape 2 : Les 3 Modes Applicatifs
+
+L'interface proposera **3 modes distincts** qui adapteront le comportement et le ton de l'IA :
+
+| Mode | Public Cible | Type de Requête (Exemple) |
+| :--- | :--- | :--- |
+| **📋 Coach** | Entraîneurs, éducateurs | *"Fais-moi une séance pour travailler le pressing haut."* |
+| **📊 Analyste** | Analystes tactiques, scouts | *"Compare le rôle de Rodri et Busquets dans la relance."* |
+| **📣 Fan** | Supporters, passionnés | *"Explique-moi le gegenpressing simplement."* |
+
+---
+
+## 🎨 Étape 3 : Amélioration de l'Interface (UX/UI)
+
+L'objectif est d'avoir une expérience utilisateur (UX) moderne et engageante ("effet Wow") avant de produire des présentations.
+
+### Éléments d'interface à intégrer :
+- **Sidebar** avec l'historique des conversations.
+- **Sélecteur de mode** (Coach, Analyste, Fan) bien visible.
+- **Zone de chat** épurée et moderne.
+- **Cartes de réponse** structurées.
+- **Sources** clairement affichées sous chaque réponse.
+
+### Boutons d'action rapide (Quick Actions) :
+* 📄 **Générer rapport**
+* ⚽ **Créer séance**
+* 🔍 **Approfondir**
+* 💡 **Simplifier**
+* 🐦 **Transformer en post X/Twitter**
+* 📥 **Exporter PDF**
+
+---
+
+## 📚 Étape 4 : Base de Connaissances Tactique (RAG)
+
+Le système de Retrieval-Augmented Generation (RAG) doit s'appuyer sur des sources spécialisées et structurées plutôt que sur de simples articles généralistes (comme Wikipédia).
+
+### Thématiques cibles :
+* Tactique & Principes de jeu (animation offensive/défensive, transitions)
+* Rôles détaillés des joueurs & Formations
+* Scouting & Analyse d'adversaires
+* Séances d'entraînement & Préparation de match
+* Data football & Statistiques avancées
+
+### Architecture des fichiers de données (`.md`) :
+* 📂 `pressing.md`
+* 📂 `build_up.md`
+* 📂 `transitions.md`
+* 📂 `player_roles.md`
+* 📂 `formations.md`
+* 📂 `training_drills.md`
+* 📂 `scouting_profiles.md`
+
+---
+
+## ✍️ Étape 5 : Prompts Système Spécialisés
+
+Chaque mode utilisera un fichier de prompt système dédié pour orienter les réponses :
+* 📄 `coach_prompt.txt` : Ton direct, axé exercices, animation, et management terrain.
+* 📄 `analyst_prompt.txt` : Analyse technique poussée, jargon tactique, données chiffrées.
+* 📄 `fan_prompt.txt` : Vulgarisation, métaphores simples, ton passionné mais accessible.
+* 📄 `scout_prompt.txt` : Fiches de profil, forces/faiblesses, potentiel d'intégration.
+
+---
+
+## 📋 Étape 6 : Modèles de Sortie (Templates)
+
+L'assistant doit structurer ses réponses selon des formats standardisés plutôt que de générer de longs textes bruts.
+
+### Formats disponibles :
+* Rapport tactique
+* Plan d’entraînement
+* Comparaison de joueurs
+* Analyse d’équipe
+* Note de scouting
+* Résumé vulgarisé
+
+### Structure type d'une réponse :
+1. **Résumé rapide** (L'essentiel en 2 lignes)
+2. **Analyse principale** (Le cœur du sujet)
+3. **Points clés** (Liste à puces claire)
+4. **Recommandations concrètes** (Conseils terrain/actionnables)
+5. **Sources utilisées** (Fichiers de la base documentaire)
+
+---
+
+## 📹 Étape 7 : Module d'Analyse Vidéo (Évolution Future)
+
+Préparer l'architecture pour l'intégration future de l'analyse vidéo.
+
+* **Dossier cible :** `video_analysis/`
+* **Contenu temporaire (Mock JSON) :**
+```json
+{
+  "minute": "12:34",
+  "event": "perte de balle",
+  "zone": "milieu droit",
+  "team": "équipe A",
+  "danger": "élevé"
+}
+```
+*Le RAG doit pouvoir interroger ces données fictives en attendant l'intégration d'un modèle vidéo réel.*
+
+---
+
+## 📅 Feuille de Route (Roadmap)
+
+```mermaid
+gantt
+    title Roadmap de Développement Football IQ
+    dateFormat  YYYY-MM-DD
+    section Phase 1
+    Interface & Prompts (Semaine 1) :active, des1, 2026-06-08, 7d
+    section Phase 2
+    RAG & Base de Connaissances (Semaine 2) : des2, after des1, 7d
+    section Phase 3
+    Templates & Exports (Semaine 3) : des3, after des2, 7d
+    section Phase 4
+    Analyse Vidéo Fictive (Semaine 4) : des4, after des3, 7d
+```
+
+### 🗓️ Semaine 1 : Interface & Configuration Initiale
+- [ ] Création d'une interface propre et responsive
+- [ ] Intégration du sélecteur à 3 modes
+- [ ] Rédaction et intégration des prompts spécialisés
+
+### 🗓️ Semaine 2 : RAG & Base Documentaire
+- [ ] Structuration de la base de connaissances football (fichiers `.md`)
+- [ ] Optimisation du pipeline RAG
+- [ ] Intégration des sources dans les réponses de l'IA
+
+### 🗓️ Semaine 3 : Templates & Fonctionnalités Avancées
+- [ ] Implémentation des formats de sortie (séance, rapport, etc.)
+- [ ] Ajout de l'export PDF
+- [ ] Gestion de l'historique des conversations
+
+### 🗓️ Semaine 4 : Préparation Vidéo
+- [ ] Intégration du module `future_video_analysis/`
+- [ ] Indexation et requêtage sur les événements JSON fictifs
+
+---
+
+## 🤖 Guide de Développement (Instructions pour les IA de Code)
+
+Pour implémenter ce plan de manière progressive et sans erreurs, soumettre les requêtes suivantes dans l'ordre exact :
+
+1. **Architecture Cible :**
+   > *"Analyse mon repo et propose une architecture cible pour transformer ce projet RAG football en application avec 3 modes : Coach, Analyste, Fan."*
+2. **Interface & Mode :**
+   > *"Implémente le sélecteur de mode dans le frontend et adapte les appels backend pour envoyer le mode choisi."*
+3. **Prompts Système :**
+   > *"Crée trois prompts système séparés pour Coach, Analyste et Fan."*
+4. **Backend RAG :**
+   > *"Modifie le backend RAG pour utiliser le prompt correspondant au mode sélectionné."*
+5. **UI & Expérience Chat :**
+   > *"Améliore l’interface chat avec historique, sources, cartes de réponse et boutons d’action."*
+6. **Modèles de Sortie :**
+   > *"Ajoute des templates de sortie : rapport tactique, séance d’entraînement, comparaison de joueurs, note de scouting."*
+7. **Simulations Événements Vidéo :**
+   > *"Ajoute un dossier future_video_analysis avec des données JSON fictives d’événements de match et rends-les interrogeables par le RAG."*

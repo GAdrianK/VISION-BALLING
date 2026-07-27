@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architecture — Football IQ Assistant</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#10b981', /* Vert Football */
+                            600: '#059669',
+                            700: '#047857',
+                            900: '#064e3b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+        }
+    </style>
+    <!-- Mermaid.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            securityLevel: 'loose',
+            flowchart: { useWidth: true, htmlLabels: true },
+            themeVariables: {
+                fontSize: '15px',
+                fontFamily: 'Outfit'
+            }
+        });
+    </script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen selection:bg-brand-500 selection:text-slate-950">
+
+    <!-- Header Section -->
+    <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50 py-5">
+        <div class="max-w-[1600px] mx-auto px-8 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-4">
+                <span class="text-4xl">⚽</span>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight text-white">Football IQ Assistant</h1>
+                    <p class="text-xs text-slate-400 font-medium tracking-wide uppercase">Spécifications & Architecture Technique</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3 bg-slate-800/80 px-4 py-2 rounded-full border border-slate-700 text-xs">
+                <span class="w-3 h-3 rounded-full bg-brand-500 animate-pulse"></span>
+                <span class="text-slate-300 font-semibold tracking-wider uppercase">Plan Interactif V1</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-[1650px] mx-auto px-8 py-12 space-y-12">
+
+        <!-- Intro -->
+        <section class="bg-gradient-to-r from-brand-900/30 to-slate-900 border border-slate-850 p-10 rounded-3xl">
+            <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-3 tracking-tight">🏗️ Architecture & Spécifications Tactiques</h2>
+            <p class="text-slate-300 max-w-5xl text-base md:text-lg leading-relaxed">
+                Ce document interactif détaille l'organisation des modules, les flux de traitement sémantiques RAG et la délimitation du périmètre fonctionnel du projet.
+            </p>
+        </section>
+
+        <!-- Tab Controls -->
+        <div class="flex flex-wrap gap-3 p-2 bg-slate-900/60 border border-slate-850 rounded-2xl">
+            <button id="tab1-btn" onclick="showTab('tab1')" class="tab-btn flex-1 min-w-[200px] py-4 px-6 text-base font-semibold rounded-xl border border-brand-600 bg-brand-600 text-white transition-all">
+                🗺️ 1. Plan & Cartographie
+            </button>
+            <button id="tab2-btn" onclick="showTab('tab2')" class="tab-btn flex-1 min-w-[200px] py-4 px-6 text-base font-semibold rounded-xl border border-slate-800 bg-slate-950/40 text-slate-400 hover:text-white transition-all">
+                🔄 2. Flux de Séquence (Dataflow)
+            </button>
+            <button id="tab3-btn" onclick="showTab('tab3')" class="tab-btn flex-1 min-w-[200px] py-4 px-6 text-base font-semibold rounded-xl border border-slate-800 bg-slate-950/40 text-slate-400 hover:text-white transition-all">
+                📂 3. Arborescence du Code
+            </button>
+            <button id="tab4-btn" onclick="showTab('tab4')" class="tab-btn flex-1 min-w-[200px] py-4 px-6 text-base font-semibold rounded-xl border border-slate-800 bg-slate-950/40 text-slate-400 hover:text-white transition-all">
+                💡 4. Rôles & Modèles
+            </button>
+            <button id="tab5-btn" onclick="showTab('tab5')" class="tab-btn flex-1 min-w-[200px] py-4 px-6 text-base font-semibold rounded-xl border border-slate-800 bg-slate-950/40 text-slate-400 hover:text-white transition-all">
+                📄 5. Fiche Produit (MVP)
+            </button>
+            <button id="tab6-btn" onclick="showTab('tab6')" class="tab-btn flex-1 min-w-[200px] py-4 px-6 text-base font-semibold rounded-xl border border-slate-800 bg-slate-950/40 text-slate-400 hover:text-white transition-all">
+                📈 6. Roadmap & Vision (CTO)
+            </button>
+        </div>
+
+        <!-- TAB 1: CARTOGRAPHIE -->
+        <div id="tab1" class="tab-content space-y-12">
+            <section class="bg-slate-900 border border-slate-850 p-8 rounded-3xl shadow-2xl">
+                <div class="mb-8">
+                    <h3 class="text-2xl font-bold text-white flex items-center gap-3">
+                        <span class="text-3xl">🗺️</span> Plan Fonctionnel & Relations Systèmes
+                    </h3>
+                    <p class="text-sm text-slate-400 mt-2">Ce schéma décrit l'interaction entre l'interface utilisateur, le moteur logique RAG, les bases tactiques et les API d'intelligence artificielle.</p>
+                </div>
+                <div class="bg-slate-950 p-8 rounded-2xl border border-slate-850 overflow-x-auto min-h-[600px] flex items-center justify-center">
+                    <div class="mermaid w-full max-w-[1200px]">
+                        flowchart TB
+                            %% Styling Configuration
+                            classDef clientStyle fill:#0284c7,stroke:#0284c7,stroke-width:1.5px,color:#fff,rx:8px,ry:8px,font-size:15px;
+                            classDef backendStyle fill:#16a34a,stroke:#16a34a,stroke-width:1.5px,color:#fff,rx:8px,ry:8px,font-size:15px;
+                            classDef dataStyle fill:#d97706,stroke:#d97706,stroke-width:1.5px,color:#fff,shape:cylinder,font-size:15px;
+                            classDef externalStyle fill:#dc2626,stroke:#dc2626,stroke-width:1.5px,color:#fff,rx:8px,ry:8px,font-size:15px;
+                            classDef futureStyle fill:#7c3aed,stroke:#7c3aed,stroke-width:1.5px,color:#fff,stroke-dasharray: 5 5,font-size:15px;
+
+                            subgraph FE ["🎨 FRONTEND (Client Interface)"]
+                                UI["💻 UI: Main Chat Interface"]:::clientStyle
+                                S_Mode["🎛️ Mode Selector (Coach / Analyst / Fan)"]:::clientStyle
+                                UI <--> S_Mode
+                            end
+
+                            subgraph BE ["⚙️ BACKEND (Logic & Intelligence)"]
+                                PM["📝 Prompt Manager"]:::backendStyle
+                                RAG["🔍 RAG Engine (Context Injection)"]:::backendStyle
+                                RG["📄 Output Formatter & Report Gen"]:::backendStyle
+                                PM --> RAG
+                            end
+
+                            subgraph DB ["📂 DATA (Base de Connaissances)"]
+                                FKB[("📚 Football Knowledge Base")]:::dataStyle
+                                TC[("📐 Tactical Concepts")]:::dataStyle
+                                ME[("📊 Match Events JSON")]:::dataStyle
+                            end
+
+                            subgraph Ext ["🔌 SERVICES TIERS"]
+                                LLM_API["🧠 API LLM (OpenAI / Anthropic)"]:::externalStyle
+                            end
+
+                            subgraph FUT ["🔮 FUTUR MODULE"]
+                                VA["📹 Analyse Vidéo (Computer Vision)"]:::futureStyle
+                            end
+
+                            UI -->|1. Saisie question + Mode| PM
+                            RAG <-->|2. Requête sémantique| DB
+                            RAG -->|3. Invite enrichie| LLM_API
+                            LLM_API -->|4. Génération brute| RG
+                            RG -->|5. Cartes structurées / PDF| UI
+                            VA -.->|Écrit les logs| ME
+                    </div>
+                </div>
+            </section>
+
+            <!-- Cards detailing each part -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-slate-900 border border-slate-850 p-6 rounded-2xl">
+                    <div class="text-3xl mb-3">🎨</div>
+                    <h4 class="text-lg font-bold text-white mb-2">Frontend</h4>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Interface de chat adaptative qui change d'aspect selon le mode choisi. Il permet à l'utilisateur de soumettre des requêtes tactiques et d'obtenir des fiches de synthèse.
+                    </p>
+                </div>
+                <div class="bg-slate-900 border border-slate-850 p-6 rounded-2xl">
+                    <div class="text-3xl mb-3">⚙️</div>
+                    <h4 class="text-lg font-bold text-white mb-2">Backend</h4>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Serveur API qui orchestre la sélection des prompts système, la recherche documentaire locale via RAG, et le formatage des sorties structurées.
+                    </p>
+                </div>
+                <div class="bg-slate-900 border border-slate-850 p-6 rounded-2xl">
+                    <div class="text-3xl mb-3">📂</div>
+                    <h4 class="text-lg font-bold text-white mb-2">Données (Data)</h4>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Base sémantique contenant la théorie du football (séances, tactiques, rôles de joueurs) et des logs d'événements de match au format JSON.
+                    </p>
+                </div>
+                <div class="bg-slate-900 border border-slate-850 p-6 rounded-2xl">
+                    <div class="text-3xl mb-3">🔮</div>
+                    <h4 class="text-lg font-bold text-white mb-2">Futur Module</h4>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Module d'analyse de flux vidéo par intelligence artificielle (Computer Vision) pour extraire des logs d'actions de match en temps réel.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: SEQUENCE (DATAFLOW) -->
+        <div id="tab2" class="tab-content hidden space-y-12">
+            <section class="bg-slate-900 border border-slate-850 p-8 rounded-3xl shadow-2xl">
+                <div class="mb-8">
+                    <h3 class="text-2xl font-bold text-white flex items-center gap-3">
+                        <span class="text-3xl">🔄</span> Cycle de Vie d'une Requête Utilisateur
+                    </h3>
+                    <p class="text-sm text-slate-400 mt-2">Suivi chronologique complet du flux d'information, de l'envoi de la question tactique à l'affichage final dans le navigateur.</p>
+                </div>
+                <div class="bg-slate-950 p-8 rounded-2xl border border-slate-850 overflow-x-auto min-h-[600px] flex items-center justify-center">
+                    <div class="mermaid w-full max-w-[950px]">
+                        sequenceDiagram
+                            autonumber
+                            actor User as 👤 Utilisateur
+                            participant FE as 🎨 Frontend
+                            participant PM as ⚙️ Prompt Manager
+                            participant RAG as 🔍 RAG Engine
+                            participant DB as 📂 Base Documentaire
+                            participant LLM as 🧠 API LLM
+                            participant RG as 📄 Report Generator
+
+                            User->>FE: Question + Choix Mode (ex: Coach)
+                            FE->>PM: Transmet requête
+                            PM->>PM: Sélectionne prompt système (coach_prompt.txt)
+                            PM->>RAG: Transmet prompt + question
+                            RAG->>DB: Recherche de concepts tactiques pertinents
+                            DB-->>RAG: Retourne le contexte documentaire
+                            RAG->>LLM: Envoie prompt + contexte + question
+                            LLM-->>RAG: Retourne réponse brute structurée
+                            RAG->>RG: Transmet réponse brute
+                            RG->>RG: Formate en sections (Résumé, Conseils, etc.)
+                            RG-->>FE: Renvoie cartes prêtes + sources documentaires
+                            FE-->>User: Affiche cartes de réponse + actions (PDF, Réseaux)
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- TAB 3: CODE STRUCTURE -->
+        <div id="tab3" class="tab-content hidden space-y-12">
+            <section class="bg-slate-900 border border-slate-850 p-8 rounded-3xl shadow-2xl">
+                <div class="mb-8">
+                    <h3 class="text-2xl font-bold text-white flex items-center gap-3">
+                        <span class="text-3xl">📂</span> Explorateur et Structure du Projet
+                    </h3>
+                    <p class="text-sm text-slate-400 mt-2">Explore l'architecture physique du code et les rôles de chaque fichier du dépôt de manière interactive.</p>
+                </div>
+
+                <div class="bg-slate-950 p-8 rounded-2xl border border-slate-850 max-w-6xl mx-auto shadow-inner">
+                    <!-- File Explorer Header -->
+                    <div class="flex items-center justify-between border-b border-slate-850 pb-4 mb-6 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                            <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+                            <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                            <span class="ml-2 font-mono text-slate-300">EXPLORER : FOOTBALL-IQ-ASSISTANT</span>
+                        </div>
+                        <span class="font-mono text-[10px] bg-slate-900 border border-slate-800 px-2.5 py-1 rounded text-brand-500 uppercase tracking-widest font-bold">Workspace Actif</span>
+                    </div>
+
+                    <!-- File Tree Root -->
+                    <div class="space-y-2">
+                        <!-- Project Root Folder -->
+                        <div class="flex items-center justify-between py-2 px-3 bg-slate-900/40 border border-slate-850 rounded-xl group transition-all">
+                            <div class="flex items-center gap-3">
+                                <span class="text-xl">📂</span>
+                                <span class="font-mono text-sm font-bold text-white">football-iq-assistant/</span>
+                            </div>
+                            <span class="text-xs text-slate-500 italic">Racine du dépôt</span>
+                        </div>
+
+                        <!-- Level 1 Folders -->
+                        <div class="border-l-2 border-slate-850 ml-5 pl-6 mt-2 space-y-4">
+                            
+                            <!-- 📁 frontend -->
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between py-1 px-2 hover:bg-slate-900/40 rounded-lg group">
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-amber-500 text-lg">📂</span>
+                                        <span class="font-mono text-sm font-bold text-sky-400">frontend/</span>
+                                    </div>
+                                    <span class="text-xs text-slate-500">Interface utilisateur (React / Next.js)</span>
+                                </div>
+                                
+                                <!-- frontend subfolders & files -->
+                                <div class="border-l-2 border-slate-850/60 ml-5 pl-6 mt-1 space-y-2">
+                                    
+                                    <!-- components -->
+                                    <div class="space-y-1.5">
+                                        <div class="flex items-center justify-between py-1 px-2">
+                                            <div class="flex items-center gap-3">
+                                                <span class="text-amber-500/80 text-lg">📂</span>
+                                                <span class="font-mono text-xs font-bold text-slate-300">components/</span>
+                                            </div>
+                                            <span class="text-xs text-slate-600">Composants réutilisables</span>
+                                        </div>
+                                        
+                                        <div class="border-l-2 border-slate-850/40 ml-4 pl-5 space-y-1.5">
+                                            <!-- ChatWindow.js -->
+                                            <div class="flex items-center justify-between py-1.5 px-3 rounded-lg hover:bg-slate-900/60 transition-colors group">
+                                                <div class="flex items-center gap-2.5">
+                                                    <span class="text-sky-400 text-xs">⚛️</span>
+                                                    <span class="font-mono text-xs text-slate-300">ChatWindow.js</span>
+                                                </div>
+                                                <div class="flex items-center gap-4">
+                                                    <span class="px-2 py-0.5 text-[9px] font-bold rounded bg-sky-500/10 text-sky-400 border border-sky-500/20 tracking-wider">REACT</span>
+                                                    <span class="text-xs text-slate-400 text-right w-64 md:w-80 truncate">Fenêtre de discussion & gestion des messages</span>
+                                                </div>
+                                            </div>
+                                            <!-- ModeSelector.js -->
+                                            <div class="flex items-center justify-between py-1.5 px-3 rounded-lg hover:bg-slate-900/60 transition-colors group">
+                                                <div class="flex items-center gap-2.5">
+                                                    <span class="text-sky-400 text-xs">⚛️</span>
+                                                    <span class="font-mono text-xs text-slate-300">ModeSelector.js</span>
+                                                </div>
+                                                <div class="flex items-center gap-4">
+                                                    <span class="px-2 py-0.5 text-[9px] font-bold rounded bg-sky-500/10 text-sky-400 border border-sky-500/20 tracking-wider">REACT</span>
+                                                    <span class="text-xs text-slate-400 text-right w-64 md:w-80 truncate">Sélecteur interactif des modes (Coach/Analyste/Fan)</span>
+                                                </div>
+                                            </div>
+                                            <!-- ResponseCard.js -->
+                                            <div class="flex items-center justify-between py-1.5 px-3 rounded-lg hover:bg-slate-900/60 transition-colors group">
+                                                <div class="flex items-center gap-2.5">
+                                                    <span class="text-sky-400 text-xs">⚛️</span>
+                                                    <span class="font-mono text-xs text-slate-300">ResponseCard.js</span>
+                                                </div>
+                                                <div class="flex items-center gap-4">
+                                                    <span class="px-2 py-0.5 text-[9px] font-bold rounded bg-sky-500/10 text-sky-400 border border-sky-500/20 tracking-wider">REACT</span>
+                                                    <span class="text-xs text-slate-400 text-right w-64 md:w-80 truncate">Cartes de réponse structurées avec sources</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- styles -->
+                                    <div class="flex items-center justify-between py-1 px-2">
+                                        <div class="flex items-center gap-3">
+                                            <span class="text-amber-500/80 text-lg">📂</span>
+                                            <span class="font-mono text-xs font-bold text-slate-300">styles/</span>
+                                        </div>
+                                        <span class="text-xs text-slate-600">Feuilles de styles CSS (Tailwind)</span>
+                                    </div>
+
+                                </div>
+                            </div>
+                            
+                            <!-- 📁 backend -->
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between py-1 px-2 hover:bg-slate-900/40 rounded-lg group">
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-amber-500 text-lg">📂</span>
+                                        <span class="font-mono text-sm font-bold text-emerald-400">backend/</span>
+                                    </div>
+                                    <span class="text-xs text-slate-500">Moteur logique et API (Python)</span>
+                                </div>
+                                
+                                <div class="border-l-2 border-slate-850/60 ml-5 pl-6 mt-1 space-y-2">
+                                    <!-- app.py -->
+                                    <div class="flex items-center justify-between py-1.5 px-3 rounded-lg hover:bg-slate-900/60 transition-colors group">
+                                        <div class="flex items-center gap-2.5">
+                                            <span class="text-emerald-400 text-xs">🐍</span>
+                                            <span class="font-mono text-xs text-slate-300">app.py</span>
+                                        </div>
+                                        <div class="flex items-center gap-4">
+                                            <span class="px-2 py-0.5 text-[9px] font-bold rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 tracking-wider">FASTAPI</span>
+                                            <span class="text-xs text-slate-400 text-right w-64 md:w-80 truncate">Point d'entrée du serveur API et routage</span>
+                                        </div>
+                                    </div>
+                                    <!-- rag_engine.py -->
+                                    <div class="flex items-center justify-between py-1.5 px-3 rounded-lg hover:bg-slate-900/60 transition-colors group">
+                                        <div class="flex items-center gap-2.5">
+                                            <span class="text-emerald-400 text-xs">🐍</span>
+                                            <span class="font-mono text-xs text-slate-300">rag_engine.py</span>
+                                        </div>
+                                        <div class="flex items-center gap-4">
+                                            <span class="px-2 py-0.5 text-[9px] font-bold rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 tracking-wider">PYTHON</span>
+                                            <span class="text-xs text-slate-400 text-right w-64 md:w-80 truncate">Traitement RAG, découpe et recherche documentaire</span>
+                                        </div>
+                                    </div>
+                                    <!-- prompt_manager.py -->
+                                    <div class="flex items-center justify-between py-1.5 px-3 rounded-lg hover:bg-slate-900/60 transition-colors group">
+                                        <div class="flex items-center gap-2.5">
+                                            <span class="text-emerald-400 text-xs">🐍</span>
+                                            <span class="font-mono text-xs text-slate-300">prompt_manager.py</span>
+                                        </div>
+                                        <div class="flex items-center gap-4">
+                                            <span class="px-2 py-0.5 text-[9px] font-bold rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 tracking-wider">PYTHON</span>
+                                            <span class="text-xs text-slate-400 text-right w-64 md:w-80 truncate">Gestionnaire et injecteur de prompts système</span>
+                                        </div>
+                                    </div>
+                                    <!-- report_generator.py -->
+                                    <div class="flex items-center justify-between py-1.5 px-3 rounded-lg hover:bg-slate-900/60 transition-colors group">
+                                        <div class="flex items-center gap-2.5">
+                                            <span class="text-emerald-400 text-xs">🐍</span>
+                                            <span class="font-mono text-xs text-slate-300">report_generator.py</span>
+                                        </div>
+                                        <div class="flex items-center gap-4">
+                                            <span class="px-2 py-0.5 text-[9px] font-bold rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 tracking-wider">PYTHON</span>
+                                            <span class="text-xs text-slate-400 text-right w-64 md:w-80 truncate">Générateur de PDF et formatage réseaux sociaux</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 📁 data -->
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between py-1 px-2 hover:bg-slate-900/40 rounded-lg group">
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-amber-500 text-lg">📂</span>
+                                        <span class="font-mono text-sm font-bold text-amber-500">data/</span>
+                                    </div>
+                                    <span class="text-xs text-slate-500">Base documentaire et événements tactiques</span>
+                                </div>
+                                
+                                <div class="border-l-2 border-slate-850/60 ml-5 pl-6 mt-1 space-y-3">
+                                    <!-- knowledge_base -->
+                                    <div class="space-y-1.5">
+                                        <div class="flex items-center justify-between py-1 px-2">
+                                            <div class="flex items-center gap-3">
+                                                <span class="text-amber-500/80 text-lg">📂</span>
+                                                <span class="font-mono text-xs font-bold text-slate-300">knowledge_base/</span>
+                                            </div>
+                                            <span class="text-xs text-slate-600">Base documentaire tactique</span>
+                                        </div>
+                                        
+                                        <div class="border-l-2 border-slate-850/40 ml-4 pl-5 space-y-1.5">
+                                            <div class="flex items-center justify-between py-1 px-2 rounded-lg hover:bg-slate-900/60 group">
+                                                <div class="flex items-center gap-2.5">
+                                                    <span class="text-indigo-400 text-xs">📝</span>
+                                                    <span class="font-mono text-xs text-slate-300">pressing.md</span>
+                                                </div>
+                                                <span class="text-xs text-slate-400 text-right w-64 md:w-80 truncate">Théorie et séances sur le pressing</span>
+                                            </div>
+                                            <div class="flex items-center justify-between py-1 px-2 rounded-lg hover:bg-slate-900/60 group">
+                                                <div class="flex items-center gap-2.5">
+                                                    <span class="text-indigo-400 text-xs">📝</span>
+                                                    <span class="font-mono text-xs text-slate-300">formations.md</span>
+                                                </div>
+                                                <span class="text-xs text-slate-400 text-right w-64 md:w-80 truncate">Description des structures de jeu</span>
+                                            </div>
+                                            <div class="flex items-center justify-between py-1 px-2 rounded-lg hover:bg-slate-900/60 group">
+                                                <div class="flex items-center gap-2.5">
+                                                    <span class="text-indigo-400 text-xs">📝</span>
+                                                    <span class="font-mono text-xs text-slate-300">player_roles.md</span>
+                                                </div>
+                                                <span class="text-xs text-slate-400 text-right w-64 md:w-80 truncate">Profils et rôles tactiques des postes</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- match_events -->
+                                    <div class="space-y-1.5">
+                                        <div class="flex items-center justify-between py-1 px-2">
+                                            <div class="flex items-center gap-3">
+                                                <span class="text-amber-500/80 text-lg">📂</span>
+                                                <span class="font-mono text-xs font-bold text-slate-300">match_events/</span>
+                                            </div>
+                                            <span class="text-xs text-slate-600">Données de matchs (Vidéos futures)</span>
+                                        </div>
+                                        
+                                        <div class="border-l-2 border-slate-850/40 ml-4 pl-5">
+                                            <div class="flex items-center justify-between py-1.5 px-3 rounded-lg hover:bg-slate-900/60 transition-colors group">
+                                                <div class="flex items-center gap-2.5">
+                                                    <span class="text-amber-400 text-xs">🔧</span>
+                                                    <span class="font-mono text-xs text-slate-300">mock_match.json</span>
+                                                </div>
+                                                <div class="flex items-center gap-4">
+                                                    <span class="px-2 py-0.5 text-[9px] font-bold rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 tracking-wider">JSON</span>
+                                                    <span class="text-xs text-slate-400 text-right w-64 md:w-80 truncate">Fichier temporaire d'événements de jeu simulés</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            
+                            <!-- 📁 prompts -->
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between py-1 px-2 hover:bg-slate-900/40 rounded-lg group">
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-amber-500 text-lg">📂</span>
+                                        <span class="font-mono text-sm font-bold text-violet-400">prompts/</span>
+                                    </div>
+                                    <span class="text-xs text-slate-500">Fichiers d'instruction système des agents</span>
+                                </div>
+                                
+                                <div class="border-l-2 border-slate-850/60 ml-5 pl-6 mt-1 space-y-2">
+                                    <div class="flex items-center justify-between py-1.5 px-3 rounded-lg hover:bg-slate-900/60 transition-colors group">
+                                        <div class="flex items-center gap-2.5">
+                                            <span class="text-violet-400 text-xs">💬</span>
+                                            <span class="font-mono text-xs text-slate-300">coach_prompt.txt</span>
+                                        </div>
+                                        <div class="flex items-center gap-4">
+                                            <span class="px-2 py-0.5 text-[9px] font-bold rounded bg-violet-500/10 text-violet-400 border border-violet-500/20 tracking-wider">PROMPT</span>
+                                            <span class="text-xs text-slate-400 text-right w-64 md:w-80 truncate">Instructions système pour le profil Entraîneur</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between py-1.5 px-3 rounded-lg hover:bg-slate-900/60 transition-colors group">
+                                        <div class="flex items-center gap-2.5">
+                                            <span class="text-violet-400 text-xs">💬</span>
+                                            <span class="font-mono text-xs text-slate-300">analyst_prompt.txt</span>
+                                        </div>
+                                        <div class="flex items-center gap-4">
+                                            <span class="px-2 py-0.5 text-[9px] font-bold rounded bg-violet-500/10 text-violet-400 border border-violet-500/20 tracking-wider">PROMPT</span>
+                                            <span class="text-xs text-slate-400 text-right w-64 md:w-80 truncate">Instructions système pour le profil Analyste Tactique</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between py-1.5 px-3 rounded-lg hover:bg-slate-900/60 transition-colors group">
+                                        <div class="flex items-center gap-2.5">
+                                            <span class="text-violet-400 text-xs">💬</span>
+                                            <span class="font-mono text-xs text-slate-300">fan_prompt.txt</span>
+                                        </div>
+                                        <div class="flex items-center gap-4">
+                                            <span class="px-2 py-0.5 text-[9px] font-bold rounded bg-violet-500/10 text-violet-400 border border-violet-500/20 tracking-wider">PROMPT</span>
+                                            <span class="text-xs text-slate-400 text-right w-64 md:w-80 truncate">Instructions système pour le profil Vulgarisateur/Réseaux</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- TAB 4: ROLES & TEMPLATES -->
+        <div id="tab4" class="tab-content hidden space-y-12">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Roles Table -->
+                <section class="bg-slate-900 border border-slate-850 p-8 rounded-3xl shadow-2xl flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                            <span>💡</span> Rôles des Modules Principaux
+                        </h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm border-collapse">
+                                <thead>
+                                    <tr class="border-b border-slate-800 text-slate-400">
+                                        <th class="py-3 font-semibold">Composant</th>
+                                        <th class="py-3 font-semibold">Mission Principale</th>
+                                        <th class="py-3 font-semibold">Critère de réussite</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800 text-slate-300">
+                                    <tr>
+                                        <td class="py-4 font-semibold text-sky-400">Frontend UI</td>
+                                        <td class="py-4">Affichage des cartes tactiques et contrôle des modes utilisateur.</td>
+                                        <td class="py-4 text-slate-400">Expérience utilisateur fluide.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-4 font-semibold text-emerald-400">Prompt Manager</td>
+                                        <td class="py-4">Chargement dynamique des directives de comportement de l'IA.</td>
+                                        <td class="py-4 text-slate-400">Personnalités IA bien typées.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-4 font-semibold text-amber-500">RAG Engine</td>
+                                        <td class="py-4">Sélection des documents football les plus proches de la requête.</td>
+                                        <td class="py-4 text-slate-400">Pas d'hallucination, sources fiables.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-4 font-semibold text-violet-400">Report Gen</td>
+                                        <td class="py-4">Formatage des synthèses et génération de fichiers PDF.</td>
+                                        <td class="py-4 text-slate-400">Partage social et export propre.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Output Templates -->
+                <section class="bg-slate-900 border border-slate-850 p-8 rounded-3xl shadow-2xl">
+                    <h3 class="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                        <span>✍️</span> Templates de Sortie Obligatoires
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="bg-slate-950 p-5 rounded-2xl border border-slate-850">
+                            <h4 class="text-emerald-400 font-bold text-base mb-2">📋 Format Mode Coach</h4>
+                            <p class="text-xs text-slate-400 leading-relaxed font-mono">
+                                1. Résumé rapide <br>
+                                2. Analyse tactique <br>
+                                3. Conseils terrain pour l'entraînement <br>
+                                4. Exercice recommandé (Mise en situation) <br>
+                                5. Points d’attention (Clés d'échec/réussite)
+                            </p>
+                        </div>
+                        <div class="bg-slate-950 p-5 rounded-2xl border border-slate-850">
+                            <h4 class="text-amber-500 font-bold text-base mb-2">📊 Format Mode Analyste</h4>
+                            <p class="text-xs text-slate-400 leading-relaxed font-mono">
+                                1. Contexte global <br>
+                                2. Principes tactiques de référence <br>
+                                3. Mécanismes clés de l'animation <br>
+                                4. Limites & Contres tactiques <br>
+                                5. Exemples réels d'équipes / joueurs
+                            </p>
+                        </div>
+                        <div class="bg-slate-950 p-5 rounded-2xl border border-slate-850">
+                            <h4 class="text-sky-400 font-bold text-base mb-2">📱 Format Mode Fan & Créateur</h4>
+                            <p class="text-xs text-slate-400 leading-relaxed font-mono">
+                                1. Réponse vulgarisée <br>
+                                2. Exemple grand public de comparaison <br>
+                                3. Pourquoi c'est important <br>
+                                4. <b>Version courte optimisée pour X (Twitter) & scripts TikTok / Instagram</b>
+                            </p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- TAB 5: PRODUCT SPEC (MVP) -->
+        <div id="tab5" class="tab-content hidden space-y-12">
+            <section class="bg-slate-900 border border-slate-850 p-8 rounded-3xl shadow-2xl">
+                <div class="mb-8">
+                    <h3 class="text-2xl font-bold text-white flex items-center gap-3">
+                        <span>📄</span> Définition du Produit (MVP)
+                    </h3>
+                    <p class="text-sm text-slate-400 mt-2">Détails de la vision du MVP (Minimum Viable Product) et exclusion des fonctionnalités futures.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Scope MVP -->
+                    <div class="bg-slate-950 p-6 rounded-2xl border border-slate-850 space-y-4">
+                        <h4 class="text-emerald-400 font-bold text-lg flex items-center gap-2">
+                            <span>✅</span> Inclus dans le MVP (V1)
+                        </h4>
+                        <ul class="space-y-2.5 text-sm text-slate-300">
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-400">✔️</span>
+                                <span><b>Interface de chat épurée :</b> Avec un design fluide et responsive.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-400">✔️</span>
+                                <span><b>Sélecteur à 3 modes :</b> Coach, Analyste, Fan/Créateur.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-400">✔️</span>
+                                <span><b>RAG Football local :</b> Recherche de documents Markdown.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-400">✔️</span>
+                                <span><b>Affichage des sources :</b> Preuves documentaires sous les messages.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-400">✔️</span>
+                                <span><b>Boutons d'action rapide :</b> Exportation PDF et formatage Réseaux.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Scope Future -->
+                    <div class="bg-slate-950 p-6 rounded-2xl border border-slate-850 space-y-4">
+                        <h4 class="text-red-400 font-bold text-lg flex items-center gap-2">
+                            <span>❌</span> Exclus du MVP (Évolutions)
+                        </h4>
+                        <ul class="space-y-2.5 text-sm text-slate-300">
+                            <li class="flex items-start gap-2">
+                                <span class="text-red-400">🚫</span>
+                                <span><b>Analyse de vidéos brutes :</b> Traitement automatique de fichiers de match.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-red-400">🚫</span>
+                                <span><b>Tracking de trajectoires :</b> Détection et suivi des joueurs/ballon.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-red-400">🚫</span>
+                                <span><b>Heatmaps interactives :</b> Cartographie des zones d'action automatiques.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- TAB 6: ROADMAP & VISION (CTO) -->
+        <div id="tab6" class="tab-content hidden space-y-12">
+            <!-- CTO Intro & Critical Alert -->
+            <section class="bg-gradient-to-r from-slate-900 via-red-950/10 to-slate-900 border border-red-500/20 p-10 rounded-3xl shadow-xl space-y-6">
+                <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+                    <div class="space-y-2">
+                        <span class="text-xs font-bold uppercase tracking-widest text-red-400 bg-red-400/10 px-3 py-1 rounded-full border border-red-400/20">Refonte Critique du CTO</span>
+                        <h3 class="text-3xl font-extrabold text-white tracking-tight">📈 Roadmap Optimisée pour l'Exécution (Solo Dev + IA)</h3>
+                        <p class="text-slate-300 max-w-4xl text-sm leading-relaxed">
+                            L'ancienne roadmap souffrait d'un excès de plomberie technique (CRUD, bases de données complexes, authentification prématurée) et d'un risque élevé d'enlisement dans la Computer Vision. Voici la version <b>simplifiée à l'extrême</b>, axée sur la valeur utilisateur immédiate et la rétention hebdomadaire de 100 coachs réels.
+                        </p>
+                    </div>
+                    <div class="bg-slate-950/80 border border-slate-800 p-5 rounded-2xl shrink-0 text-center lg:text-left border-l-4 border-l-red-500">
+                        <div class="text-xs text-slate-400">Objectif Clé</div>
+                        <div class="text-lg font-bold text-white mt-1">100 Coachs Actifs/Semaine</div>
+                        <div class="text-[10px] text-slate-500 mt-1 uppercase tracking-wide">Friction Technique Réduite à Zéro</div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-950 p-6 rounded-2xl border border-slate-850 space-y-4">
+                    <h4 class="text-sm font-bold text-red-400 uppercase tracking-wider flex items-center gap-2">
+                        <span>⚠️</span> Diagnostic CTO : Pourquoi il fallait tout changer
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-slate-400 leading-relaxed">
+                        <div>
+                            <span class="font-bold text-white block mb-1">1. Le piège du CRM joueur</span>
+                            Créer une base de données de joueurs (âge, poste, statistiques) en Phase 2 est une erreur. C'est 80% de plomberie CRUD (SQL/API) sans valeur ajoutée IA. Un coach veut de l'aide sur la tactique et sa séance, pas un énième tableau Excel.
+                        </div>
+                        <div>
+                            <span class="font-bold text-white block mb-1">2. La donnée de match d'abord</span>
+                            Analyser des statistiques (StatsBomb/Wyscout JSON) en Phase 3 est dix fois plus simple et plus rentable que la vidéo. Cela apporte de la crédibilité analytique immédiate à un coût d'infrastructure nul.
+                        </div>
+                        <div>
+                            <span class="font-bold text-white block mb-1">3. La vidéo simplifiée</span>
+                            La Computer Vision temps réel (tracking 2D/3D via YOLO) est un gouffre. Pour un développeur solo, le vrai gain de temps réside dans l'<b>indexation temporelle brute</b> (cliquer sur une statistique de passe -> sauter à la seconde correspondante du match).
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5 Refined Phases Grid -->
+            <section class="space-y-6">
+                <h4 class="text-xl font-bold text-white flex items-center gap-3">
+                    <span>🚀</span> Nouvelle Séquence de Développement
+                </h4>
+                
+                <div class="grid grid-cols-1 xl:grid-cols-5 gap-6">
+                    <!-- Phase 1 -->
+                    <div class="bg-slate-900 border border-slate-850 rounded-2xl p-6 flex flex-col justify-between hover:border-sky-500/30 transition-all duration-300">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-sky-400 bg-sky-400/10 px-2 py-0.5 rounded border border-sky-400/20">PHASE 1</span>
+                                <span class="text-xs text-slate-500">1.5 Mois</span>
+                            </div>
+                            <h5 class="text-base font-bold text-white">Football Assistant MVP</h5>
+                            <p class="text-xs text-slate-400 leading-relaxed">
+                                Chat spécialisé avec prompts système extrêmement typés, RAG local (Markdown) et exports PDF. Zéro inscription pour friction minimale.
+                            </p>
+                            <div class="space-y-1">
+                                <div class="text-[10px] font-bold text-slate-500 uppercase">Focus Tech</div>
+                                <div class="text-xs text-slate-300 font-mono">FastAPI / RAG mémoire / Export PDF</div>
+                            </div>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-slate-850/80 text-center">
+                            <span class="text-xs font-bold text-emerald-400">Difficulté : 2/10</span>
+                        </div>
+                    </div>
+
+                    <!-- Phase 2 -->
+                    <div class="bg-slate-900 border border-slate-850 rounded-2xl p-6 flex flex-col justify-between hover:border-emerald-500/30 transition-all duration-300">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded border border-emerald-400/20">PHASE 2</span>
+                                <span class="text-xs text-slate-500">2 Mois</span>
+                            </div>
+                            <h5 class="text-base font-bold text-white">Playbooks & Ingestion</h5>
+                            <p class="text-xs text-slate-400 leading-relaxed">
+                                Téléversement de documents tactiques personnels (PDF/Images) par le coach pour alimenter le RAG privé. Zéro DB joueur.
+                            </p>
+                            <div class="space-y-1">
+                                <div class="text-[10px] font-bold text-slate-500 uppercase">Focus Tech</div>
+                                <div class="text-xs text-slate-300 font-mono">pgvector / Parseur PDF / GPT-4o Vision</div>
+                            </div>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-slate-850/80 text-center">
+                            <span class="text-xs font-bold text-emerald-400">Difficulté : 3.5/10</span>
+                        </div>
+                    </div>
+
+                    <!-- Phase 3 -->
+                    <div class="bg-slate-900 border border-slate-850 rounded-2xl p-6 flex flex-col justify-between hover:border-amber-500/30 transition-all duration-300">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">PHASE 3</span>
+                                <span class="text-xs text-slate-500">2 Mois</span>
+                            </div>
+                            <h5 class="text-base font-bold text-white">Match Intelligence</h5>
+                            <p class="text-xs text-slate-400 leading-relaxed">
+                                Analyse de données structurées Wyscout/Statsbomb. Rendu de passing networks et shot maps statiques + résumé écrit IA.
+                            </p>
+                            <div class="space-y-1">
+                                <div class="text-[10px] font-bold text-slate-500 uppercase">Focus Tech</div>
+                                <div class="text-xs text-slate-300 font-mono">Python mplsoccer / JSON Parser</div>
+                            </div>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-slate-850/80 text-center">
+                            <span class="text-xs font-bold text-amber-400">Difficulté : 5.5/10</span>
+                        </div>
+                    </div>
+
+                    <!-- Phase 4 -->
+                    <div class="bg-slate-900 border border-slate-850 rounded-2xl p-6 flex flex-col justify-between hover:border-violet-500/30 transition-all duration-300">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-violet-400 bg-violet-400/10 px-2 py-0.5 rounded border border-violet-400/20">PHASE 4</span>
+                                <span class="text-xs text-slate-500">3 Mois</span>
+                            </div>
+                            <h5 class="text-base font-bold text-white">Football Copilot</h5>
+                            <p class="text-xs text-slate-400 leading-relaxed">
+                                Création d'une mémoire d'équipe (historique des séances, des matchs et recommandations tactiques). <b>À faire avant la vidéo.</b>
+                            </p>
+                            <div class="space-y-1">
+                                <div class="text-[10px] font-bold text-slate-500 uppercase">Focus Tech</div>
+                                <div class="text-xs text-slate-300 font-mono">Postgres SQL / RAG historique / Relational DB</div>
+                            </div>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-slate-850/80 text-center">
+                            <span class="text-xs font-bold text-amber-400">Difficulté : 4/10</span>
+                        </div>
+                    </div>
+
+                    <!-- Phase 5 -->
+                    <div class="bg-slate-900 border border-slate-850 rounded-2xl p-6 flex flex-col justify-between hover:border-pink-500/30 transition-all duration-300">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-pink-400 bg-pink-400/10 px-2 py-0.5 rounded border border-pink-400/20">PHASE 5</span>
+                                <span class="text-xs text-slate-500">3.5 Mois</span>
+                            </div>
+                            <h5 class="text-base font-bold text-white">Video Indexing</h5>
+                            <p class="text-xs text-slate-400 leading-relaxed">
+                                Synchronisation temporelle brute : un clic sur une passe du chat saute au timestamp de la vidéo. Clipping auto avec FFmpeg.
+                            </p>
+                            <div class="space-y-1">
+                                <div class="text-[10px] font-bold text-slate-500 uppercase">Focus Tech</div>
+                                <div class="text-xs text-slate-300 font-mono">video.js / FFmpeg / Timestamp mapping</div>
+                            </div>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-slate-850/80 text-center">
+                            <span class="text-xs font-bold text-red-400">Difficulté : 7.5/10</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Detailed Phase Specs (Optimized) -->
+            <section class="bg-slate-900 border border-slate-850 p-8 rounded-3xl space-y-6">
+                <h4 class="text-xl font-bold text-white">📋 Spécifications Détaillées des Phases</h4>
+                
+                <div class="space-y-4">
+                    <!-- Phase 1 detail -->
+                    <div class="bg-slate-950 p-5 rounded-2xl border border-slate-850">
+                        <div class="flex items-center justify-between border-b border-slate-850 pb-2 mb-3">
+                            <h5 class="text-base font-bold text-sky-400">Phase 1 : Football Assistant MVP</h5>
+                            <span class="text-xs text-slate-400">But : Être meilleur que ChatGPT en football</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-slate-300 leading-relaxed">
+                            <div>
+                                <span class="font-bold text-white block mb-1">🛠️ À construire :</span>
+                                Chat responsive épuré sans inscription. 3 prompts système complexes (Coach, Analyste, Fan). RAG local lisant des fichiers Markdown tactiques. Bouton d'exportation PDF formaté pour le terrain.
+                            </div>
+                            <div>
+                                <span class="font-bold text-red-400 block mb-1">🚫 À éviter absolument :</span>
+                                Base de données relationnelle, système d'authentification utilisateur, bases vectorielles payantes en ligne, gestion de profils joueurs.
+                            </div>
+                            <div>
+                                <span class="font-bold text-brand-500 block mb-1">📈 Validation :</span>
+                                Un coach amateur génère une séance d'entraînement tactique en 3 clics, l'imprime en PDF, et la valide pour son entraînement du soir.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phase 2 detail -->
+                    <div class="bg-slate-950 p-5 rounded-2xl border border-slate-850">
+                        <div class="flex items-center justify-between border-b border-slate-850 pb-2 mb-3">
+                            <h5 class="text-base font-bold text-emerald-400">Phase 2 : Playbooks Tactiques & Ingestion</h5>
+                            <span class="text-xs text-slate-400">But : L'IA adopte la philosophie du coach</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-slate-300 leading-relaxed">
+                            <div>
+                                <span class="font-bold text-white block mb-1">🛠️ À construire :</span>
+                                Téléverseur de PDF tactiques et notes personnelles. Utilisation des capacités de vision du LLM pour parser les images de schémas tactiques. pgvector pour stocker le playbook privé.
+                            </div>
+                            <div>
+                                <span class="font-bold text-red-400 block mb-1">🚫 À éviter absolument :</span>
+                                Gestion d'effectif joueurs (nom, prénom, blessures). Le coach peut simplement mentionner ses contraintes d'effectif dans le prompt si besoin.
+                            </div>
+                            <div>
+                                <span class="font-bold text-brand-500 block mb-1">📈 Validation :</span>
+                                Le coach uploade son document tactique privé. L'IA conçoit une séance d'entraînement en réutilisant exactement ses principes et son jargon.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phase 3 detail -->
+                    <div class="bg-slate-950 p-5 rounded-2xl border border-slate-850">
+                        <div class="flex items-center justify-between border-b border-slate-850 pb-2 mb-3">
+                            <h5 class="text-base font-bold text-amber-400">Phase 3 : Match Intelligence</h5>
+                            <span class="text-xs text-slate-400">But : Traduire la donnée brute en insights exploitables</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-slate-300 leading-relaxed">
+                            <div>
+                                <span class="font-bold text-white block mb-1">🛠️ À construire :</span>
+                                Parseur JSON Statsbomb/Wyscout. Scripts python `mplsoccer` générant des shot maps et passing networks statiques. Analyse écrite automatique (forces, faiblesses, reco d'entraînements).
+                            </div>
+                            <div>
+                                <span class="font-bold text-red-400 block mb-1">🚫 À éviter absolument :</span>
+                                Éditeur de schémas interactif ou collecte manuelle de données. On utilise exclusivement des imports de fichiers générés par des plateformes tierces.
+                            </div>
+                            <div>
+                                <span class="font-bold text-brand-500 block mb-1">📈 Validation :</span>
+                                Importation d'un JSON de match -> Rendu immédiat d'un rapport écrit pertinent et de 2 visuels terrains SVG corrects.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phase 4 detail -->
+                    <div class="bg-slate-950 p-5 rounded-2xl border border-slate-850">
+                        <div class="flex items-center justify-between border-b border-slate-850 pb-2 mb-3">
+                            <h5 class="text-base font-bold text-violet-400">Phase 4 : Football Copilot (Mémoire d'Équipe)</h5>
+                            <span class="text-xs text-slate-400">But : Verrouiller la boucle de rétention hebdomadaire</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-slate-300 leading-relaxed">
+                            <div>
+                                <span class="font-bold text-white block mb-1">🛠️ À construire :</span>
+                                Table SQL de suivi d'équipe (matchs joués, débriefings, séances faites). L'IA se souvient des semaines passées et génère des recommandations en fonction des faiblesses persistantes.
+                            </div>
+                            <div>
+                                <span class="font-bold text-red-400 block mb-1">🚫 À éviter absolument :</span>
+                                Commencer la vidéo. On stabilise la valeur sémantique et la persistance relationnelle d'abord.
+                            </div>
+                            <div>
+                                <span class="font-bold text-brand-500 block mb-1">📈 Validation :</span>
+                                L'IA génère un plan de séance du mardi en ciblant précisément une lacune identifiée dans le débriefing du match du dimanche précédent.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phase 5 detail -->
+                    <div class="bg-slate-950 p-5 rounded-2xl border border-slate-850">
+                        <div class="flex items-center justify-between border-b border-slate-850 pb-2 mb-3">
+                            <h5 class="text-base font-bold text-pink-400">Phase 5 : Video Intelligence (Synchro & Clips)</h5>
+                            <span class="text-xs text-slate-400">But : Supprimer le temps de montage vidéo du coach</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-slate-300 leading-relaxed">
+                            <div>
+                                <span class="font-bold text-white block mb-1">🛠️ À construire :</span>
+                                Lecteur HTML5 indexé (video.js) lié aux événements statistiques. Découpe automatique de clips ( corners, tirs) via script FFmpeg backend.
+                            </div>
+                            <div>
+                                <span class="font-bold text-red-400 block mb-1">🚫 À éviter absolument :</span>
+                                Tracking continu complexe en 3D temps réel des joueurs ou détection automatique de ballon. Inutile et trop lourd pour un dev solo.
+                            </div>
+                            <div>
+                                <span class="font-bold text-brand-500 block mb-1">📈 Validation :</span>
+                                Le coach uploade la vidéo de match -> clique sur "corners" -> télécharge un MP4 de 10 secondes de l'action sélectionnée.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 12-Month Timeline -->
+            <section class="bg-slate-900 border border-slate-850 p-8 rounded-3xl space-y-6">
+                <h4 class="text-xl font-bold text-white flex items-center gap-3">
+                    <span>🗓️</span> Planification Temporelle 12 Mois (Solo Dev + IA)
+                </h4>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-slate-400 font-semibold">
+                                <th class="py-3 px-2">Phase</th>
+                                <th class="py-3 px-2">Valeur Utilisateur</th>
+                                <th class="py-3 px-2 text-center">Difficulté</th>
+                                <th class="py-3 px-2 text-center">Temps Estimé</th>
+                                <th class="py-3 px-2 text-center">Risque d'Échec</th>
+                                <th class="py-3 px-2 text-center">Potentiel Business</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-850 text-slate-300">
+                            <tr>
+                                <td class="py-4 px-2 font-bold text-white">Phase 1 : Assistant MVP</td>
+                                <td class="py-4 px-2 text-sky-400 font-medium">Moyenne (Idéation)</td>
+                                <td class="py-4 px-2 text-center">2/10 (Très Faible)</td>
+                                <td class="py-4 px-2 text-center font-bold text-sky-400">1.5 Mois</td>
+                                <td class="py-4 px-2 text-center text-emerald-400">Très Faible (15%)</td>
+                                <td class="py-4 px-2 text-center text-slate-400">Faible (Facilement imitable)</td>
+                            </tr>
+                            <tr>
+                                <td class="py-4 px-2 font-bold text-white">Phase 2 : Playbooks & Ingestion</td>
+                                <td class="py-4 px-2 text-emerald-400 font-medium">Élevée (Intelligence privée)</td>
+                                <td class="py-4 px-2 text-center">3.5/10 (Faible)</td>
+                                <td class="py-4 px-2 text-center font-bold text-emerald-400">2 Mois</td>
+                                <td class="py-4 px-2 text-center text-emerald-400">Faible (20%)</td>
+                                <td class="py-4 px-2 text-center text-emerald-400">Moyen (Abonnements solo)</td>
+                            </tr>
+                            <tr>
+                                <td class="py-4 px-2 font-bold text-white">Phase 3 : Match Intelligence</td>
+                                <td class="py-4 px-2 text-amber-400 font-medium">Très Élevée (Visualisation & Data)</td>
+                                <td class="py-4 px-2 text-center">5.5/10 (Moyenne)</td>
+                                <td class="py-4 px-2 text-center font-bold text-amber-400">2 Mois</td>
+                                <td class="py-4 px-2 text-center text-amber-400">Moyen (35%)</td>
+                                <td class="py-4 px-2 text-center text-emerald-400">Élevé (Staffs techniques)</td>
+                            </tr>
+                            <tr>
+                                <td class="py-4 px-2 font-bold text-white">Phase 4 : Football Copilot</td>
+                                <td class="py-4 px-2 text-violet-400 font-medium">Critique (Boucle de rétention)</td>
+                                <td class="py-4 px-2 text-center">4/10 (Faible)</td>
+                                <td class="py-4 px-2 text-center font-bold text-violet-400">3 Mois</td>
+                                <td class="py-4 px-2 text-center text-emerald-400">Faible (15%)</td>
+                                <td class="py-4 px-2 text-center text-violet-400">Très Élevé (Rétention hebdo)</td>
+                            </tr>
+                            <tr>
+                                <td class="py-4 px-2 font-bold text-white">Phase 5 : Video Indexing & Synchro</td>
+                                <td class="py-4 px-2 text-pink-400 font-medium">Maximale (Montage & Analyse)</td>
+                                <td class="py-4 px-2 text-center">7.5/10 (Élevée)</td>
+                                <td class="py-4 px-2 text-center font-bold text-pink-400">3.5 Mois</td>
+                                <td class="py-4 px-2 text-center text-red-400">Élevé (50%)</td>
+                                <td class="py-4 px-2 text-center text-pink-400">Énorme (Clubs professionnels)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Séquence d'exécution pour 100 coachs actifs hebdomadaires -->
+            <section class="bg-gradient-to-r from-emerald-950/20 via-slate-900 to-emerald-950/20 border border-slate-800 p-8 rounded-3xl space-y-6">
+                <div class="flex items-center gap-3 border-b border-slate-800 pb-4">
+                    <span class="text-3xl">💡</span>
+                    <div>
+                        <h4 class="text-xl font-bold text-white">Séquence d'Exécution CTO pour atteindre 100 Coachs Actifs/Semaine</h4>
+                        <p class="text-xs text-slate-400 mt-0.5">Le plan de bataille pragmatique au jour le jour pour un lancement réussi.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm text-slate-300 leading-relaxed">
+                    <!-- Warning / Danger -->
+                    <div class="space-y-4 bg-slate-950/60 p-6 rounded-2xl border border-slate-850">
+                        <h5 class="text-red-400 font-bold flex items-center gap-2">
+                            <span>⚠️</span> Les 3 Règles d'Or pour Éviter l'Échec
+                        </h5>
+                        <ul class="space-y-3 text-xs text-slate-400">
+                            <li class="flex items-start gap-2">
+                                <span class="text-red-500 font-bold">1.</span>
+                                <span><b>Zéro authentification au départ :</b> Ne demandez pas de login aux 50 premiers bêta-testeurs. Chaque étape d'inscription divise le taux de conversion par deux. Laissez-les essayer librement.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-red-500 font-bold">2.</span>
+                                <span><b>Investir sur la sémantique tactique :</b> La valeur du RAG dépend à 100% de la qualité des fiches Markdown initiales. L'étudiant doit peaufiner la théorie tactique avant d'essayer de coder.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-red-500 font-bold">3.</span>
+                                <span><b>Pas de tracking vidéo lourd :</b> Oubliez ByteTrack ou DeepSORT. La synchro brute événements-timeline résout 90% du problème de gain de temps et s'implémente en quelques jours sans coût GPU.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Step-by-step sequencing -->
+                    <div class="space-y-4 bg-slate-950/60 p-6 rounded-2xl border border-slate-850">
+                        <h5 class="text-brand-500 font-bold flex items-center gap-2">
+                            <span>🛠️</span> Déroulement de la Séquence d'Exécution
+                        </h5>
+                        <div class="space-y-4 text-xs">
+                            <div class="border-l-2 border-brand-500 pl-4 py-1">
+                                <span class="font-bold text-white block mb-0.5">Jours 1-15 : Rédaction Tactique & Prompts</span>
+                                Rédaction de 20 fiches tactiques d'excellence. Test des prompts système sur Claude/ChatGPT. Validation du ton "coach professionnel" auprès de contacts.
+                            </div>
+                            <div class="border-l-2 border-brand-500 pl-4 py-1">
+                                <span class="font-bold text-white block mb-0.5">Jours 16-35 : MVP sans inscription en ligne</span>
+                                Développement du chat avec RAG local en mémoire. Déploiement sur Railway (5$/mois). Acquisition de 30-50 coachs bêta-testeurs via Twitter/X ou clubs locaux.
+                            </div>
+                            <div class="border-l-2 border-brand-500 pl-4 py-1">
+                                <span class="font-bold text-white block mb-0.5">Jours 36-60 : Ingestion Playbook privé</span>
+                                Ajout du téléverseur de PDF. L'IA utilise les concepts propres du club pour créer des séances sur-mesure. C'est l'activation utilisateur ("Aha Moment").
+                            </div>
+                            <div class="border-l-2 border-brand-500 pl-4 py-1">
+                                <span class="font-bold text-white block mb-0.5">Jours 61-90 : Analyse de match statistique</span>
+                                Parsing des JSON d'événements Wyscout/Statsbomb. Rendu SVG de passing networks et génération de débriefings écrits.
+                            </div>
+                            <div class="border-l-2 border-brand-500 pl-4 py-1">
+                                <span class="font-bold text-white block mb-0.5">Jours 91-120 : Mémoire d'équipe SQL & Rétention</span>
+                                Base SQL relationnelle. L'IA fait le lien chronologique entre les débriefings de match et la génération de séances hebdomadaires adaptées.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+
+    </main>
+
+    <footer class="border-t border-slate-900 bg-slate-950 py-10 text-center text-xs text-slate-500">
+        <p>© 2026 Football IQ Assistant. Tous droits réservés.</p>
+    </footer>
+
+    <!-- Tab Logic Script -->
+    <script>
+        function showTab(tabId) {
+            // Hide all tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            // Show selected tab content
+            document.getElementById(tabId).classList.remove('hidden');
+
+            // Reset all tab button styles
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-brand-600', 'text-white', 'border-brand-600');
+                btn.classList.add('bg-slate-950/40', 'text-slate-400', 'border-slate-800');
+            });
+
+            // Apply active styles to clicked tab button
+            const activeBtn = document.getElementById(tabId + '-btn');
+            activeBtn.classList.remove('bg-slate-950/40', 'text-slate-400', 'border-slate-800');
+            activeBtn.classList.add('bg-brand-600', 'text-white', 'border-brand-600');
+        }
+    </script>
+</body>
+</html>

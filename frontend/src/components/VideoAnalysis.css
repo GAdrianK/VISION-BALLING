@@ -1,0 +1,28 @@
+.video-section { position: relative; z-index: 2; }
+.video-analysis-grid { display: grid; grid-template-columns: minmax(280px,.85fr) minmax(360px,1.4fr); gap: 18px; }
+.video-upload-card,.video-result-card { min-height: 420px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; }
+.video-eyebrow,.video-status-row span { color: var(--lime); font-family: var(--font-geist-mono); font-size: 9px; letter-spacing: .12em; }
+.video-upload-card h3 { margin: 16px 0 10px; font-size: 25px; }
+.video-upload-card>p { color: var(--muted); line-height: 1.6; }
+.video-file-drop { display: grid; place-items: center; min-height: 140px; margin: 24px 0 14px; border: 1px dashed var(--line-bright); border-radius: 14px; background: rgba(255,255,255,.025); cursor: pointer; }
+.video-file-drop input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.video-file-drop span { color: var(--muted); font-size: 12px; }
+.video-submit { width: 100%; min-height: 50px; border-radius: 11px; background: var(--lime); color: #080b07; font-weight: 700; }
+.video-submit:disabled { opacity: .4; cursor: not-allowed; }
+.video-result-card { display: flex; flex-direction: column; gap: 18px; }
+.video-empty { display: grid; flex: 1; place-items: center; color: var(--muted); }
+.video-status-row,.video-summary { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+.video-status-row>div,.video-summary>div { display: grid; gap: 5px; }
+.video-status-row strong { font-size: 12px; }
+.video-progress { height: 4px; overflow: hidden; border-radius: 10px; background: rgba(255,255,255,.08); }
+.video-progress i { display: block; height: 100%; background: linear-gradient(90deg,var(--cyan),var(--lime)); transition: width .35s ease; }
+.annotated-video { width: 100%; max-height: 360px; border-radius: 12px; background: #000; }
+.video-summary { grid-template-columns: repeat(4,1fr); }
+.video-summary strong { color: var(--lime); font-size: 20px; }
+.video-summary span,.video-warning,.video-error { color: var(--muted); font-size: 11px; }
+.video-warning { margin: 0; }
+.video-error { margin-top: 12px; color: #ff8b7f; }
+@media (max-width:900px) {
+  .video-analysis-grid { grid-template-columns: 1fr; }
+  .video-status-row,.video-summary { grid-template-columns: repeat(2,1fr); }
+}

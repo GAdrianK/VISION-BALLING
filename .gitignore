@@ -1,0 +1,70 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Virtual environments
+backend/venv/
+backend/.venv/
+venv/
+ENV/
+
+# Configuration & Secrets
+backend/.env
+*.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# =====================
+# Generated Databases & Storage
+# =====================
+*.db
+*.sqlite
+*.sqlite3
+backend/data/qdrant_local/
+backend/data/html_matches/
+backend/data/raw/
+backend/data/raw_json/
+backend/data/soccerdata/
+backend/data/flashrank_cache/
+backend/data/processed/
+backend/data/video_uploads/
+backend/data/video_results/
+backend/data/parent_store.db
+backend/evaluation/benchmark_results.json
+
+# Logs
+*.log
+backend/uvicorn.log
+backend/scratch/
+
+# =====================
+# Frontend / Node
+# =====================
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+football-intelligence-ui/node_modules/
+football-intelligence-ui/dist/
+football-intelligence-ui/.vinext/
+frontend-vanilla/
+
+# Prototypes et archives locales hors application principale
+/football-intelligence-ui/
+/synapseX/
+
+# Vidéos et poids de modèles locaux
+*.mp4
+*.mov
+*.mkv
+*.avi
+*.webm
+*.pt
+*.onnx
+
+# Misc
+*.egg-info/
+dist-info/

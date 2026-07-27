@@ -1,0 +1,123 @@
+# 📋 Cahier des Charges & Définition Produit — Football IQ Assistant
+
+Ce document sert de feuille de route pour la conception de l'application **Football IQ Assistant**. L'objectif est de structurer les fonctionnalités clés, les modes utilisateurs, les formats de réponse, et de délimiter le périmètre du MVP (Minimum Viable Product).
+
+---
+
+## 🎯 1. Concept Global & Objectif
+
+> **But Final :** Fournir un outil complet d'analyse et de préparation de match pour les coachs, analystes, et fans/créateurs de contenu.
+
+Le principe d'interaction est simple : **poser une question football et obtenir une réponse tactique claire, structurée et exploitable sur le terrain ou sur les réseaux.**
+
+### 💡 Exemples de requêtes :
+* 🛡️ **Tactique bloc bas :** *"Comment battre une équipe en 4-4-2 bloc bas ?"*
+* 🏃 **Entraînement :** *"Crée une séance pour travailler la sortie de balle."*
+* 📐 **Rôle tactique :** *"Explique le rôle du numéro 6 dans un 3-2-5."*
+* 📊 **Analyse comparative :** *"Compare Rodri et Busquets dans la première relance."*
+* ⚔️ **Plan de match :** *"Prépare un plan de match contre une équipe qui presse haut."*
+
+---
+
+## ⚙️ 2. Les 3 Modes Utilisateurs
+
+L'application adapte ses fonctionnalités et ses réponses selon le profil sélectionné :
+
+### 📋 Mode Coach
+* **Objectif :** Produire des contenus directement exploitables sur le terrain.
+* **Fonctions clés :**
+  - ⏱️ Création de séances d'entraînement adaptées.
+  - 📝 Préparation tactique de match.
+  - 🔍 Analyse et résolution de problèmes tactiques en cours de saison.
+  - 🗣️ Formulation de consignes simples pour les joueurs.
+  - 📊 Génération de rapports orientés entraîneur.
+
+### 📊 Mode Analyste
+* **Objectif :** Fournir une analyse tactique et statistique approfondie.
+* **Fonctions clés :**
+  - 🧠 Analyse tactique globale et macro.
+  - ⚖️ Comparaison statistique et comportementale des joueurs.
+  - 📐 Analyse de systèmes de jeu (ex. 3-2-5, 4-3-3).
+  - 🕵️ Scouting de joueurs et d'équipes adverses.
+  - 📖 Explication de concepts tactiques avancés.
+
+### 📱 Mode Fan & Créateur de Contenu
+* **Objectif :** Vulgarisation, débats et **création de contenu engageant pour les réseaux sociaux**.
+* **Fonctions clés :**
+  - 💡 Vulgarisation simple et accessible des concepts complexes.
+  - 🧵 **Génération automatique de threads (X/Twitter).**
+  - 🎬 **Création de scripts et d'idées de posts pour TikTok / Instagram.**
+  - 🥊 Comparaison de joueurs pour alimenter ou trancher des débats football.
+  - 💬 Réponses rapides aux débats populaires (ex. "Qui est le meilleur dans tel rôle ?").
+
+---
+
+## ✍️ 3. Formats de Réponses Obligatoires
+
+L'IA ne doit **jamais** répondre sous forme de texte brut désorganisé. Chaque mode dispose d'un template de sortie strict et structuré.
+
+| Mode | Structure de la Réponse |
+| :--- | :--- |
+| **📋 Coach** | 1. Résumé rapide <br> 2. Analyse <br> 3. Conseils terrain <br> 4. Exercice recommandé <br> 5. Points d'attention |
+| **📊 Analyste** | 1. Contexte de l'analyse <br> 2. Principes tactiques <br> 3. Mécanismes clés <br> 4. Limites de l'approche <br> 5. Exemples concrets |
+| **📱 Fan / Créateur** | 1. Réponse simple & vulgarisée <br> 2. Exemple connu du grand public <br> 3. Pourquoi c'est important <br> 4. **Version courte formatée pour les réseaux sociaux (X, Instagram)** |
+
+---
+
+## 🚀 4. Périmètre du MVP (Minimum Viable Product)
+
+Pour la première version, nous nous concentrons sur le cœur de l'expérience utilisateur afin d'obtenir un rendu propre et percutant rapidement.
+
+### ✅ Inclus dans le MVP (V1) :
+1. **Interface propre & moderne** (Dark mode, design fluide).
+2. **Sélecteur de mode** (Coach, Analyste, Fan/Créateur) réactif.
+3. **RAG Football** (Base documentaire tactique).
+4. **Réponses structurées** (via les formats définis ci-dessus).
+5. **Sources visibles** sous chaque réponse.
+6. **Boutons d'action** (Générer post, Exporter PDF, Simplifier, Approfondir).
+7. **Export de rapport** au format PDF.
+
+### ❌ Exclus du MVP (Évolutions Futures) :
+- 📹 Analyse automatique de vidéos (upload de matchs).
+- 🏃 Tracking de joueurs et détection automatique du ballon.
+- 🗺️ Génération automatique de heatmaps.
+- 🧠 Entraînement d'un modèle LLM propriétaire depuis zéro.
+
+---
+
+## 📂 5. Fiche Produit Officielle (`docs/product_definition.md`)
+
+*Voici le contenu du fichier de définition produit à intégrer dans le dossier `docs/` de l'application :*
+
+```markdown
+# Football IQ Assistant
+
+## 👁️ Vision
+Créer une interface IA spécialisée football pour assister les coachs dans leurs séances, les analystes dans leurs rapports, et aider les passionnés et créateurs de contenu à décrypter le jeu et animer leurs réseaux.
+
+## ⚠️ Problème
+Les coachs amateurs, les passionnés et les créateurs de contenu n'ont pas accès facilement à une analyse football claire, exploitable, structurée et contextualisée sans y passer des heures.
+
+## 💡 Solution
+Une application RAG football complète avec plusieurs modes adaptés (Coach, Analyste, Fan) et des outils de génération de contenu en un clic.
+
+## 🎯 Cibles
+- **Cible principale :** Le coach amateur / semi-professionnel souhaitant professionnaliser ses entraînements et ses causeries.
+- **Cible secondaire :** Les passionnés de tactique et les **créateurs de contenu football** sur les réseaux sociaux (X/Twitter, TikTok, Instagram, YouTube).
+
+## 🛠️ Fonctionnalités V1
+- Chat football spécialisé.
+- 3 modes de réponse adaptés (Coach, Analyste, Fan/Créateur).
+- Réponses structurées avec sources documentaires visibles.
+- Génération automatique de rapports d'analyse.
+- Création de fiches de séances d'entraînement.
+- Comparaison tactique de joueurs et de systèmes.
+- Outils de conversion rapide en posts pour les réseaux sociaux.
+
+## 🔮 Fonctionnalités Futures
+- Module d'analyse vidéo (Upload de match/séquence).
+- Détection automatique d'événements de match.
+- Découpage automatique de clips vidéo tactiques.
+- Génération automatisée de heatmaps et de statistiques visuelles.
+```
+ 
