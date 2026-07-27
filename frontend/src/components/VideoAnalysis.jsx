@@ -66,8 +66,8 @@ export default function VideoAnalysis() {
     }
   };
 
-  const personCount = result?.detections?.filter((item) => item.class_name === "person").length || 0;
-  const ballCount = result?.detections?.filter((item) => item.football_role === "ball").length || 0;
+  const personCount = result?.class_summary?.person_detections ?? 0;
+  const ballCount = result?.class_summary?.ball_detections ?? 0;
   const artifactUrl = result?.artifacts?.annotated_video
     ? `${API_BASE}${result.artifacts.annotated_video}`
     : null;
@@ -75,9 +75,9 @@ export default function VideoAnalysis() {
   return (
     <div className="video-analysis-grid">
       <form className="video-upload-card glass-panel" onSubmit={submit}>
-        <span className="video-eyebrow">PIPELINE V0.1 • BASELINE CPU</span>
+        <span className="video-eyebrow">PIPELINE V0.2 • FOOTBALL BASELINE</span>
         <h3>Détection vidéo expérimentale</h3>
-        <p>Importez un court extrait. La baseline détecte les personnes et n’invente aucune position de ballon.</p>
+        <p>Importez un court extrait. Le détecteur configuré analyse les personnes et le ballon sans interpolation.</p>
         <label className="video-file-drop">
           <input
             type="file"
@@ -117,6 +117,12 @@ export default function VideoAnalysis() {
               <div><strong>{personCount}</strong><span>personnes détectées</span></div>
               <div><strong>{ballCount}</strong><span>ballons détectés</span></div>
               <div><strong>{result.processing_duration_seconds}s</strong><span>traitement</span></div>
+              <div><strong>{result.tracking_summary?.unique_person_tracks || 0}</strong><span>tracks personnes</span></div>
+              <div><strong>{result.average_processing_fps || 0}</strong><span>FPS traitement</span></div>
+              <div><strong>{result.pipeline?.detector_name || result.pipeline?.detector}</strong><span>détecteur</span></div>
+              <div><strong>{result.pipeline?.tracker_name || "none"}</strong><span>tracker</span></div>
+              <div><strong>{result.pipeline?.device || "unknown"}</strong><span>device</span></div>
+              <div><strong>{result.pipeline?.video_backend || "opencv"}</strong><span>backend vidéo</span></div>
             </div>
             {result.warnings?.map((warning) => (
               <p className="video-warning" key={warning}>⚠ {warning}</p>

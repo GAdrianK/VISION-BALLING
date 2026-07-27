@@ -1,9 +1,11 @@
 import os
 from pathlib import Path
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Chemin vers la racine du dossier backend
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
 
 class Settings(BaseSettings):
     OPENAI_API_KEY: str = "mock-local-only"
@@ -24,6 +26,7 @@ class Settings(BaseSettings):
     @property
     def openrouter_key(self) -> str:
         return self.OPENROUTER_API_KEY.strip()
+
     ALLOWED_ORIGINS: str = "*"
 
     RAW_DATA_DIR: str = ""
@@ -40,10 +43,23 @@ class Settings(BaseSettings):
     VIDEO_MIN_HEIGHT: int = 240
     VIDEO_MIN_FREE_DISK_MB: int = 256
     VIDEO_FRAME_INTERVAL: int = 10
+    VIDEO_FRAME_SAMPLE_RATE: int = 0
+    VIDEO_DETECTOR: str = "hog"
+    VIDEO_MODEL_PATH: str = "yolo11n.pt"
     VIDEO_CONFIDENCE_THRESHOLD: float = 0.45
+    VIDEO_PERSON_CONFIDENCE_THRESHOLD: float = 0.45
+    VIDEO_BALL_CONFIDENCE_THRESHOLD: float = 0.25
     VIDEO_MODEL: str = "opencv-hog"
     VIDEO_DEVICE: str = "cpu"
+    VIDEO_TRACKING_ENABLED: bool = True
+    VIDEO_TRACKER: str = "iou"
+    VIDEO_PRESERVE_AUDIO: bool = True
+    VIDEO_MAX_PROCESSING_SECONDS: float = 0
     VIDEO_KEEP_TEMPORARY_FILES: bool = False
+
+    @property
+    def video_frame_sample_rate(self) -> int:
+        return self.VIDEO_FRAME_SAMPLE_RATE or self.VIDEO_FRAME_INTERVAL
 
     def get_kb_dir(self) -> str:
         if self.KNOWLEDGE_BASE_DIR:
@@ -83,7 +99,8 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=os.path.join(BASE_DIR, ".env"),
         env_file_encoding="utf-8",
-        extra="ignore"
+        extra="ignore",
     )
+
 
 settings = Settings()

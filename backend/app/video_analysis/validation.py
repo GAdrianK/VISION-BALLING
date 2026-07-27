@@ -24,7 +24,9 @@ class VideoValidator:
         min_height: int,
         minimum_free_bytes: int,
     ) -> None:
-        self.allowed_extensions = {ext.lower().lstrip(".") for ext in allowed_extensions}
+        self.allowed_extensions = {
+            ext.lower().lstrip(".") for ext in allowed_extensions
+        }
         self.max_size_bytes = max_size_bytes
         self.max_duration_seconds = max_duration_seconds
         self.min_width = min_width
@@ -41,10 +43,14 @@ class VideoValidator:
         if not path.is_file() or path.stat().st_size == 0:
             raise VideoValidationError("Le fichier vidéo est vide ou introuvable.")
         if path.stat().st_size > self.max_size_bytes:
-            raise VideoValidationError("La vidéo dépasse la taille maximale configurée.")
+            raise VideoValidationError(
+                "La vidéo dépasse la taille maximale configurée."
+            )
         free_bytes = shutil.disk_usage(path.parent).free
         if free_bytes < self.minimum_free_bytes:
-            raise VideoValidationError("Espace disque insuffisant pour traiter la vidéo.")
+            raise VideoValidationError(
+                "Espace disque insuffisant pour traiter la vidéo."
+            )
 
         metadata = self._probe(path, original_filename)
         if metadata.duration_seconds > self.max_duration_seconds:
@@ -63,7 +69,13 @@ class VideoValidator:
         if shutil.which("ffprobe"):
             try:
                 return self._probe_ffmpeg(path, filename)
-            except (OSError, subprocess.SubprocessError, ValueError, KeyError, json.JSONDecodeError):
+            except (
+                OSError,
+                subprocess.SubprocessError,
+                ValueError,
+                KeyError,
+                json.JSONDecodeError,
+            ):
                 pass
         return self._probe_opencv(path, filename)
 
@@ -71,10 +83,16 @@ class VideoValidator:
     def _probe_ffmpeg(path: Path, filename: str) -> VideoMetadata:
         completed = subprocess.run(
             [
-                "ffprobe", "-v", "error", "-select_streams", "v:0",
+                "ffprobe",
+                "-v",
+                "error",
+                "-select_streams",
+                "v:0",
                 "-show_entries",
                 "stream=codec_name,width,height,avg_frame_rate,nb_frames:format=duration,format_name",
-                "-of", "json", str(path),
+                "-of",
+                "json",
+                str(path),
             ],
             check=True,
             capture_output=True,
@@ -106,14 +124,18 @@ class VideoValidator:
         capture = cv2.VideoCapture(str(path))
         try:
             if not capture.isOpened():
-                raise VideoValidationError("La vidéo est illisible ou ne contient aucun flux vidéo.")
+                raise VideoValidationError(
+                    "La vidéo est illisible ou ne contient aucun flux vidéo."
+                )
             fps = float(capture.get(cv2.CAP_PROP_FPS))
             width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))
             height = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
             frame_count = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))
             ok, _ = capture.read()
             if not ok or fps <= 0 or width <= 0 or height <= 0 or frame_count <= 0:
-                raise VideoValidationError("Métadonnées vidéo invalides ou première frame illisible.")
+                raise VideoValidationError(
+                    "Métadonnées vidéo invalides ou première frame illisible."
+                )
             return VideoMetadata(
                 filename=filename,
                 duration_seconds=frame_count / fps,
@@ -125,4 +147,3 @@ class VideoValidator:
             )
         finally:
             capture.release()
-

@@ -6,9 +6,8 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-
-SCHEMA_VERSION = "1.0.0"
-PIPELINE_VERSION = "0.1.0"
+SCHEMA_VERSION = "1.1.0"
+PIPELINE_VERSION = "0.2.0"
 
 
 class JobStatus(str, Enum):
@@ -30,11 +29,20 @@ class Detection(BaseModel):
     frame_index: int = Field(ge=0)
     timestamp_seconds: float = Field(ge=0)
     class_name: str
-    football_role: Literal["unknown_player", "ball", "referee", "unknown"] = "unknown"
+    football_role: Literal[
+        "unknown_player",
+        "player_candidate",
+        "ball",
+        "ball_candidate",
+        "referee",
+        "unknown",
+    ] = "unknown"
     confidence: float = Field(ge=0, le=1)
     bbox: BoundingBox
     track_id: int | None = None
+    tracker_name: str | None = None
     model_id: str
+    center: dict[str, float] | None = None
 
 
 class VideoMetadata(BaseModel):
@@ -54,6 +62,14 @@ class PipelineMetadata(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     frame_interval: int = Field(ge=1)
     device: str
+    detector_name: str | None = None
+    detector_version: str | None = None
+    tracker_name: str = "none"
+    tracker_version: str | None = None
+    tracking_enabled: bool = False
+    ffmpeg_version: str | None = None
+    video_backend: str = "opencv"
+    frame_sample_rate: int | None = None
 
 
 class ArtifactSet(BaseModel):
@@ -74,6 +90,9 @@ class AnalysisResult(BaseModel):
     warnings: list[str] = Field(default_factory=list)
     frames_analyzed: int = 0
     processing_duration_seconds: float = 0
+    average_processing_fps: float = 0
+    class_summary: dict[str, int | float] = Field(default_factory=dict)
+    tracking_summary: dict[str, int | float] = Field(default_factory=dict)
 
 
 class JobError(BaseModel):
@@ -113,4 +132,3 @@ class ArtifactInfo(BaseModel):
 class ArtifactList(BaseModel):
     analysis_id: str
     artifacts: list[ArtifactInfo]
-

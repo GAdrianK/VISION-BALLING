@@ -15,7 +15,11 @@ class ResultStorage:
         self._lock = threading.RLock()
 
     def analysis_dir(self, analysis_id: str) -> Path:
-        if not analysis_id.startswith("analysis_") or "/" in analysis_id or ".." in analysis_id:
+        if (
+            not analysis_id.startswith("analysis_")
+            or "/" in analysis_id
+            or ".." in analysis_id
+        ):
             raise ValueError("Identifiant d'analyse invalide.")
         return self.root / analysis_id
 
@@ -27,7 +31,10 @@ class ResultStorage:
     def save_job(self, job: AnalysisJob) -> None:
         with self._lock:
             job.updated_at = datetime.now(timezone.utc)
-            self._atomic_json(self.analysis_dir(job.analysis_id) / "job.json", job.model_dump(mode="json"))
+            self._atomic_json(
+                self.analysis_dir(job.analysis_id) / "job.json",
+                job.model_dump(mode="json"),
+            )
 
     def load_job(self, analysis_id: str) -> AnalysisJob | None:
         path = self.analysis_dir(analysis_id) / "job.json"
@@ -51,7 +58,9 @@ class ResultStorage:
     def find_completed_by_sha(self, sha256: str) -> AnalysisJob | None:
         for job_path in self.root.glob("analysis_*/job.json"):
             try:
-                job = AnalysisJob.model_validate_json(job_path.read_text(encoding="utf-8"))
+                job = AnalysisJob.model_validate_json(
+                    job_path.read_text(encoding="utf-8")
+                )
             except (OSError, ValueError):
                 continue
             if job.source_sha256 == sha256 and job.status == JobStatus.COMPLETED:
@@ -66,4 +75,3 @@ class ResultStorage:
             encoding="utf-8",
         )
         temporary.replace(path)
-

@@ -2,10 +2,19 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, UploadFile
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    File,
+    Form,
+    HTTPException,
+    UploadFile,
+)
 from fastapi.responses import FileResponse
 
 from app.core.config import settings
+from app.video_analysis.backends import diagnose_video_backend
 from app.video_analysis.schemas import (
     AnalysisCreated,
     AnalysisJob,
@@ -17,6 +26,13 @@ from app.video_analysis.service import VideoAnalysisService
 from app.video_analysis.validation import VideoValidationError
 
 router = APIRouter(prefix="/api/video-analysis", tags=["video-analysis"])
+
+
+@router.get("/diagnostics/backend")
+def video_backend_diagnostics() -> dict:
+    return diagnose_video_backend().__dict__
+
+
 _service = VideoAnalysisService(settings)
 
 
@@ -64,7 +80,9 @@ def get_detections(
     except ValueError as exc:
         raise HTTPException(status_code=404, detail="Résultats introuvables.") from exc
     if result is None:
-        raise HTTPException(status_code=409, detail="Les détections ne sont pas encore disponibles.")
+        raise HTTPException(
+            status_code=409, detail="Les détections ne sont pas encore disponibles."
+        )
     return result
 
 
@@ -110,4 +128,3 @@ def download_artifact(
     if not path.is_file():
         raise HTTPException(status_code=404, detail="Artefact introuvable.")
     return FileResponse(path=Path(path), media_type=media_type, filename=filename)
-
