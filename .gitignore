@@ -35,6 +35,13 @@ backend/data/video_uploads/
 backend/data/video_results/
 backend/data/parent_store.db
 backend/evaluation/benchmark_results.json
+benchmark_*.json
+data/external/
+
+data/benchmarks/
+data/soccernet/
+*.gt.txt
+
 
 # Logs
 *.log
