@@ -1,3 +1,4 @@
 # Dépendances optionnelles du détecteur moderne. Aucun test ne télécharge de poids.
 ultralytics>=8.3,<9
 supervision>=0.25,<1
+psutil>=5.9,<8

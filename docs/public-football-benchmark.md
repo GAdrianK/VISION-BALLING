@@ -9,11 +9,12 @@ Ce document décrit le protocole de benchmark public de détection (Ball & Perso
 ### SoccerNet-v3 H250 (YOLO Detection) & SoccerNet Tracking
 - **Description** : Dataset de référence international pour la détection et le suivi de joueurs/ballon dans des matchs de football professionnels.
 - **Format d'annotation** :
-  - Détection : Format YOLO (`class_id x_center y_center width height` normalisés).
-  - Tracking : Format MOTChallenge (`gt.txt` avec `frame, track_id, bb_left, bb_top, bb_width, bb_height, mark, class_id, visibility`).
+  - H250 : format YOLO (`class_id x_center y_center width height` normalisés), avec `0 = ball` et `1 = person`.
+  - Tracking : dix colonnes compatibles MOTChallenge (`frame, track_id, left, top, width, height, confidence, -1, -1, -1`). Les classes d'objets ne sont pas encodées dans ce fichier.
 - **Licence & Conditions** :
-  - Données fournies sous licence **SoccerNet Research License** (usage non commercial).
-  - L'accès aux archives requiert une inscription préalable sur [SoccerNet.org](https://www.soccer-net.org/).
+  - Vérifier et respecter la licence distribuée avec chaque archive.
+  - H250 est téléchargeable sur [Zenodo](https://zenodo.org/records/7808511).
+  - SoccerNet Tracking est distribué via le client officiel et certains contenus peuvent demander l'acceptation des conditions SoccerNet.
 
 > [!NOTE]
 > Les scripts de ce dépôt respectent strictement l'exclusion des fichiers de données (`.gitignore`) et ne versionnent ni images, ni vidéos, ni annotations volumineuses, ni poids de modèles.
@@ -24,18 +25,33 @@ Ce document décrit le protocole de benchmark public de détection (Ball & Perso
 
 ### A. Téléchargement optionnel de SoccerNet Tracking (Split Train)
 ```bash
+pip install SoccerNet
 python scripts/soccernet_downloader.py --dest-dir data/external/soccernet --split train
 ```
-*Remarque* : Ce script ne télécharge pas les matchs vidéos complets. En cas de demande d'identifiants par l'API SoccerNet, le script s'arrête proprement et affiche la procédure à suivre.
+Le contenu exact de l'archive de tâche est géré par SoccerNet et peut comprendre des clips et leurs annotations. Cette commande ne lance pas le téléchargement séparé des 12 matchs bruts complets. En cas d'accès protégé, utiliser `--password` ou la variable `SOCCERNET_PASSWORD`.
 
 ### B. Évaluation des Détecteurs (YOLO COCO vs Modèle Fine-tuné)
+
+Télécharger puis extraire `YOLO.zip` depuis Zenodo dans `data/external/h250`. Repérer les dossiers d'images et de labels du split à tester, puis lancer d'abord un smoke test :
+
 ```bash
 python scripts/benchmark_sprint2_1.py \
-  --yolo-dir data/external/soccernet/labels \
+  --yolo-labels data/external/h250/labels/test \
+  --yolo-images data/external/h250/images/test \
   --detector-coco yolo11n.pt \
-  --detector-finetuned path/to/football_yolo.pt \
+  --max-frames 100 \
   --output benchmark_detection_report.json
 ```
+
+Le benchmark s'arrête si les images correspondant aux labels sont absentes. Il ne remplace jamais les images manquantes par des frames noires.
+
+Pour comparer un modèle fine-tuné H250, ajouter :
+
+```bash
+--detector-finetuned path/to/football_yolo.pt
+```
+
+Le détecteur COCO utilise `0 = person, 32 = sports ball`. Le modèle fine-tuné H250 utilise `0 = ball, 1 = person`.
 
 **Métriques évaluées** :
 - **Précision, Rappel, F1-score & mAP@0.5** (par classe `person` et `sports ball`).
@@ -45,7 +61,8 @@ python scripts/benchmark_sprint2_1.py \
 ### C. Évaluation des Trackers (IoU Tracker vs ByteTrack)
 ```bash
 python scripts/benchmark_sprint2_1.py \
-  --mot-gt data/external/soccernet/gt.txt \
+  --mot-gt data/external/soccernet/sequence/gt/gt.txt \
+  --mot-frames data/external/soccernet/sequence/img1 \
   --trackers iou,bytetrack \
   --use-trackeval \
   --output benchmark_tracking_report.json
@@ -56,7 +73,9 @@ python scripts/benchmark_sprint2_1.py \
 - **DetA@0.5** (Detection Accuracy à 0.5).
 - **AssA@0.5** (Association Accuracy à 0.5, pondérée par les instances TP d'association).
 - **IDF1** (ID F1-score par assignation globale).
-- **HOTA Officiel 19 Seuils** (`HOTA_official_19_thresholds`) : généré lorsque le paquet optionnel `trackeval` (`pip install trackeval`) est installé et le drapeau `--use-trackeval` est activé.
+- **HOTA, DetA et AssA officiels sur 19 seuils** : calculés directement par les métriques du paquet TrackEval lorsque `trackeval` est installé et `--use-trackeval` activé.
+
+Sans TrackEval, le rapport indique explicitement le moteur intégré et ne fournit que les métriques locales au seuil `0.5`.
 
 ### D. Exécution des Tests Automatisés
 ```bash

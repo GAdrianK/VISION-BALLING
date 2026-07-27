@@ -2,15 +2,106 @@ from __future__ import annotations
 
 import math
 import os
-import resource
+import sys
 import threading
 import time
 from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
-import psutil
-from scipy.optimize import linear_sum_assignment
+
+try:
+    import psutil
+except ImportError:  # pragma: no cover - optional on Unix, required on Windows
+    psutil = None
+
+try:
+    import resource
+except ImportError:  # pragma: no cover - unavailable on Windows
+    resource = None
+
+
+def _resource_peak_rss_bytes() -> int:
+    if resource is None:
+        return 0
+    max_rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    # macOS reports bytes; Linux and other Unix variants report KiB.
+    return int(max_rss if sys.platform == "darwin" else max_rss * 1024)
+
+
+def linear_sum_assignment(cost_matrix: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Exact rectangular Hungarian assignment without a mandatory SciPy dependency."""
+    costs = np.asarray(cost_matrix, dtype=float)
+    if costs.ndim != 2:
+        raise ValueError("La matrice de coût doit avoir deux dimensions.")
+    if 0 in costs.shape:
+        return np.array([], dtype=int), np.array([], dtype=int)
+
+    transposed = costs.shape[0] > costs.shape[1]
+    if transposed:
+        costs = costs.T
+
+    rows, columns = costs.shape
+    row_potential = np.zeros(rows + 1)
+    column_potential = np.zeros(columns + 1)
+    matching = np.zeros(columns + 1, dtype=int)
+    predecessor = np.zeros(columns + 1, dtype=int)
+
+    for row in range(1, rows + 1):
+        matching[0] = row
+        min_values = np.full(columns + 1, np.inf)
+        used = np.zeros(columns + 1, dtype=bool)
+        column = 0
+
+        while True:
+            used[column] = True
+            matched_row = matching[column]
+            delta = np.inf
+            next_column = 0
+            for candidate in range(1, columns + 1):
+                if used[candidate]:
+                    continue
+                reduced_cost = (
+                    costs[matched_row - 1, candidate - 1]
+                    - row_potential[matched_row]
+                    - column_potential[candidate]
+                )
+                if reduced_cost < min_values[candidate]:
+                    min_values[candidate] = reduced_cost
+                    predecessor[candidate] = column
+                if min_values[candidate] < delta:
+                    delta = min_values[candidate]
+                    next_column = candidate
+
+            for candidate in range(columns + 1):
+                if used[candidate]:
+                    row_potential[matching[candidate]] += delta
+                    column_potential[candidate] -= delta
+                else:
+                    min_values[candidate] -= delta
+            column = next_column
+            if matching[column] == 0:
+                break
+
+        while True:
+            previous_column = predecessor[column]
+            matching[column] = matching[previous_column]
+            column = previous_column
+            if column == 0:
+                break
+
+    row_indices = np.array(
+        [matching[column] - 1 for column in range(1, columns + 1) if matching[column]],
+        dtype=int,
+    )
+    column_indices = np.array(
+        [column - 1 for column in range(1, columns + 1) if matching[column]],
+        dtype=int,
+    )
+    if transposed:
+        row_indices, column_indices = column_indices, row_indices
+    order = np.argsort(row_indices)
+    return row_indices[order], column_indices[order]
 
 
 class MemoryTracker:
@@ -23,6 +114,8 @@ class MemoryTracker:
         self._thread: threading.Thread | None = None
 
     def _sample_loop(self) -> None:
+        if psutil is None:
+            return
         proc = psutil.Process(os.getpid())
         while not self._stop_event.is_set():
             try:
@@ -33,9 +126,11 @@ class MemoryTracker:
             time.sleep(self.sample_interval_s)
 
     def __enter__(self) -> MemoryTracker:  # noqa: PYI034
-
-        proc = psutil.Process(os.getpid())
-        self._peak_rss_bytes = proc.memory_info().rss
+        if psutil is not None:
+            proc = psutil.Process(os.getpid())
+            self._peak_rss_bytes = proc.memory_info().rss
+        else:
+            self._peak_rss_bytes = _resource_peak_rss_bytes()
         self._stop_event.clear()
         self._thread = threading.Thread(target=self._sample_loop, daemon=True)
         self._thread.start()
@@ -47,12 +142,8 @@ class MemoryTracker:
         if self._thread:
             self._thread.join(timeout=0.1)
 
-
     def get_peak_rss_mb(self) -> float:
-        # ru_maxrss on Linux returns peak RSS in KiB
-        ru_maxrss_kib = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-        ru_maxrss_bytes = ru_maxrss_kib * 1024
-        final_peak_bytes = max(ru_maxrss_bytes, self._peak_rss_bytes)
+        final_peak_bytes = max(_resource_peak_rss_bytes(), self._peak_rss_bytes)
         return float(final_peak_bytes) / (1024.0 * 1024.0)
 
 
@@ -101,9 +192,7 @@ class DetectionEvaluator:
             return 0.0, 0.0, 0.0, 0.0
 
         sorted_preds = sorted(pred_boxes, key=lambda x: x[2], reverse=True)
-        matched_gt: dict[int, set[int]] = {
-            f_idx: set() for f_idx in gt_boxes_by_frame
-        }
+        matched_gt: dict[int, set[int]] = {f_idx: set() for f_idx in gt_boxes_by_frame}
 
         tp = np.zeros(len(sorted_preds))
         fp = np.zeros(len(sorted_preds))
@@ -144,7 +233,9 @@ class DetectionEvaluator:
 
         final_tp = cum_tp[-1] if len(cum_tp) > 0 else 0
         final_fp = cum_fp[-1] if len(cum_fp) > 0 else 0
-        final_precision = final_tp / (final_tp + final_fp) if (final_tp + final_fp) > 0 else 0.0
+        final_precision = (
+            final_tp / (final_tp + final_fp) if (final_tp + final_fp) > 0 else 0.0
+        )
         final_recall = final_tp / total_gt if total_gt > 0 else 0.0
         f1 = (
             2 * final_precision * final_recall / (final_precision + final_recall)
@@ -178,7 +269,11 @@ class DetectionEvaluator:
             for p in preds:
                 cls_name = getattr(p, "class_name", None) or p.get("class_name")
                 bbox = getattr(p, "bbox", None) or p.get("bbox")
-                conf = getattr(p, "confidence", 1.0) if hasattr(p, "confidence") else p.get("confidence", 1.0)
+                conf = (
+                    getattr(p, "confidence", 1.0)
+                    if hasattr(p, "confidence")
+                    else p.get("confidence", 1.0)
+                )
                 if cls_name not in pred_by_class:
                     pred_by_class[cls_name] = []
                 pred_by_class[cls_name].append((f_idx, bbox, conf))
@@ -200,20 +295,33 @@ class DetectionEvaluator:
             aps.append(ap)
 
         mAP_50 = float(np.mean(aps)) if aps else 0.0
-        total_prec = float(np.mean([m["precision"] for m in class_metrics.values()])) if class_metrics else 0.0
-        total_rec = float(np.mean([m["recall"] for m in class_metrics.values()])) if class_metrics else 0.0
+        total_prec = (
+            float(np.mean([m["precision"] for m in class_metrics.values()]))
+            if class_metrics
+            else 0.0
+        )
+        total_rec = (
+            float(np.mean([m["recall"] for m in class_metrics.values()]))
+            if class_metrics
+            else 0.0
+        )
         total_f1 = (
             2 * total_prec * total_rec / (total_prec + total_rec)
             if (total_prec + total_rec) > 0
             else 0.0
         )
 
-        ball_recall = class_metrics.get("sports ball", {}).get("recall", class_metrics.get("ball", {}).get("recall", 0.0))
+        ball_recall = class_metrics.get("sports ball", {}).get(
+            "recall", class_metrics.get("ball", {}).get("recall", 0.0)
+        )
         fps = len(ground_truth) / duration_seconds if duration_seconds > 0 else 0.0
 
         if peak_rss_mb <= 0.0:
-            ru_maxrss_kib = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-            peak_rss_mb = float(ru_maxrss_kib) / 1024.0
+            if psutil is not None:
+                peak_bytes = psutil.Process(os.getpid()).memory_info().rss
+            else:
+                peak_bytes = _resource_peak_rss_bytes()
+            peak_rss_mb = float(peak_bytes) / (1024.0 * 1024.0)
 
         return DetectionEvaluationResult(
             precision=round(total_prec, 4),
@@ -239,6 +347,8 @@ class TrackingEvaluationResult:
     num_pred_tracks: int
     evaluation_engine: str = "built_in (HOTA@0.5)"
     hota_official: float | None = None
+    deta_official: float | None = None
+    assa_official: float | None = None
 
 
 class TrackingEvaluator:
@@ -266,14 +376,19 @@ class TrackingEvaluator:
     ) -> TrackingEvaluationResult:
         if use_trackeval:
             try:
-                import trackeval  # noqa: F401
+                import trackeval
+
                 return self._evaluate_with_trackeval(
-                    ground_truth_frames, tracker_predictions, tracker_name
+                    ground_truth_frames,
+                    tracker_predictions,
+                    tracker_name,
+                    trackeval,
                 )
-            except ImportError:
+            except ImportError as exc:
+                missing_name = exc.name or "une dépendance"
                 print(
-                    "[!] Le paquet optionnel 'trackeval' n'est pas installe. "
-                    "Pour installer : pip install trackeval\n"
+                    f"[!] TrackEval est indisponible ({missing_name} manque). "
+                    "Pour installer toutes ses dépendances : pip install trackeval\n"
                     "    Basculement automatique sur le moteur integre (HOTA@0.5)."
                 )
 
@@ -300,7 +415,11 @@ class TrackingEvaluator:
         pred_data: dict[tuple[int, int], list[float]] = {}
         for f_idx, preds in tracker_predictions.items():
             for p in preds:
-                t_id = getattr(p, "track_id", None) if hasattr(p, "track_id") else p.get("track_id")
+                t_id = (
+                    getattr(p, "track_id", None)
+                    if hasattr(p, "track_id")
+                    else p.get("track_id")
+                )
                 bbox = getattr(p, "bbox", None) if hasattr(p, "bbox") else p.get("bbox")
                 if t_id is not None and bbox is not None:
                     pred_tracks.add(t_id)
@@ -329,7 +448,11 @@ class TrackingEvaluator:
                 for f_idx in ground_truth_frames:
                     g_box = gt_data.get((f_idx, g_id))
                     p_box = pred_data.get((f_idx, p_id))
-                    if g_box and p_box and compute_iou(g_box, p_box) >= self.iou_threshold:
+                    if (
+                        g_box
+                        and p_box
+                        and compute_iou(g_box, p_box) >= self.iou_threshold
+                    ):
                         overlap_count += 1
                 cost_matrix[i, j] = -overlap_count
 
@@ -341,7 +464,11 @@ class TrackingEvaluator:
 
         idfp = total_pred_boxes - idtp
         idfn = total_gt_boxes - idtp
-        idf1 = (2 * idtp) / (2 * idtp + idfp + idfn) if (2 * idtp + idfp + idfn) > 0 else 0.0
+        idf1 = (
+            (2 * idtp) / (2 * idtp + idfp + idfn)
+            if (2 * idtp + idfp + idfn) > 0
+            else 0.0
+        )
 
         # Frame-by-frame TP, FP, FN and track association
         tp_count = 0
@@ -365,8 +492,16 @@ class TrackingEvaluator:
         matched_tp_pairs: list[tuple[int, int]] = []
 
         for f_idx in sorted(ground_truth_frames):
-            f_gts = [(g_id, gt_data[(f_idx, g_id)]) for g_id in gt_list if (f_idx, g_id) in gt_data]
-            f_preds = [(p_id, pred_data[(f_idx, p_id)]) for p_id in pred_list if (f_idx, p_id) in pred_data]
+            f_gts = [
+                (g_id, gt_data[(f_idx, g_id)])
+                for g_id in gt_list
+                if (f_idx, g_id) in gt_data
+            ]
+            f_preds = [
+                (p_id, pred_data[(f_idx, p_id)])
+                for p_id in pred_list
+                if (f_idx, p_id) in pred_data
+            ]
 
             if not f_gts and not f_preds:
                 continue
@@ -401,7 +536,11 @@ class TrackingEvaluator:
                 fn_count += len(f_gts)
                 fp_count += len(f_preds)
 
-        deta_0_5 = tp_count / (tp_count + fp_count + fn_count) if (tp_count + fp_count + fn_count) > 0 else 0.0
+        deta_0_5 = (
+            tp_count / (tp_count + fp_count + fn_count)
+            if (tp_count + fp_count + fn_count) > 0
+            else 0.0
+        )
 
         # Exact TrackEval AssA formula weighted over all matched TP detection instances:
         # AssA = 1/|TP| sum_{(c,g) in TP} TPA(c,g) / (TPA(c,g) + FPA(c) + FNA(g))
@@ -428,23 +567,131 @@ class TrackingEvaluator:
             evaluation_engine="built_in (HOTA@0.5)",
         )
 
+    @staticmethod
+    def _prediction_values(prediction: Any) -> tuple[int | None, list[float] | None]:
+        if hasattr(prediction, "track_id"):
+            track_id = prediction.track_id
+            bbox = prediction.bbox
+        else:
+            track_id = prediction.get("track_id")
+            bbox = prediction.get("bbox")
+        return track_id, bbox
+
+    def _build_trackeval_data(
+        self,
+        ground_truth_frames: dict[int, Any],
+        tracker_predictions: dict[int, list[Any]],
+    ) -> dict[str, Any]:
+        frame_indices = sorted(set(ground_truth_frames).union(tracker_predictions))
+
+        gt_track_ids = sorted(
+            {
+                annotation.track_id
+                for frame in ground_truth_frames.values()
+                for annotation in frame.annotations
+                if annotation.track_id is not None
+            }
+        )
+        pred_track_ids = sorted(
+            {
+                track_id
+                for predictions in tracker_predictions.values()
+                for track_id, _ in (
+                    self._prediction_values(item) for item in predictions
+                )
+                if track_id is not None
+            }
+        )
+        gt_id_map = {track_id: index for index, track_id in enumerate(gt_track_ids)}
+        pred_id_map = {track_id: index for index, track_id in enumerate(pred_track_ids)}
+
+        gt_ids_by_frame: list[np.ndarray] = []
+        pred_ids_by_frame: list[np.ndarray] = []
+        similarity_scores: list[np.ndarray] = []
+        num_gt_dets = 0
+        num_tracker_dets = 0
+
+        for frame_index in frame_indices:
+            frame_ground_truth = ground_truth_frames.get(frame_index)
+            ground_truth = [
+                annotation
+                for annotation in (
+                    frame_ground_truth.annotations if frame_ground_truth else []
+                )
+                if annotation.track_id is not None
+            ]
+            predictions = [
+                values
+                for values in (
+                    self._prediction_values(item)
+                    for item in tracker_predictions.get(frame_index, [])
+                )
+                if values[0] is not None and values[1] is not None
+            ]
+
+            gt_ids = np.asarray(
+                [gt_id_map[item.track_id] for item in ground_truth],
+                dtype=int,
+            )
+            pred_ids = np.asarray(
+                [pred_id_map[track_id] for track_id, _ in predictions],
+                dtype=int,
+            )
+            similarities = np.zeros((len(ground_truth), len(predictions)))
+            for gt_index, annotation in enumerate(ground_truth):
+                for pred_index, (_, bbox) in enumerate(predictions):
+                    similarities[gt_index, pred_index] = compute_iou(
+                        annotation.bbox,
+                        bbox,
+                    )
+
+            gt_ids_by_frame.append(gt_ids)
+            pred_ids_by_frame.append(pred_ids)
+            similarity_scores.append(similarities)
+            num_gt_dets += len(gt_ids)
+            num_tracker_dets += len(pred_ids)
+
+        return {
+            "num_timesteps": len(frame_indices),
+            "num_gt_ids": len(gt_track_ids),
+            "num_tracker_ids": len(pred_track_ids),
+            "num_gt_dets": num_gt_dets,
+            "num_tracker_dets": num_tracker_dets,
+            "gt_ids": gt_ids_by_frame,
+            "tracker_ids": pred_ids_by_frame,
+            "similarity_scores": similarity_scores,
+        }
+
     def _evaluate_with_trackeval(
         self,
         ground_truth_frames: dict[int, Any],
         tracker_predictions: dict[int, list[Any]],
         tracker_name: str,
+        trackeval: Any,
     ) -> TrackingEvaluationResult:
-        builtin_res = self._evaluate_builtin(
-            ground_truth_frames, tracker_predictions, tracker_name
+        data = self._build_trackeval_data(
+            ground_truth_frames,
+            tracker_predictions,
         )
+        metric_config = {"PRINT_CONFIG": False}
+        hota_metric = trackeval.metrics.HOTA(metric_config)
+        identity_metric = trackeval.metrics.Identity(metric_config)
+        hota_result = hota_metric.eval_sequence(data)
+        identity_result = identity_metric.eval_sequence(data)
+
+        alpha_labels = np.asarray(hota_metric.array_labels)
+        alpha_0_5 = int(np.flatnonzero(np.isclose(alpha_labels, 0.5))[0])
+
         return TrackingEvaluationResult(
             tracker_name=tracker_name,
-            hota_0_5=builtin_res.hota_0_5,
-            deta_0_5=builtin_res.deta_0_5,
-            assa_0_5=builtin_res.assa_0_5,
-            idf1=builtin_res.idf1,
-            num_gt_tracks=builtin_res.num_gt_tracks,
-            num_pred_tracks=builtin_res.num_pred_tracks,
+            hota_0_5=round(float(hota_result["HOTA"][alpha_0_5]), 4),
+            deta_0_5=round(float(hota_result["DetA"][alpha_0_5]), 4),
+            assa_0_5=round(float(hota_result["AssA"][alpha_0_5]), 4),
+            idf1=round(float(identity_result["IDF1"]), 4),
+            num_gt_tracks=data["num_gt_ids"],
+            num_pred_tracks=data["num_tracker_ids"],
             evaluation_engine="trackeval (official 19 thresholds)",
-            hota_official=builtin_res.hota_0_5,
+            hota_official=round(float(np.mean(hota_result["HOTA"])), 4),
+            deta_official=round(float(np.mean(hota_result["DetA"])), 4),
+            assa_official=round(float(np.mean(hota_result["AssA"])), 4),
         )
