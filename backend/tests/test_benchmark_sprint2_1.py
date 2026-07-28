@@ -119,9 +119,56 @@ def test_detection_evaluator_metrics() -> None:
     assert res.precision == 1.0
     assert res.recall == 1.0
     assert res.f1_score == 1.0
+    assert res.macro_f1 == 1.0
+    assert res.f1_from_macro_precision_recall == 1.0
     assert res.mAP_50 == 1.0
     assert res.ball_recall == 1.0
     assert res.peak_rss_mb == 12.5
+
+
+def test_detection_evaluator_macro_f1_aggregation() -> None:
+    # Frame 0: 2 persons, 1 sports ball
+    gt = [
+        FrameGroundTruth(
+            frame_index=0,
+            image_path=None,
+            width=1000,
+            height=1000,
+            annotations=[
+                GroundTruthBox(0, "person", [100, 100, 200, 300]),
+                GroundTruthBox(0, "person", [300, 300, 400, 500]),
+                GroundTruthBox(0, "sports ball", [500, 500, 550, 550]),
+            ],
+        )
+    ]
+
+    # Person: 1 TP, 0 FP (P=1.0, R=0.5 => F1=0.6667)
+    # Sports ball: 1 TP, 4 FP (P=0.2, R=1.0 => F1=0.3333)
+    preds = {
+        0: [
+            RawDetection("person", "player", 0.9, (100, 100, 200, 300)),
+            RawDetection("sports ball", "ball", 0.9, (500, 500, 550, 550)),
+            RawDetection("sports ball", "ball_fp1", 0.8, (10, 10, 20, 20)),
+            RawDetection("sports ball", "ball_fp2", 0.7, (30, 30, 40, 40)),
+            RawDetection("sports ball", "ball_fp3", 0.6, (50, 50, 60, 60)),
+            RawDetection("sports ball", "ball_fp4", 0.5, (70, 70, 80, 80)),
+        ]
+    }
+
+    evaluator = DetectionEvaluator(iou_threshold=0.5)
+    res = evaluator.evaluate(ground_truth=gt, predictions_by_frame=preds)
+
+    assert res.class_metrics["person"]["f1"] == 0.6667
+    assert res.class_metrics["sports ball"]["f1"] == 0.3333
+    # macro_f1 = mean(0.6667, 0.3333) = 0.5
+    assert res.macro_f1 == 0.5
+    # macro_precision = (1.0 + 0.2)/2 = 0.6
+    assert res.precision == 0.6
+    # macro_recall = (0.5 + 1.0)/2 = 0.75
+    assert res.recall == 0.75
+    # f1_from_macro_precision_recall = 2 * 0.6 * 0.75 / 1.35 = 0.6667
+    assert res.f1_from_macro_precision_recall == 0.6667
+
 
 
 def test_tracking_evaluator_metrics() -> None:

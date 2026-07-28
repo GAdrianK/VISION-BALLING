@@ -95,6 +95,8 @@ def benchmark_detector_on_yolo(
             "precision": metrics.precision,
             "recall": metrics.recall,
             "f1_score": metrics.f1_score,
+            "macro_f1": metrics.macro_f1,
+            "f1_from_macro_precision_recall": metrics.f1_from_macro_precision_recall,
             "ball_recall": metrics.ball_recall,
             "class_breakdown": metrics.class_metrics,
             "fps": metrics.fps,

@@ -173,6 +173,8 @@ class DetectionEvaluationResult:
     total_seconds: float
     fps: float
     peak_rss_mb: float
+    macro_f1: float = 0.0
+    f1_from_macro_precision_recall: float = 0.0
 
 
 class DetectionEvaluator:
@@ -305,11 +307,17 @@ class DetectionEvaluator:
             if class_metrics
             else 0.0
         )
-        total_f1 = (
+        macro_f1 = (
+            float(np.mean([m["f1"] for m in class_metrics.values()]))
+            if class_metrics
+            else 0.0
+        )
+        f1_from_macro_pr = (
             2 * total_prec * total_rec / (total_prec + total_rec)
             if (total_prec + total_rec) > 0
             else 0.0
         )
+        total_f1 = f1_from_macro_pr
 
         ball_recall = class_metrics.get("sports ball", {}).get(
             "recall", class_metrics.get("ball", {}).get("recall", 0.0)
@@ -333,6 +341,8 @@ class DetectionEvaluator:
             total_seconds=round(duration_seconds, 3),
             fps=round(fps, 2),
             peak_rss_mb=round(peak_rss_mb, 2),
+            macro_f1=round(macro_f1, 4),
+            f1_from_macro_precision_recall=round(f1_from_macro_pr, 4),
         )
 
 
