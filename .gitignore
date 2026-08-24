@@ -64,6 +64,7 @@ frontend-vanilla/
 /synapseX/
 
 # Vidéos et poids de modèles locaux
+/runs/
 *.mp4
 *.mov
 *.mkv
