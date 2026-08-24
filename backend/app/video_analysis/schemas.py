@@ -78,6 +78,16 @@ class ArtifactSet(BaseModel):
     preview_image: str | None = None
 
 
+class BallTrajectoryPoint(BaseModel):
+    frame_index: int = Field(ge=0)
+    timestamp_seconds: float = Field(ge=0)
+    state: Literal["observed", "predicted"]
+    class_name: Literal["sports ball"] = "sports ball"
+    confidence: float | None = Field(default=None, ge=0, le=1)
+    bbox: BoundingBox
+    center: dict[str, float]
+
+
 class AnalysisResult(BaseModel):
     schema_version: str = SCHEMA_VERSION
     analysis_id: str
@@ -86,6 +96,7 @@ class AnalysisResult(BaseModel):
     video: VideoMetadata
     pipeline: PipelineMetadata
     detections: list[Detection] = Field(default_factory=list)
+    ball_trajectory: list[BallTrajectoryPoint] = Field(default_factory=list)
     artifacts: ArtifactSet = Field(default_factory=ArtifactSet)
     warnings: list[str] = Field(default_factory=list)
     frames_analyzed: int = 0

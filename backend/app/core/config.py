@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Chemin vers la racine du dossier backend
@@ -54,6 +55,9 @@ class Settings(BaseSettings):
     VIDEO_DEVICE: str = "cpu"
     VIDEO_TRACKING_ENABLED: bool = True
     VIDEO_TRACKER: str = "iou"
+    VIDEO_BALL_TRACK_MAX_MISSING_FRAMES: int = Field(default=5, ge=0)
+    VIDEO_BALL_TRACK_MAX_DISTANCE_RATIO: float = Field(default=0.15, gt=0, le=1)
+    VIDEO_BALL_TRAJECTORY_LENGTH: int = Field(default=12, ge=1)
     VIDEO_PRESERVE_AUDIO: bool = True
     VIDEO_MAX_PROCESSING_SECONDS: float = 0
     VIDEO_KEEP_TEMPORARY_FILES: bool = False

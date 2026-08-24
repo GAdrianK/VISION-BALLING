@@ -19,7 +19,7 @@ from app.video_analysis.schemas import (
     JobStatus,
 )
 from app.video_analysis.storage import ResultStorage
-from app.video_analysis.trackers import Tracker, create_tracker
+from app.video_analysis.trackers import BallTracker, Tracker, create_tracker
 from app.video_analysis.validation import VideoValidationError, VideoValidator
 
 logger = logging.getLogger("football.video_analysis")
@@ -54,6 +54,11 @@ class VideoAnalysisService:
             else lambda: create_tracker(
                 settings.VIDEO_TRACKING_ENABLED, settings.VIDEO_TRACKER
             )
+        )
+        self.ball_tracker_factory = lambda: BallTracker(
+            max_missing_frames=settings.VIDEO_BALL_TRACK_MAX_MISSING_FRAMES,
+            max_distance_ratio=settings.VIDEO_BALL_TRACK_MAX_DISTANCE_RATIO,
+            trajectory_length=settings.VIDEO_BALL_TRAJECTORY_LENGTH,
         )
         self.validator = VideoValidator(
             allowed_extensions=set(settings.video_extensions),
@@ -146,6 +151,7 @@ class VideoAnalysisService:
             pipeline = VideoPipeline(
                 detector=self.detector,
                 tracker=self.tracker_factory(),
+                ball_tracker=self.ball_tracker_factory(),
                 frame_interval=self.settings.video_frame_sample_rate,
                 keep_extracted_frames=self.settings.VIDEO_KEEP_TEMPORARY_FILES,
                 preserve_audio=self.settings.VIDEO_PRESERVE_AUDIO,

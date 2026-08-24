@@ -119,6 +119,121 @@ def test_job_creation_status_progress_and_fake_detector(
     assert (service.storage.analysis_dir(created.analysis_id) / "annotated.mp4").is_file()
 
 
+def test_predicted_ball_positions_do_not_count_as_detections(
+    sample_video: Path, video_settings: Settings
+):
+    class BallGapDetector(FakeDetector):
+        def __init__(self) -> None:
+            self.calls = 0
+
+        def detect(self, frame: np.ndarray) -> list[RawDetection]:
+            del frame
+            self.calls += 1
+            if self.calls == 1:
+                return [
+                    RawDetection(
+                        "sports ball", "ball_candidate", 0.8, (20, 90, 30, 100)
+                    )
+                ]
+            return []
+
+        def metadata(self) -> dict:
+            metadata = super().metadata()
+            metadata["classes"] = ["sports ball"]
+            metadata["ball_detection"] = True
+            return metadata
+
+    video_settings.VIDEO_FRAME_INTERVAL = 1
+    video_settings.VIDEO_BALL_TRACK_MAX_MISSING_FRAMES = 2
+    service = VideoAnalysisService(video_settings, detector=BallGapDetector())
+    created = upload(service, sample_video)
+
+    service.process(created.analysis_id)
+    result = service.storage.load_result(created.analysis_id)
+
+    assert result is not None
+    assert len(result.detections) == 1
+    assert result.detections[0].class_name == "sports ball"
+    assert result.class_summary["ball_detections"] == 1
+    assert [point.state for point in result.ball_trajectory] == [
+        "observed",
+        "predicted",
+        "predicted",
+    ]
+    assert result.tracking_summary == {
+        "unique_person_tracks": 0,
+        "tracked_person_detections": 0,
+        "observed_frames": 1,
+        "predicted_frames": 2,
+        "missing_frames": 7,
+        "observed_coverage": 0.1,
+        "effective_coverage": 0.3,
+        "longest_missing_gap": 7,
+        "reset_count": 1,
+    }
+
+
+@pytest.mark.parametrize(
+    ("sample_rate", "expected_observed", "expected_predicted"),
+    [(1, 10, 0), (2, 5, 5), (5, 2, 8)],
+)
+def test_ball_tracking_uses_source_frame_cadence(
+    sample_video: Path,
+    video_settings: Settings,
+    sample_rate: int,
+    expected_observed: int,
+    expected_predicted: int,
+):
+    class BallDetector(FakeDetector):
+        def detect(self, frame: np.ndarray) -> list[RawDetection]:
+            del frame
+            return [
+                RawDetection(
+                    "sports ball", "ball_candidate", 0.8, (20, 90, 30, 100)
+                )
+            ]
+
+        def metadata(self) -> dict:
+            metadata = super().metadata()
+            metadata["classes"] = ["sports ball"]
+            metadata["ball_detection"] = True
+            return metadata
+
+    video_settings.VIDEO_FRAME_SAMPLE_RATE = sample_rate
+    service = VideoAnalysisService(video_settings, detector=BallDetector())
+    created = upload(service, sample_video)
+
+    service.process(created.analysis_id)
+    result = service.storage.load_result(created.analysis_id)
+
+    assert result is not None
+    observed = [point for point in result.ball_trajectory if point.state == "observed"]
+    predicted = [
+        point for point in result.ball_trajectory if point.state == "predicted"
+    ]
+    assert [point.frame_index for point in observed] == list(
+        range(0, 10, sample_rate)
+    )
+    assert all(
+        point.timestamp_seconds == pytest.approx(point.frame_index / 10)
+        for point in result.ball_trajectory
+    )
+    assert len(observed) == expected_observed
+    assert len(predicted) == expected_predicted
+    assert all(point.confidence is None for point in predicted)
+    assert len(result.detections) == expected_observed
+    assert result.class_summary["ball_detections"] == expected_observed
+    assert result.tracking_summary["observed_frames"] == expected_observed
+    assert result.tracking_summary["predicted_frames"] == expected_predicted
+    assert result.tracking_summary["missing_frames"] == 0
+    assert result.tracking_summary["observed_coverage"] == pytest.approx(
+        expected_observed / 10
+    )
+    assert result.tracking_summary["effective_coverage"] == 1
+    assert result.tracking_summary["longest_missing_gap"] == 0
+    assert result.tracking_summary["reset_count"] == 0
+
+
 def test_service_propagates_video_model_profile(
     video_settings: Settings, monkeypatch: pytest.MonkeyPatch
 ):

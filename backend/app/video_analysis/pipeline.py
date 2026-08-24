@@ -5,6 +5,7 @@ import shutil
 import subprocess
 import time
 from collections.abc import Callable
+from itertools import pairwise
 from pathlib import Path
 
 import cv2
@@ -18,13 +19,19 @@ from app.video_analysis.detectors import ObjectDetector
 from app.video_analysis.schemas import (
     AnalysisResult,
     ArtifactSet,
+    BallTrajectoryPoint,
     BoundingBox,
     Detection,
     JobStatus,
     PipelineMetadata,
     VideoMetadata,
 )
-from app.video_analysis.trackers import DisabledTracker, Tracker
+from app.video_analysis.trackers import (
+    BallTracker,
+    BallTrackPosition,
+    DisabledTracker,
+    Tracker,
+)
 
 logger = logging.getLogger("football.video_analysis")
 ProgressCallback = Callable[[float, str], None]
@@ -39,9 +46,11 @@ class VideoPipeline:
         keep_extracted_frames: bool = False,
         preserve_audio: bool = True,
         max_processing_seconds: float = 0,
+        ball_tracker: BallTracker | None = None,
     ) -> None:
         self.detector = detector
         self.tracker = tracker or DisabledTracker()
+        self.ball_tracker = ball_tracker or BallTracker()
         self.frame_interval = max(1, frame_interval)
         self.keep_extracted_frames = keep_extracted_frames
         self.preserve_audio = preserve_audio
@@ -59,6 +68,7 @@ class VideoPipeline:
         started_at = time.monotonic()
         self.detector.load()
         self.tracker.reset()
+        self.ball_tracker.reset()
         detector_metadata = self.detector.metadata()
         tracker_metadata = self.tracker.metadata()
         backend = diagnose_video_backend()
@@ -92,6 +102,12 @@ class VideoPipeline:
             )
 
         detections: list[Detection] = []
+        ball_trajectory: list[BallTrajectoryPoint] = []
+        ball_observed_frames = 0
+        ball_predicted_frames = 0
+        ball_missing_frames = 0
+        current_tracking_gap = 0
+        longest_tracking_gap = 0
         frames_analyzed = 0
         frames_with_ball: set[int] = set()
         ball_confidences: list[float] = []
@@ -107,7 +123,9 @@ class VideoPipeline:
                 if not ok:
                     break
 
-                if frame_index % self.frame_interval == 0:
+                frame_analyzed = frame_index % self.frame_interval == 0
+                raw_detections = []
+                if frame_analyzed:
                     try:
                         raw_detections = self.detector.detect(frame)
                     except Exception as exc:
@@ -149,6 +167,40 @@ class VideoPipeline:
                         current_ball_gap += 1
                         longest_ball_gap = max(longest_ball_gap, current_ball_gap)
 
+                ball_position = self.ball_tracker.update(
+                    frame_index, frame, raw_detections
+                )
+                if ball_position is None:
+                    ball_missing_frames += 1
+                    current_tracking_gap += 1
+                    longest_tracking_gap = max(
+                        longest_tracking_gap, current_tracking_gap
+                    )
+                else:
+                    current_tracking_gap = 0
+                    if ball_position.state == "observed":
+                        ball_observed_frames += 1
+                    else:
+                        ball_predicted_frames += 1
+                    x1, y1, x2, y2 = ball_position.bbox
+                    ball_trajectory.append(
+                        BallTrajectoryPoint(
+                            frame_index=frame_index,
+                            timestamp_seconds=round(frame_index / metadata.fps, 6),
+                            state=ball_position.state,
+                            confidence=ball_position.confidence,
+                            bbox=BoundingBox(x1=x1, y1=y1, x2=x2, y2=y2),
+                            center={
+                                "x": ball_position.center[0],
+                                "y": ball_position.center[1],
+                            },
+                        )
+                    )
+                    self._annotate_ball_trajectory(
+                        frame, ball_position, self.ball_tracker.trajectory
+                    )
+
+                if frame_analyzed:
                     if self.keep_extracted_frames:
                         cv2.imwrite(
                             str(frames_dir / f"frame_{frame_index:08d}.jpg"), frame
@@ -219,6 +271,10 @@ class VideoPipeline:
         average_fps = frames_analyzed / duration if duration else 0
         ball_count = len(ball_confidences)
         ball_rate = len(frames_with_ball) / frames_analyzed if frames_analyzed else 0
+        observed_coverage = ball_observed_frames / frame_index
+        effective_coverage = (
+            ball_observed_frames + ball_predicted_frames
+        ) / frame_index
         logger.info(
             "video_processing_completed analysis_id=%s frames=%s detections=%s duration=%.3f",
             analysis_id,
@@ -245,6 +301,7 @@ class VideoPipeline:
                 frame_sample_rate=self.frame_interval,
             ),
             detections=detections,
+            ball_trajectory=ball_trajectory,
             artifacts=ArtifactSet(
                 annotated_video=f"/api/video-analysis/{analysis_id}/artifacts/annotated_video",
                 detections_json=f"/api/video-analysis/{analysis_id}/artifacts/detections_json",
@@ -275,6 +332,13 @@ class VideoPipeline:
                     for item in detections
                     if item.class_name == "person" and item.track_id is not None
                 ),
+                "observed_frames": ball_observed_frames,
+                "predicted_frames": ball_predicted_frames,
+                "missing_frames": ball_missing_frames,
+                "observed_coverage": round(observed_coverage, 6),
+                "effective_coverage": round(effective_coverage, 6),
+                "longest_missing_gap": longest_tracking_gap,
+                "reset_count": self.ball_tracker.reset_count,
             },
         )
 
@@ -292,6 +356,47 @@ class VideoPipeline:
             (box.x1, max(18, box.y1 - 7)),
             cv2.FONT_HERSHEY_SIMPLEX,
             0.5,
+            color,
+            1,
+            cv2.LINE_AA,
+        )
+
+    @staticmethod
+    def _annotate_ball_trajectory(
+        frame,
+        current: BallTrackPosition,
+        trajectory: tuple[BallTrackPosition, ...],
+    ) -> None:
+        for previous, following in pairwise(trajectory):
+            color = (0, 165, 255) if following.state == "predicted" else (0, 255, 255)
+            cv2.line(
+                frame,
+                (round(previous.center[0]), round(previous.center[1])),
+                (round(following.center[0]), round(following.center[1])),
+                color,
+                2,
+                cv2.LINE_AA,
+            )
+
+        center = (round(current.center[0]), round(current.center[1]))
+        color = (0, 165, 255) if current.state == "predicted" else (0, 255, 255)
+        if current.state == "predicted":
+            cv2.drawMarker(
+                frame,
+                center,
+                color,
+                markerType=cv2.MARKER_CROSS,
+                markerSize=10,
+                thickness=2,
+            )
+        else:
+            cv2.circle(frame, center, 5, color, 2, cv2.LINE_AA)
+        cv2.putText(
+            frame,
+            f"{current.class_name} {current.state}",
+            (center[0] + 7, max(18, center[1] - 7)),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.45,
             color,
             1,
             cv2.LINE_AA,
