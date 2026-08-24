@@ -172,3 +172,26 @@ def test_ffmpeg_command_is_argument_safe(tmp_path: Path):
     assert command[0] == "ffmpeg"
     assert str(tmp_path / "source;video.mp4") in command
     assert all("shell=True" not in part for part in command)
+
+
+def test_ffmpeg_command_produces_browser_compatible_mp4(tmp_path: Path):
+    command = build_audio_remux_command(
+        "ffmpeg",
+        tmp_path / "annotated_silent.mp4",
+        tmp_path / "source.mp4",
+        tmp_path / "annotated.mp4",
+    )
+
+    assert command[command.index("-c:v") + 1] == "libx264"
+    assert command[command.index("-preset") + 1] == "veryfast"
+    assert command[command.index("-crf") + 1] == "20"
+    assert command[command.index("-pix_fmt") + 1] == "yuv420p"
+    assert command[command.index("-c:a") + 1] == "aac"
+    assert command[command.index("-movflags") + 1] == "+faststart"
+    assert [
+        command[index + 1]
+        for index, argument in enumerate(command)
+        if argument == "-map"
+    ] == ["0:v:0", "1:a:0?"]
+    assert "-shortest" in command
+    assert "copy" not in command

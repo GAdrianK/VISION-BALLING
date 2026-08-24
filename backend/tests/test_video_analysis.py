@@ -185,6 +185,20 @@ def test_create_and_get_endpoints(sample_video: Path, video_settings: Settings):
             artifacts = api.get(f"/api/video-analysis/{analysis_id}/artifacts")
             assert artifacts.status_code == 200
             assert len(artifacts.json()["artifacts"]) >= 2
+            annotated = api.get(
+                f"/api/video-analysis/{analysis_id}/artifacts/annotated_video"
+            )
+            assert annotated.status_code == 200
+            assert annotated.headers["content-type"].startswith("video/mp4")
+            assert annotated.headers["content-disposition"].startswith("inline;")
+            assert annotated.headers["accept-ranges"] == "bytes"
+            partial = api.get(
+                f"/api/video-analysis/{analysis_id}/artifacts/annotated_video",
+                headers={"Range": "bytes=0-9"},
+            )
+            assert partial.status_code == 206
+            assert partial.headers["accept-ranges"] == "bytes"
+            assert partial.headers["content-range"].startswith("bytes 0-9/")
     finally:
         app.dependency_overrides.clear()
 

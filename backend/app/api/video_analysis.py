@@ -127,4 +127,11 @@ def download_artifact(
         raise HTTPException(status_code=404, detail="Artefact introuvable.") from exc
     if not path.is_file():
         raise HTTPException(status_code=404, detail="Artefact introuvable.")
-    return FileResponse(path=Path(path), media_type=media_type, filename=filename)
+    return FileResponse(
+        path=Path(path),
+        media_type=media_type,
+        filename=filename,
+        content_disposition_type=(
+            "inline" if artifact_name == "annotated_video" else "attachment"
+        ),
+    )
