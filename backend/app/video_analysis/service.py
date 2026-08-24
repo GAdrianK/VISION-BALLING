@@ -42,6 +42,7 @@ class VideoAnalysisService:
         self.detector = detector or create_detector(
             settings.VIDEO_DETECTOR,
             model_path=settings.VIDEO_MODEL_PATH,
+            model_profile=settings.VIDEO_MODEL_PROFILE,
             device=settings.VIDEO_DEVICE,
             confidence_threshold=settings.VIDEO_CONFIDENCE_THRESHOLD,
             person_threshold=settings.VIDEO_PERSON_CONFIDENCE_THRESHOLD,

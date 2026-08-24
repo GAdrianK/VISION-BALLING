@@ -85,6 +85,14 @@ class UltralyticsYOLODetector(ObjectDetector):
         0: "person",
         32: "sports ball",
     }
+    H250_FOOTBALL_CLASS_MAP: ClassVar[dict[int, str]] = {
+        0: "sports ball",
+        1: "person",
+    }
+    MODEL_PROFILES: ClassVar[dict[str, dict[int, str]]] = {
+        "coco": COCO_FOOTBALL_CLASS_MAP,
+        "h250": H250_FOOTBALL_CLASS_MAP,
+    }
 
     def __init__(
         self,
@@ -93,12 +101,26 @@ class UltralyticsYOLODetector(ObjectDetector):
         person_threshold: float = 0.45,
         ball_threshold: float = 0.25,
         class_map: dict[int, str] | None = None,
+        model_profile: str = "coco",
     ) -> None:
+        normalized_profile = model_profile.strip().lower()
+        if normalized_profile not in self.MODEL_PROFILES:
+            accepted = ", ".join(sorted(self.MODEL_PROFILES))
+            raise ValueError(
+                f"Profil de modèle YOLO inconnu : {model_profile!r}. "
+                f"Valeurs acceptées : {accepted}."
+            )
         self.model_path = model_path
         self.device = device
         self.person_threshold = person_threshold
         self.ball_threshold = ball_threshold
-        self.class_map = class_map or self.COCO_FOOTBALL_CLASS_MAP
+        self.model_profile = normalized_profile
+        selected_map = (
+            class_map
+            if class_map is not None
+            else self.MODEL_PROFILES[normalized_profile]
+        )
+        self.class_map = dict(selected_map)
         self._model: Any = None
         self._version = "unknown"
 
@@ -167,16 +189,18 @@ def create_detector(
     person_threshold: float = 0.45,
     ball_threshold: float = 0.25,
     class_map: dict[int, str] | None = None,
+    model_profile: str = "coco",
 ) -> ObjectDetector:
     normalized = name.strip().lower()
     if normalized in {"hog", "opencv-hog", "opencv-hog-default-people-detector"}:
         return OpenCVHOGPersonDetector(confidence_threshold)
     if normalized in {"yolo", "ultralytics"}:
         return UltralyticsYOLODetector(
-            model_path,
-            device,
-            person_threshold,
-            ball_threshold,
-            class_map,
+            model_path=model_path,
+            device=device,
+            person_threshold=person_threshold,
+            ball_threshold=ball_threshold,
+            class_map=class_map,
+            model_profile=model_profile,
         )
     raise ValueError(f"Détecteur vidéo inconnu : {name}")

@@ -6,9 +6,6 @@ from pathlib import Path
 import cv2
 import numpy as np
 import pytest
-from fastapi.testclient import TestClient
-from starlette.datastructures import UploadFile
-
 from app.api.video_analysis import get_video_analysis_service
 from app.core.config import Settings
 from app.main import app
@@ -16,6 +13,8 @@ from app.video_analysis.detectors import ObjectDetector, RawDetection
 from app.video_analysis.schemas import JobStatus
 from app.video_analysis.service import VideoAnalysisService
 from app.video_analysis.validation import VideoValidationError, VideoValidator
+from fastapi.testclient import TestClient
+from starlette.datastructures import UploadFile
 
 
 class FakeDetector(ObjectDetector):
@@ -118,6 +117,37 @@ def test_job_creation_status_progress_and_fake_detector(
     assert result and result.frames_analyzed == 5 and result.detections
     assert all(item.model_id == "fake-detector-v1" for item in result.detections)
     assert (service.storage.analysis_dir(created.analysis_id) / "annotated.mp4").is_file()
+
+
+def test_service_propagates_video_model_profile(
+    video_settings: Settings, monkeypatch: pytest.MonkeyPatch
+):
+    captured = {}
+    fake_detector = FakeDetector()
+
+    def fake_create_detector(name: str, **kwargs):
+        captured["name"] = name
+        captured.update(kwargs)
+        return fake_detector
+
+    video_settings.VIDEO_DETECTOR = "yolo"
+    video_settings.VIDEO_MODEL_PROFILE = "h250"
+    monkeypatch.setattr(
+        "app.video_analysis.service.create_detector", fake_create_detector
+    )
+
+    service = VideoAnalysisService(video_settings)
+
+    assert service.detector is fake_detector
+    assert captured == {
+        "name": "yolo",
+        "model_path": video_settings.VIDEO_MODEL_PATH,
+        "model_profile": "h250",
+        "device": video_settings.VIDEO_DEVICE,
+        "confidence_threshold": video_settings.VIDEO_CONFIDENCE_THRESHOLD,
+        "person_threshold": video_settings.VIDEO_PERSON_CONFIDENCE_THRESHOLD,
+        "ball_threshold": video_settings.VIDEO_BALL_CONFIDENCE_THRESHOLD,
+    }
 
 
 def test_processing_error_sets_failed_status(sample_video: Path, video_settings: Settings):

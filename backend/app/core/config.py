@@ -46,6 +46,7 @@ class Settings(BaseSettings):
     VIDEO_FRAME_SAMPLE_RATE: int = 0
     VIDEO_DETECTOR: str = "hog"
     VIDEO_MODEL_PATH: str = "yolo11n.pt"
+    VIDEO_MODEL_PROFILE: str = "coco"
     VIDEO_CONFIDENCE_THRESHOLD: float = 0.45
     VIDEO_PERSON_CONFIDENCE_THRESHOLD: float = 0.45
     VIDEO_BALL_CONFIDENCE_THRESHOLD: float = 0.25

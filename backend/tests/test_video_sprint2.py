@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -22,11 +23,112 @@ def detection():
     return RawDetection("person", "player_candidate", 0.9, (10, 10, 30, 50))
 
 
+class FakeYOLOModel:
+    def __init__(self, boxes: list[SimpleNamespace]) -> None:
+        self.boxes = boxes
+        self.predict_kwargs = {}
+
+    def predict(self, **kwargs):
+        self.predict_kwargs = kwargs
+        return [SimpleNamespace(boxes=self.boxes)]
+
+
+def fake_box(class_id: int, confidence: float) -> SimpleNamespace:
+    return SimpleNamespace(
+        cls=np.array(class_id),
+        conf=np.array(confidence),
+        xyxy=np.array([[1.0, 2.0, 8.0, 9.0]]),
+    )
+
+
 def test_detector_selection_and_hog_fallback():
     assert isinstance(create_detector("hog"), OpenCVHOGPersonDetector)
-    assert isinstance(create_detector("yolo"), UltralyticsYOLODetector)
+    yolo = create_detector("yolo")
+    assert isinstance(yolo, UltralyticsYOLODetector)
+    assert yolo.model_profile == "coco"
+    assert yolo.class_map == {0: "person", 32: "sports ball"}
     with pytest.raises(ValueError):
         create_detector("mystery")
+
+
+def test_h250_model_profile_mapping():
+    detector = create_detector("yolo", model_profile="h250")
+
+    assert isinstance(detector, UltralyticsYOLODetector)
+    assert detector.model_profile == "h250"
+    assert detector.class_map == {0: "sports ball", 1: "person"}
+
+
+def test_unknown_yolo_model_profile_is_rejected():
+    with pytest.raises(ValueError, match="Profil de modèle YOLO inconnu"):
+        create_detector("yolo", model_profile="unknown")
+
+
+def test_explicit_class_map_has_priority_over_model_profile():
+    custom_map = {7: "sports ball"}
+    detector = create_detector(
+        "yolo", model_profile="h250", class_map=custom_map
+    )
+    assert isinstance(detector, UltralyticsYOLODetector)
+    model = FakeYOLOModel([fake_box(7, 0.9)])
+    detector._model = model
+
+    output = detector.detect(np.zeros((10, 10, 3), dtype=np.uint8))
+
+    assert detector.class_map == custom_map
+    assert model.predict_kwargs["classes"] == [7]
+    assert [item.class_name for item in output] == ["sports ball"]
+
+
+@pytest.mark.parametrize(
+    ("model_profile", "class_ids", "expected_classes", "expected_names"),
+    [
+        ("coco", [0, 32], [0, 32], ["person", "sports ball"]),
+        ("h250", [0, 1], [0, 1], ["sports ball", "person"]),
+    ],
+)
+def test_yolo_profiles_normalize_classes_sent_to_predict(
+    model_profile: str,
+    class_ids: list[int],
+    expected_classes: list[int],
+    expected_names: list[str],
+):
+    detector = UltralyticsYOLODetector(
+        "unused.pt", model_profile=model_profile
+    )
+    model = FakeYOLOModel([fake_box(class_id, 0.9) for class_id in class_ids])
+    detector._model = model
+
+    output = detector.detect(np.zeros((10, 10, 3), dtype=np.uint8))
+
+    assert model.predict_kwargs["classes"] == expected_classes
+    assert [item.class_name for item in output] == expected_names
+
+
+def test_yolo_profile_applies_person_and_ball_thresholds():
+    detector = UltralyticsYOLODetector(
+        "unused.pt",
+        model_profile="h250",
+        person_threshold=0.45,
+        ball_threshold=0.25,
+    )
+    model = FakeYOLOModel(
+        [
+            fake_box(0, 0.24),
+            fake_box(0, 0.25),
+            fake_box(1, 0.44),
+            fake_box(1, 0.45),
+        ]
+    )
+    detector._model = model
+
+    output = detector.detect(np.zeros((10, 10, 3), dtype=np.uint8))
+
+    assert model.predict_kwargs["conf"] == 0.25
+    assert [(item.class_name, item.confidence) for item in output] == [
+        ("sports ball", 0.25),
+        ("person", 0.45),
+    ]
 
 
 def test_tracker_disabled():
