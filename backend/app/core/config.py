@@ -61,6 +61,8 @@ class Settings(BaseSettings):
     VIDEO_PRESERVE_AUDIO: bool = True
     VIDEO_MAX_PROCESSING_SECONDS: float = 0
     VIDEO_KEEP_TEMPORARY_FILES: bool = False
+    VIDEO_RETAIN_SOURCE: bool = True
+    VIDEO_GIT_SHA: str = ""
 
     @property
     def video_frame_sample_rate(self) -> int:

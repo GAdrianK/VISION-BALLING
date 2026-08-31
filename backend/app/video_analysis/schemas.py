@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Literal
+from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
-SCHEMA_VERSION = "1.1.0"
-PIPELINE_VERSION = "0.2.0"
+SCHEMA_VERSION = "1.2.0"
+PIPELINE_VERSION = "0.3.0"
 
 
 class JobStatus(str, Enum):
@@ -58,6 +58,7 @@ class VideoMetadata(BaseModel):
 
 class PipelineMetadata(BaseModel):
     version: str = PIPELINE_VERSION
+    pipeline_version: str = PIPELINE_VERSION
     detector: str
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     frame_interval: int = Field(ge=1)
@@ -70,6 +71,28 @@ class PipelineMetadata(BaseModel):
     ffmpeg_version: str | None = None
     video_backend: str = "opencv"
     frame_sample_rate: int | None = None
+    source_sha256: str | None = None
+    analysis_key: str | None = None
+    git_sha: str = "unknown"
+    model_id: str | None = None
+    model_checksum: str | None = None
+    thresholds: dict[str, float] = Field(default_factory=dict)
+    source_fps: float | None = Field(default=None, gt=0)
+    canonical_config: dict[str, Any] = Field(default_factory=dict)
+
+    @model_validator(mode="before")
+    @classmethod
+    def synchronize_pipeline_versions(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            normalized = dict(data)
+            if "pipeline_version" not in normalized:
+                normalized["pipeline_version"] = normalized.get(
+                    "version", PIPELINE_VERSION
+                )
+            if "version" not in normalized:
+                normalized["version"] = normalized["pipeline_version"]
+            return normalized
+        return data
 
 
 class ArtifactSet(BaseModel):
@@ -121,6 +144,8 @@ class AnalysisJob(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     source_sha256: str | None = None
+    analysis_key: str | None = None
+    pipeline: PipelineMetadata | None = None
     error: JobError | None = None
     artifacts: ArtifactSet = Field(default_factory=ArtifactSet)
     warnings: list[str] = Field(default_factory=list)

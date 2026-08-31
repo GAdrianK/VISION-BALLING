@@ -1,4 +1,5 @@
 from app.video_analysis.schemas import (
+    AnalysisJob,
     AnalysisResult,
     BallTrajectoryPoint,
     BoundingBox,
@@ -28,7 +29,7 @@ def test_analysis_contract_serialization():
         ),
     )
     payload = result.model_dump(mode="json")
-    assert payload["schema_version"] == "1.1.0"
+    assert payload["schema_version"] == "1.2.0"
     assert payload["status"] == "completed"
     assert payload["detections"] == []
     assert payload["ball_trajectory"] == []
@@ -80,5 +81,22 @@ def test_sprint_one_payload_remains_readable():
     }
     restored = AnalysisResult.model_validate(payload)
     assert restored.schema_version == "1.0.0"
+    assert restored.pipeline.pipeline_version == "0.1.0"
     assert restored.pipeline.tracker_name == "none"
     assert restored.ball_trajectory == []
+
+
+def test_legacy_job_without_analysis_key_remains_readable():
+    restored = AnalysisJob.model_validate(
+        {
+            "schema_version": "1.1.0",
+            "analysis_id": "analysis_legacy",
+            "match_id": "match_legacy",
+            "status": "completed",
+            "source_sha256": "legacy-source-sha",
+        }
+    )
+
+    assert restored.source_sha256 == "legacy-source-sha"
+    assert restored.analysis_key is None
+    assert restored.pipeline is None

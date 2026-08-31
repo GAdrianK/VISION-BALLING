@@ -64,6 +64,7 @@ class VideoPipeline:
         output_dir: Path,
         metadata: VideoMetadata,
         progress: ProgressCallback,
+        pipeline_metadata: PipelineMetadata | None = None,
     ) -> AnalysisResult:
         started_at = time.monotonic()
         self.detector.load()
@@ -288,24 +289,37 @@ class VideoPipeline:
             len(detections),
             duration,
         )
+        runtime_metadata = pipeline_metadata or PipelineMetadata(
+            detector=detector_metadata["model_id"],
+            frame_interval=self.frame_interval,
+            device=detector_metadata.get("device", "unknown"),
+        )
+        runtime_metadata = runtime_metadata.model_copy(
+            update={
+                "detector": (
+                    runtime_metadata.detector
+                    if pipeline_metadata is not None
+                    else detector_metadata["model_id"]
+                ),
+                "detector_name": detector_metadata.get("name")
+                or runtime_metadata.detector_name,
+                "detector_version": detector_metadata.get("version")
+                or runtime_metadata.detector_version,
+                "tracker_name": tracker_metadata["name"],
+                "tracker_version": tracker_metadata.get("version"),
+                "tracking_enabled": tracker_metadata["enabled"],
+                "ffmpeg_version": backend.ffmpeg_version,
+                "video_backend": final_video_backend,
+                "frame_sample_rate": self.frame_interval,
+                "source_fps": metadata.fps,
+            }
+        )
         return AnalysisResult(
             analysis_id=analysis_id,
             match_id=match_id,
             status=JobStatus.COMPLETED,
             video=metadata,
-            pipeline=PipelineMetadata(
-                detector=detector_metadata["model_id"],
-                frame_interval=self.frame_interval,
-                device=detector_metadata.get("device", "unknown"),
-                detector_name=detector_metadata.get("name"),
-                detector_version=detector_metadata.get("version"),
-                tracker_name=tracker_metadata["name"],
-                tracker_version=tracker_metadata.get("version"),
-                tracking_enabled=tracker_metadata["enabled"],
-                ffmpeg_version=backend.ffmpeg_version,
-                video_backend=final_video_backend,
-                frame_sample_rate=self.frame_interval,
-            ),
+            pipeline=runtime_metadata,
             detections=detections,
             ball_trajectory=ball_trajectory,
             artifacts=ArtifactSet(

@@ -116,7 +116,55 @@ def test_job_creation_status_progress_and_fake_detector(
     result = service.storage.load_result(created.analysis_id)
     assert result and result.frames_analyzed == 5 and result.detections
     assert all(item.model_id == "fake-detector-v1" for item in result.detections)
+    assert result.pipeline.source_sha256 == completed.source_sha256
+    assert result.pipeline.analysis_key == completed.analysis_key
+    assert result.pipeline.pipeline_version == "0.3.0"
+    assert result.pipeline.model_id == "fake-detector-v1"
+    assert result.pipeline.model_checksum
+    assert result.pipeline.git_sha != "unknown"
+    assert result.pipeline.source_fps == pytest.approx(10)
+    assert result.pipeline.canonical_config
     assert (service.storage.analysis_dir(created.analysis_id) / "annotated.mp4").is_file()
+
+
+def test_completed_run_is_reused_only_by_analysis_key(
+    sample_video: Path, video_settings: Settings
+):
+    service = VideoAnalysisService(video_settings, detector=FakeDetector())
+    first = upload(service, sample_video)
+    service.process(first.analysis_id)
+
+    reused = upload(service, sample_video)
+    assert reused.reused is True
+    assert reused.analysis_id == first.analysis_id
+
+    video_settings.VIDEO_CONFIDENCE_THRESHOLD = 0.55
+    distinct = upload(service, sample_video)
+    assert distinct.reused is False
+    assert distinct.analysis_id != first.analysis_id
+
+
+@pytest.mark.parametrize(
+    ("keep_temporary", "retain_source", "source_exists"),
+    [(False, True, True), (True, True, True), (False, False, False)],
+)
+def test_source_retention_is_independent_from_temporary_files(
+    sample_video: Path,
+    video_settings: Settings,
+    keep_temporary: bool,
+    retain_source: bool,
+    source_exists: bool,
+):
+    video_settings.VIDEO_KEEP_TEMPORARY_FILES = keep_temporary
+    video_settings.VIDEO_RETAIN_SOURCE = retain_source
+    service = VideoAnalysisService(video_settings, detector=FakeDetector())
+    created = upload(service, sample_video)
+    directory = service.storage.analysis_dir(created.analysis_id)
+    source = next(directory.glob("source.*"))
+
+    service.process(created.analysis_id)
+
+    assert source.exists() is source_exists
 
 
 def test_predicted_ball_positions_do_not_count_as_detections(

@@ -2,7 +2,7 @@
 
 > **Statut : documentation technique actuelle, non normative.** Le périmètre et les garanties V1 sont définis par les documents de `docs/product/` et l'ADR 0001.
 
-Le module `backend/app/video_analysis/` fournit un pipeline local versionné `0.2.0` et un schéma de résultat `1.1.0`. Il valide une vidéo, échantillonne ses frames, exécute le détecteur configuré, applique éventuellement des trackers, produit un JSON et tente de créer une vidéo annotée.
+Le module `backend/app/video_analysis/` fournit un pipeline local versionné `0.3.0` et un schéma de résultat `1.2.0`. Il valide une vidéo, échantillonne ses frames, exécute le détecteur configuré, applique éventuellement des trackers, produit un JSON et crée une vidéo annotée.
 
 ## Composants
 
@@ -11,7 +11,8 @@ Le module `backend/app/video_analysis/` fournit un pipeline local versionné `0.
 - `trackers.py` : suivi des personnes par IoU ou ByteTrack facultatif et suivi temporel expérimental du ballon ;
 - `pipeline.py` : traitement frame par frame, résumés, annotations et artefacts ;
 - `storage.py` : persistance locale des jobs, résultats JSON et artefacts ;
-- `service.py` : orchestration, progression et réutilisation d'un résultat par SHA source.
+- `service.py` : orchestration, progression et réutilisation d'un résultat par clé d'analyse reproductible.
+- `reproducibility.py` : configuration canonique, checksum modèle, clé d'analyse et commit Git.
 
 ## Détecteurs disponibles
 
@@ -44,6 +45,9 @@ Le profil H250 est vérifié par des tests de mapping, pas validé sur les vidé
 | `VIDEO_BALL_TRACK_MAX_MISSING_FRAMES` | `5` | limite des prédictions consécutives du ballon |
 | `VIDEO_BALL_TRACK_MAX_DISTANCE_RATIO` | `0.15` | filtre de déplacement relatif |
 | `VIDEO_PRESERVE_AUDIO` | `true` | demande la conservation de l'audio lors de l'encodage |
+| `VIDEO_KEEP_TEMPORARY_FILES` | `false` | conserve les frames et intermédiaires de diagnostic |
+| `VIDEO_RETAIN_SOURCE` | `true` | conserve la vidéo source pour une réanalyse reproductible |
+| `VIDEO_GIT_SHA` | vide | injecte le commit du build quand `.git` n'est pas disponible |
 
 Les autres contraintes d'entrée sont centralisées dans `backend/app/core/config.py`.
 
@@ -84,13 +88,23 @@ Un job terminé peut référencer :
 - le JSON de détections ;
 - une image d'aperçu.
 
-Ils sont écrits dans le stockage local configuré et ignorés par Git. La réutilisation actuelle cherche un résultat complété à partir du SHA de la vidéo source ; elle ne tient pas compte de toute la configuration du pipeline.
+Ils sont écrits dans le stockage local configuré et ignorés par Git. La source est conservée par défaut, indépendamment des frames temporaires. Ce choix permet une réanalyse reproductible avant l'arrivée d'un stockage objet, au prix d'une consommation disque proportionnelle aux uploads. `VIDEO_RETAIN_SOURCE=false` supprime la source après un traitement réussi ; une source ayant échoué reste disponible pour diagnostic.
+
+## Reproductibilité et cache
+
+Le SHA-256 de la source ne suffit pas à identifier un résultat. Le service calcule désormais une `analysis_key` déterministe à partir du SHA source, du checksum modèle, de la version pipeline et d'un JSON canonique trié. Ce JSON contient uniquement les paramètres ayant un effet sur le run : détecteur et modèle, seuils effectifs, sampling, tracker et paramètres du tracker ballon, profil de normalisation vidéo, audio et version du normaliseur.
+
+Pour YOLO, le device fait partie de l'identité car CPU et accélérateurs peuvent produire des différences numériques affectant les détections. Le device HOG, fixé au CPU, n'est pas dupliqué dans la configuration canonique. Les chemins absolus, répertoires temporaires et secrets sont exclus.
+
+Si `VIDEO_MODEL_PATH` désigne un fichier présent, son SHA-256 réel est calculé et mis en cache selon le chemin résolu, la taille et la date de modification. Sans poids, l'identité est un SHA-256 déterministe du backend, du modèle, de son profil et de sa version. Le commit Git vient de `VIDEO_GIT_SHA`, puis de `git rev-parse HEAD`, sinon vaut exactement `unknown`.
+
+Seul un job terminé portant la même `analysis_key` est réutilisé. Les anciens JSON sans cette clé restent lisibles grâce aux valeurs optionnelles du schéma, mais ne sont pas réutilisés automatiquement : leur configuration complète ne peut pas être prouvée.
 
 ## Encodage et navigateurs
 
-Le pipeline contient une étape FFmpeg visant un flux H.264/AAC, un pixel format `yuv420p` et le déplacement des métadonnées au début du fichier. Les tests vérifient la construction de la commande, mais pas la lecture réelle sur une matrice de navigateurs.
+Quand FFmpeg est disponible, la vidéo finale passe toujours par une normalisation `libx264`, `yuv420p`, tag `avc1`, cadence source explicite en CFR, timestamps non négatifs et `+faststart`, avec ou sans conservation de l'audio. Les commandes utilisent une liste d'arguments et `shell=False`.
 
-Une incompatibilité de lecture a été observée sous Linux et n'est pas considérée comme résolue par cette documentation. La normalisation définitive de l'encodage et sa validation multi-navigateurs relèvent du chapitre 2.
+Sans FFmpeg, ou si la normalisation échoue, le fichier `mp4v` OpenCV est conservé avec un warning explicite : il ne satisfait pas la garantie de compatibilité navigateur. Un smoke test synthétique vérifie avec ffprobe H.264, `avc1`, `yuv420p`, FPS, durée et timestamp initial ; il est skippé explicitement lorsque FFmpeg ou ffprobe manque. La validation Chrome, Firefox et Edge reste prévue au chapitre 2B.
 
 ## Limites
 

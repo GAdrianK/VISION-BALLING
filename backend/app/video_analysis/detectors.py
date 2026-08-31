@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from importlib import metadata
 from typing import Any, ClassVar
 
 import cv2
@@ -111,6 +112,7 @@ class UltralyticsYOLODetector(ObjectDetector):
                 f"Valeurs acceptées : {accepted}."
             )
         self.model_path = model_path
+        self.model_id = model_path.replace("\\", "/").rstrip("/").rsplit("/", 1)[-1]
         self.device = device
         self.person_threshold = person_threshold
         self.ball_threshold = ball_threshold
@@ -122,7 +124,10 @@ class UltralyticsYOLODetector(ObjectDetector):
         )
         self.class_map = dict(selected_map)
         self._model: Any = None
-        self._version = "unknown"
+        try:
+            self._version = metadata.version("ultralytics")
+        except metadata.PackageNotFoundError:
+            self._version = "unknown"
 
     def load(self) -> None:
         try:
@@ -170,7 +175,7 @@ class UltralyticsYOLODetector(ObjectDetector):
         return {
             "name": "yolo",
             "version": self._version,
-            "model_id": self.model_path,
+            "model_id": self.model_id,
             "provider": "Ultralytics",
             "device": self.device,
             "classes": ["person", "sports ball"],

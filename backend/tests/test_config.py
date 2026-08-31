@@ -8,6 +8,7 @@ def test_config_loading():
     assert len(settings.OPENAI_API_KEY) > 0
     assert settings.HOST == "0.0.0.0"
     assert settings.PORT == 8000
+    assert settings.VIDEO_RETAIN_SOURCE is True
 
 
 @pytest.mark.parametrize(
