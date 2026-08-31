@@ -1,8 +1,19 @@
-# React + Vite
+# Frontend VISION-BALLING
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interface React 18 construite avec Vite 5. Elle expose le chat, la comparaison statistique alimentée par l'API et le flux d'analyse vidéo.
 
-Currently, two official plugins are available:
+```bash
+npm ci
+npm run dev
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Contrôles disponibles :
+
+```bash
+npm run lint
+npm run build
+```
+
+La variable facultative `VITE_API_URL` définit l'adresse du backend ; la valeur locale par défaut est `http://127.0.0.1:8000`.
+
+Les cartes de terrain décoratives ne représentent pas une analyse calculée. Les résultats vidéo affichés proviennent exclusivement des réponses de l'API.

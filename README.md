@@ -1,214 +1,184 @@
-# ⚽ Football IQ Assistant — MVP V1
+# VISION-BALLING
 
-> Assistant tactique football à intelligence artificielle, propulsé par un moteur RAG local (Retrieval-Augmented Generation).
+VISION-BALLING est un prototype d'assistance à l'analyse football post-match. Il réunit une interface React, une API FastAPI, un pipeline vidéo local et un moteur documentaire local afin de préparer une analyse tactique vérifiable par un humain.
 
----
+> **Statut : prototype V1 en construction.** Le dépôt permet déjà d'ingérer et d'annoter des vidéos, mais il ne produit pas encore les métriques tactiques définies pour la V1 et ne doit pas être considéré comme prêt pour la production.
 
-## 🎯 Présentation
+## État réel du produit
 
-**Football IQ Assistant** est un assistant conversationnel spécialisé dans l'analyse tactique du football.  
-Il répond à des questions en s'appuyant exclusivement sur une base de connaissances structurée de **24 documents tactiques** (268 chunks indexés), couvrant formations, pressing, transitions, rôles et phases offensives.
+### Fonctionnel aujourd'hui
 
-Trois modes de réponse adaptés à chaque profil :
-- 🎓 **Coach** — consignes terrain, séances d'entraînement structurées
-- 🔍 **Analyste** — observations tactiques cliniques, forces/faiblesses
-- 📣 **Fan** — vulgarisation accessible et vivante
+- interface React/Vite pour le chat, l'import vidéo, le suivi d'un traitement et la lecture des résultats ;
+- API FastAPI avec routes de chat, d'export PDF et d'analyse vidéo ;
+- validation des fichiers vidéo, traitement frame par frame et stockage local des jobs et résultats ;
+- détecteur OpenCV HOG par défaut pour les personnes, sans poids externe ;
+- vidéo annotée et export JSON horodaté ;
+- moteur RAG local distinct du pipeline vidéo.
 
----
+### Expérimental
 
-## 🏆 MVP - Football Intelligence Core (Juin 2026)
+- détecteur YOLO facultatif, qui exige des dépendances et des poids locaux non versionnés ;
+- profil de classes H250 (`ball`, `person`) ;
+- suivi des personnes par IoU ou ByteTrack facultatif ;
+- suivi temporel du ballon, avec séparation entre observations et prédictions ;
+- compatibilité de la vidéo annotée entre navigateurs ;
+- traitement en arrière-plan basé sur `BackgroundTasks`, non durable.
 
-Le pipeline d'intelligence tactique est désormais entièrement opérationnel avec une architecture hybride de pointe :
-- **Ingestion & Structuration (ETL)** : Découpage intelligent du corpus Markdown via `MarkdownHeaderSplitter` avec détection déterministe des concepts tactiques, types de chunks (exercices, matches, tactiques) et équipes concernées.
-- **Stockage Hybride Enfant-Parent** : Association persistante entre les chunks enfants indexés vectoriellement dans **Qdrant** (`:memory:` pour le mode local) et les rapports parents complets stockés dans **SQLite**.
-- **Moteur de Recherche Retriever** :
-  1. *Query Rewriting* : Multi-requêtes générées via GPT-4o-mini (avec fallback local).
-  2. *Recherche Hybride* : Fusion des scores sémantiques (Qdrant) et lexicaux (BM25 custom).
-  3. *Tactical Reranking* : Re-classement des 20 meilleurs candidats via **FlashRank**.
-  4. *Résolution Parent* : Extraction du document parent complet depuis SQLite pour conserver le contexte global.
-- **Génération Structurée** : Endpoint `/api/analyze` FastAPI utilisant les `Structured Outputs` d'OpenAI (schémas Pydantic stricts de 10 piliers tactiques) pour générer des rapports dynamiques affichés sous forme de tableau de bord premium dans l'interface utilisateur.
+### Non implémenté
 
-### 📊 Résultats du Benchmark (Qualité RAG)
-Les performances ont été évaluées de manière déterministe via une logique *LLM-as-a-judge* :
-*   **Fidélité au contexte (Faithfulness)** : **9.00 / 10** — Absence d'hallucinations tactiques, respect rigoureux du corpus source.
-*   **Pertinence de la réponse (Answer Relevance)** : **8.50 / 10** — Réponses hautement ciblées et structure tactique de qualité professionnelle.
+- identification des équipes et correction humaine ;
+- calibration du terrain et état de jeu en coordonnées 2D ;
+- possession et métriques tactiques V1 : largeur, longueur/profondeur, centroid robuste de l’équipe, compacité et transitions ;
+- PPDA et xT ;
+- rapport vidéo sourcé et benchmark golden exécuté.
 
----
+Les illustrations tactiques de l'interface ne sont pas des résultats d'analyse. Une valeur tactique ne doit être considérée comme un résultat que si elle provient de l'API courante et si son origine est traçable.
 
-## ✨ Fonctionnalités MVP
+## Architecture actuelle
 
-
-| Fonctionnalité | Statut |
-|---|---|
-| Chat conversationnel multi-mode | ✅ |
-| RAG local TF-IDF (268 chunks, 24 documents) | ✅ |
-| Classification des requêtes (salutation, hors-sujet, tactique) | ✅ |
-| Scoring hybride intention défensive/offensive | ✅ |
-| Persistence localStorage (restauration au rechargement) | ✅ |
-| Bouton Copier (feedback visuel) | ✅ |
-| Bouton Simplifier (reformulation débutant) | ✅ |
-| Bouton Approfondir (détails tactiques enrichis) | ✅ |
-| Export PDF tactique (téléchargement direct) | ✅ |
-| Réinitialisation de session | ✅ |
-| Interface responsive dark mode | ✅ |
-| Mode OpenAI (GPT-4o-mini) si clé API présente | ✅ |
-| Fallback offline TF-IDF sans clé API | ✅ |
-
----
-
-## 🏗️ Architecture
-
-```
-IA FOOT/
-├── backend/              # API FastAPI
-│   ├── app/
-│   │   ├── api/          # Routes (chat, search, pdf, health)
-│   │   ├── services/     # RAGEngine, ChatService, QueryClassifier, PDFGenerator
-│   │   ├── schemas/      # Modèles Pydantic
-│   │   └── prompts/      # Prompts système Coach / Analyste / Fan
-│   └── tests/            # 18 tests unitaires et d'intégration
-├── frontend/             # Interface SPA Vanilla JS
-│   ├── index.html
-│   ├── styles.css
-│   └── app.js
-└── football-rag-system/  # Base de connaissances Markdown
-    └── data_football/knowledge_base/   # 24 fichiers tactiques
+```text
+frontend/                     React 18 + Vite 5
+backend/app/main.py           Application FastAPI et routes principales
+backend/app/video_analysis/   Validation, détection, tracking et artefacts
+backend/data/                 Stockage local ignoré par Git
+knowledge_base/               Corpus du moteur documentaire local
+docs/                         Contrats, état courant et documentation technique
 ```
 
----
+Le pipeline vidéo est configurable. Le réglage par défaut utilise HOG sur CPU et ne détecte que les personnes. YOLO, le profil H250 et ByteTrack restent des options locales et expérimentales. Le RAG ne fournit pas les métriques issues d'une vidéo.
 
-## 🚀 Installation
+## Prérequis
 
-### Prérequis
-- Python 3.10+
-- Un navigateur web moderne
+- Git ;
+- Python 3.10 ou plus récent ;
+- Node.js 20 recommandé et npm ;
+- FFmpeg facultatif pour la normalisation/lecture de certains artefacts vidéo ;
+- uniquement pour YOLO ou ByteTrack : dépendances vidéo facultatives et poids locaux compatibles.
 
-### 1. Cloner et configurer
+Aucun modèle, dataset ou média n'est téléchargé par les commandes de démarrage ci-dessous.
+
+## Installation et démarrage
+
+Depuis la racine du dépôt.
+
+### Backend — Windows PowerShell
+
+```powershell
+py -3.11 -m venv backend\.venv
+backend\.venv\Scripts\python.exe -m pip install -r backend\requirements.txt
+backend\.venv\Scripts\python.exe -m pip install -r backend\requirements-dev.txt
+backend\.venv\Scripts\python.exe -m uvicorn app.main:app --app-dir backend --reload --port 8000
+```
+
+### Backend — Linux ou macOS
 
 ```bash
-cd "IA FOOT/backend"
-python -m venv venv
-venv/bin/pip install -r requirements.txt
+python3 -m venv backend/.venv
+backend/.venv/bin/python -m pip install -r backend/requirements.txt
+backend/.venv/bin/python -m pip install -r backend/requirements-dev.txt
+backend/.venv/bin/python -m uvicorn app.main:app --app-dir backend --reload --port 8000
 ```
 
-### 2. Configurer l'environnement
+L'API est alors disponible sur `http://127.0.0.1:8000`. La documentation OpenAPI est exposée sur `/docs`.
+
+### Frontend
+
+Dans un second terminal :
 
 ```bash
-cp .env.example .env
-# Éditer .env si vous avez une clé OpenAI
+cd frontend
+npm ci
+npm run dev
 ```
 
----
+Vite affiche l'URL locale du frontend. `VITE_API_URL` peut cibler une autre API ; sa valeur par défaut est `http://127.0.0.1:8000`.
 
-## ▶️ Lancer l'application
+### Configuration facultative
 
-### Backend (Terminal 1)
+La configuration est lue depuis les variables d'environnement et, localement, depuis `backend/.env`. Ce fichier est ignoré par Git.
+
+Principaux réglages vidéo :
+
+| Variable | Valeur par défaut | Rôle |
+|---|---|---|
+| `VIDEO_DETECTOR` | `hog` | `hog` ou `yolo` |
+| `VIDEO_MODEL_PATH` | `yolo11n.pt` | chemin local du poids YOLO |
+| `VIDEO_MODEL_PROFILE` | `coco` | profil `coco` ou `h250` |
+| `VIDEO_TRACKER` | `iou` | tracker de personnes |
+| `VIDEO_TRACKING_ENABLED` | `true` | active le suivi temporel |
+
+Sans modèle YOLO, conservez `VIDEO_DETECTOR=hog`. Le pipeline fonctionne alors sans poids externe, mais il ne détecte pas le ballon. Pour activer YOLO ou ByteTrack, installez explicitement les dépendances facultatives :
+
+```powershell
+backend\.venv\Scripts\python.exe -m pip install -r backend\requirements-video.txt
+```
+
+ou sous Linux/macOS :
 
 ```bash
-cd "IA FOOT/backend"
-venv/bin/python -m uvicorn app.main:app --reload --port 8000
+backend/.venv/bin/python -m pip install -r backend/requirements-video.txt
 ```
 
-Logs attendus :
-```
-Indexation locale réussie de 268 chunks via TF-IDF.
-Football IQ Assistant API démarrée avec succès.
-```
+Cette commande n'installe aucun poids. Ne configurez `VIDEO_MODEL_PATH` que vers un fichier local compatible.
 
-### Frontend (Navigateur)
+## Routes principales
 
-Ouvrir directement dans le navigateur :
-```
-file:///chemin/vers/IA FOOT/frontend/index.html
-```
+- `GET /api/health`
+- `POST /api/chat`
+- `POST /api/analyze`
+- `POST /api/export-pdf`
+- `GET /api/video-analysis/diagnostics/backend`
+- `POST /api/video-analysis`
+- `GET /api/video-analysis/{analysis_id}`
+- `GET /api/video-analysis/{analysis_id}/detections`
+- `GET /api/video-analysis/{analysis_id}/artifacts`
+- `GET /api/video-analysis/{analysis_id}/artifacts/{artifact_name}`
 
-Le badge vert en haut confirme la connexion au backend.
+`/api/analyze` dépend des données SQL locales disponibles. Certaines réponses génératives peuvent aussi dépendre d'une configuration de fournisseur ; les tests n'exigent ni clé ni appel distant.
 
----
+## Vérification locale
 
-## 🔌 API — Endpoints principaux
-
-### Health check
-```bash
-curl http://127.0.0.1:8000/api/health
-```
-
-### Chat
-```bash
-curl -X POST "http://127.0.0.1:8000/api/chat" \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Explique-moi le faux 9", "mode": "analyst"}'
-```
-
-### Recherche RAG
-```bash
-curl "http://127.0.0.1:8000/api/search?q=pressing+haut&top_k=3"
-```
-
-### Analyse Tactique Structurée (10 Piliers)
-```bash
-curl -X POST "http://127.0.0.1:8000/api/analyze" \
-  -H "Content-Type: application/json" \
-  -d '{"query": "Comment animer les couloirs avec un ailier inversé dans un système en 4-3-3 ?"}'
-```
-
-
-### Export PDF
-```bash
-curl -X POST "http://127.0.0.1:8000/api/export-pdf" \
-  -H "Content-Type: application/json" \
-  -d '{"title":"Séance pressing","blocks":[{"title":"Exercice 1","content":"Rondo 4v2."}]}' \
-  -o fiche.pdf
-```
-
----
-
-## 💬 Exemples de requêtes
-
-| Mode | Question exemple |
-|---|---|
-| Coach | "Prépare une séance de pressing haut pour U17" |
-| Analyste | "Quels sont les avantages et faiblesses du 3-5-2 ?" |
-| Fan | "C'est quoi un faux 9 en vrai ?" |
-| Coach | "Comment défendre en bloc bas face à une équipe qui joue long ?" |
-| Analyste | "Explique la différence entre un pivot et un double pivot" |
-
----
-
-## ⚠️ Limites actuelles
-
-Voir [`docs/known_limitations.md`](docs/known_limitations.md) pour le détail complet.
-
-- Mode offline : réponses basées sur extraction directe du RAG (sans LLM complet)
-- Base de connaissances textuelle uniquement — pas de vidéo ni de schémas
-- Pas d'authentification ni de multi-utilisateur
-- Pas de mémoire long-terme entre sessions (localStorage limité à la session courante)
-
----
-
-## 🧪 Tests
+Avec l'environnement Python local activé ou en utilisant son exécutable, installez les outils de développement puis lancez :
 
 ```bash
-cd backend
-venv/bin/pytest tests/ -v
-# → 18 passed
+python -m pip install -r backend/requirements-dev.txt
+pytest backend/tests -q
+ruff check backend
 ```
 
----
+Puis :
 
-## 🗺️ Roadmap
+```bash
+cd frontend
+npm run lint
+npm run build
+```
 
-| Priorité | Fonctionnalité |
-|---|---|
-| 🔴 Court terme | Connexion OpenAI GPT-4o-mini pour réponses enrichies |
-| 🔴 Court terme | Déploiement sur Render / Railway avec CORS configuré |
-| 🟡 Moyen terme | Interface d'upload de documents tactiques personnalisés |
-| 🟡 Moyen terme | Historique multi-sessions avec IndexedDB |
-| 🟢 Long terme | Intégration de schémas tactiques SVG interactifs |
-| 🟢 Long terme | Module d'analyse vidéo avec extraction de données |
+La CI reproduit ces quatre contrôles. Aucune suite de tests frontend n'est déclarée actuellement.
 
----
+## Limites et garanties
 
-## 📄 Licence
+Le suivi du ballon n'est pas validé sur le terrain et aucune amélioration de qualité n'est revendiquée sans benchmark golden. La compatibilité navigateur de l'encodage doit encore être finalisée. Le stockage est local, la déduplication ne tient pas encore compte de toute la configuration et les tâches de fond ne survivent pas à un redémarrage du processus.
 
-Projet personnel — usage pédagogique et démonstration.
+Voir [les limites connues](docs/known_limitations.md) et [l'état vérifiable du projet](docs/project_status.md) pour la matrice complète.
+
+## Documentation de référence
+
+Les documents normatifs V1 sont :
+
+- [Contrat produit V1](docs/product/product_contract_v1.md)
+- [Protocole des vidéos golden](docs/product/golden_videos_protocol.md)
+- [Métriques de réussite V1](docs/product/success_metrics_v1.md)
+- [Priorités du backlog V1](docs/product/backlog_priorities_v1.md)
+- [ADR 0001 — périmètre de l'analyse tactique assistée](docs/adr/0001-assisted-tactical-analysis-scope.md)
+
+Documentation technique et gouvernance :
+
+- [Index documentaire](docs/README.md)
+- [Analyse vidéo](docs/video-analysis.md)
+- [Politique de branches](docs/development/branch_policy.md)
+- [ADR 0002 — source de vérité du dépôt](docs/adr/0002-repository-source-of-truth.md)
+
+## Données et artefacts locaux
+
+Les secrets, environnements virtuels, dépendances installées, caches, bases générées, résultats, modèles, checkpoints, datasets, vidéos sources, frames et vidéos annotées ne sont pas versionnés. Ils doivent rester dans les emplacements locaux ignorés par Git et être obtenus séparément avec une licence adaptée.

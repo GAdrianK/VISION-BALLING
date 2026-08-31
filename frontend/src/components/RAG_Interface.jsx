@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 export default function RAG_Interface({ messages, onSendMessage }) {
   const [inputValue, setInputValue] = useState('')
@@ -33,13 +33,6 @@ export default function RAG_Interface({ messages, onSendMessage }) {
               </div>
               <div className="message-content">
                 <p>{msg.text}</p>
-                {msg.visualizationActive && (
-                  <div className="visual-indicator-tag">
-                    {msg.visualizationActive === 'pressing' && '🔥 Visualisation : Pressing Haut'}
-                    {msg.visualizationActive === 'passes' && '↗️ Visualisation : Passes Clés'}
-                    {msg.visualizationActive === 'xt' && '⚡ Visualisation : Expected Threat (xT)'}
-                  </div>
-                )}
               </div>
             </div>
           ))}

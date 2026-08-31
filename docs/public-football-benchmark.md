@@ -1,5 +1,7 @@
 # Benchmark Public Football — Sprint 2.1
 
+> **Statut : expérimentation / non normatif.** Ce fichier décrit un protocole ; il ne fournit aucun résultat de référence et ne remplace pas le [protocole golden V1](product/golden_videos_protocol.md).
+
 Ce document décrit le protocole de benchmark public de détection (Ball & Person) et de suivi multi-objets (Tracking) pour la vision par ordinateur appliquée au football.
 
 ---

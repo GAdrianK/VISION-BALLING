@@ -1,4 +1,4 @@
-import React, { useRef, useMemo } from 'react'
+import { useMemo } from 'react'
 import { useTexture } from '@react-three/drei'
 import * as THREE from 'three'
 
@@ -38,7 +38,7 @@ function Spot({ pos }) {
   )
 }
 
-export default function Pitch({ visualType }) {
+export default function Pitch() {
   const grassTexture = useTexture('/textures/pitch_grass_dark.jpg')
 
   useMemo(() => {
@@ -125,85 +125,6 @@ export default function Pitch({ visualType }) {
         ))}
 
       </group>
-
-      {/* ══════════ DYNAMIC PROMPT-DRIVEN OVERLAYS ══════════ */}
-
-      {/* A. PRESSING VISUALIZATION */}
-      {visualType === 'pressing' && (
-        <group position={[0, 0, Z + 0.02]}>
-          {/* Active press blocks (glowing hot zones) */}
-          <mesh position={[-6, 3, 0]}>
-            <circleGeometry args={[2.5, 32]} />
-            <meshBasicMaterial color="#ef4444" transparent opacity={0.4} />
-          </mesh>
-          <mesh position={[-5, -4, 0]}>
-            <circleGeometry args={[2.0, 32]} />
-            <meshBasicMaterial color="#ef4444" transparent opacity={0.35} />
-          </mesh>
-          <mesh position={[3, 1, 0]}>
-            <circleGeometry args={[2.8, 32]} />
-            <meshBasicMaterial color="#ef4444" transparent opacity={0.3} />
-          </mesh>
-
-          {/* Glowing contour rings */}
-          <mesh position={[-6, 3, 0.005]}>
-            <ringGeometry args={[2.4, 2.5, 32]} />
-            <meshBasicMaterial color="#f87171" transparent opacity={0.8} />
-          </mesh>
-          <mesh position={[-5, -4, 0.005]}>
-            <ringGeometry args={[1.9, 2.0, 32]} />
-            <meshBasicMaterial color="#f87171" transparent opacity={0.8} />
-          </mesh>
-          <mesh position={[3, 1, 0.005]}>
-            <ringGeometry args={[2.7, 2.8, 32]} />
-            <meshBasicMaterial color="#f87171" transparent opacity={0.8} />
-          </mesh>
-        </group>
-      )}
-
-      {/* B. KEY PASSES VISUALIZATION */}
-      {visualType === 'passes' && (
-        <group position={[0, 0, Z + 0.02]}>
-          {/* Player Node points */}
-          {/* Passer */}
-          <mesh position={[-7, -3, 0]}>
-            <circleGeometry args={[0.35, 32]} />
-            <meshBasicMaterial color="#06b6d4" />
-          </mesh>
-          {/* Receiver */}
-          <mesh position={[4, 2, 0]}>
-            <circleGeometry args={[0.35, 32]} />
-            <meshBasicMaterial color="#10b981" />
-          </mesh>
-
-          {/* Key Pass Lane Arrow */}
-          <Line pos={[-1.5, -0.5, 0.005]} w={12} h={0.12} rotation={[0, 0, 0.42]} />
-          {/* Arrowhead */}
-          <mesh position={[4.1, 2.1, 0.005]} rotation={[0, 0, -1.15]}>
-            <coneGeometry args={[0.3, 0.7, 4]} />
-            <meshBasicMaterial color="#10b981" />
-          </mesh>
-        </group>
-      )}
-
-      {/* C. EXPECTED THREAT (xT) FLOW */}
-      {visualType === 'xt' && (
-        <group position={[0, 0, Z + 0.02]}>
-          {/* Heat map blocks for Threat Flow */}
-          <mesh position={[4, 5, 0]}>
-            <planeGeometry args={[5, 4]} />
-            <meshBasicMaterial color="#eab308" transparent opacity={0.25} />
-          </mesh>
-          <mesh position={[8, 2, 0]}>
-            <planeGeometry args={[4, 6]} />
-            <meshBasicMaterial color="#f97316" transparent opacity={0.3} />
-          </mesh>
-          <mesh position={[12, 0, 0]}>
-            <planeGeometry args={[4, 10]} />
-            <meshBasicMaterial color="#ef4444" transparent opacity={0.4} />
-          </mesh>
-        </group>
-      )}
 
     </group>
   )

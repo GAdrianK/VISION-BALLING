@@ -1,99 +1,55 @@
-# ⚠️ Limites Connues — Football IQ Assistant MVP V1
+# Limites connues
 
-Ce document recense honnêtement les limites actuelles du système, pour une présentation transparente.
+> **Statut : inventaire technique actuel.** Ce document complète, sans remplacer, le contrat produit V1 et les critères de réussite normatifs.
 
----
+## Validation de domaine
 
-## 1. 📚 Base de connaissances limitée
+- Aucun dataset golden, média golden, jeu d'annotations ou résultat golden n'est versionné.
+- La vérité terrain requise pour évaluer les cinq familles de métriques V1 n'existe pas encore dans le dépôt.
+- Le suivi temporel du ballon est couvert par des tests synthétiques, mais n'a pas été validé visuellement sur le protocole golden.
+- Aucun résultat ne démontre que les prédictions temporelles améliorent la qualité par rapport aux seules observations.
 
-**Statut actuel :** 24 documents tactiques, 268 chunks indexés.
+## Détection et suivi
 
-**Impact :**
-- Les sujets non couverts retournent "Je n'ai pas assez d'informations".
-- La qualité de la réponse est directement proportionnelle à la richesse du document source.
-- Certains sous-thèmes tactiques spécialisés (ex: set-pieces, pressing différentiel, hors-jeu actif) ne sont pas encore couverts.
+- HOG détecte uniquement des personnes candidates et n'est pas spécialisé pour le football.
+- YOLO et le profil H250 exigent des dépendances et des poids locaux facultatifs ; aucun poids n'est versionné.
+- Le mapping H250 est présent, mais sa qualité n'a pas été benchmarkée sur une référence versionnée.
+- Le suivi des joueurs par IoU reste limité lors des croisements, sorties de champ et occultations. ByteTrack est facultatif et expérimental.
+- Une prédiction du ballon est explicitement distincte d'une détection observée et ne possède pas de confiance de détecteur.
 
-**Contournement :** Ajouter un fichier `.md` dans `football-rag-system/data_football/knowledge_base/` et relancer le backend.
+## Vidéo et exécution
 
----
+- La compatibilité de la vidéo annotée doit être finalisée et validée sur plusieurs navigateurs. Un problème de lecture sous Linux reste documenté pour le chapitre 2.
+- La commande FFmpeg est testée comme construction logicielle, pas comme matrice complète de décodage navigateur.
+- `BackgroundTasks` exécute les jobs dans le processus web : la file n'est ni durable ni reprise après redémarrage.
+- Le délai, la mémoire et le débit sur une vidéo de match complète ne sont pas établis par un benchmark versionné.
 
-## 2. 🎥 Pas d'analyse vidéo réelle
+## État tactique V1
 
-**Statut actuel :** Les documents `analyse_video_*.md` décrivent des principes d'observation, mais le système ne traite pas de vraies vidéos.
+- Les équipes ne sont pas classifiées.
+- Le terrain n'est pas calibré et aucun état de jeu 2D fiable n'est produit.
+- Il n'existe pas de flux de correction humaine des joueurs, équipes ou positions.
+- La possession, la largeur, la longueur/profondeur, le centroid robuste de l’équipe, la compacité et les transitions ne sont pas calculés.
+- PPDA et xT ne sont pas calculés par le pipeline vidéo et ne font pas partie des garanties V1.
+- Aucun rapport vidéo sourcé ne relie encore une affirmation à un intervalle et à une preuve visuelle.
 
-**Impact :** Impossible d'analyser un match ou une action vidéo concrète.
+## Stockage et reproductibilité
 
-**Feuille de route :** Module d'intégration vidéo prévu en V2.
+- Les jobs, JSON, vidéos et aperçus sont stockés sur le système de fichiers local.
+- La déduplication actuelle repose sur le SHA de la vidéo source ; elle doit ultérieurement inclure la configuration, le modèle et la version du pipeline.
+- Les artefacts locaux ne sont pas portables entre plusieurs instances et ne disposent pas d'une politique de rétention centralisée.
+- Les modèles, datasets et médias restent hors Git ; leur provenance, licence et empreinte doivent être gérées séparément avant un benchmark.
 
----
+## Moteur documentaire
 
-## 3. 🔐 Pas d'authentification
+- Le RAG utilise un corpus local borné dont la couverture dépend des documents disponibles.
+- Le RAG est séparé du pipeline vidéo et ne constitue jamais la source d'une métrique calculée sur une vidéo.
+- Les routes qui utilisent des données structurées dépendent du contenu local disponible ; une réponse textuelle ne remplace pas une preuve vidéo.
 
-**Statut actuel :** L'application est ouverte sans login.
+## Qualité statique
 
-**Impact :**
-- Usage personnel uniquement.
-- Pas de profil utilisateur ni de personnalisation persistante.
-- Pas de contrôle d'accès pour un déploiement public.
+- La configuration Ruff du chapitre 1 exécute volontairement une baseline critique et transitoire (`E9`, `F63`, `F7`, `F82`) ; elle ne constitue pas un lint backend complet.
+- Un contrôle indépendant avec les règles Ruff par défaut recense 110 constats historiques : 65 `E402`, 30 `F401`, 9 `F541`, 1 `F811` et 5 `F841`. Leur correction globale dépasserait la consolidation du dépôt et doit faire l'objet d'un chantier dédié de qualité backend.
+- ESLint ne signale aucune erreur, mais conserve six avertissements historiques hors des fichiers modifiés par le chapitre 1 : cinq imports React inutilisés (`no-unused-vars`) et une dépendance de hook (`react-hooks/exhaustive-deps`). Le hook doit être revu dans un chantier frontend dédié afin de ne pas modifier sa logique sans test ciblé.
 
----
-
-## 4. 🧠 Pas de mémoire long-terme
-
-**Statut actuel :** Le `localStorage` conserve la session en cours par onglet/navigateur uniquement.
-
-**Impact :**
-- Changer de navigateur ou vider le cache = perte de l'historique.
-- Pas de continuité entre sessions distinctes (ex: "comme on en avait parlé la semaine dernière").
-- Historique limité à la session courante (pas de multi-conversations).
-
-**Feuille de route :** Base de données légère (SQLite ou IndexedDB) prévue en V2.
-
----
-
-## 5. 📝 Qualité RAG dépendante des documents
-
-**Statut actuel :** Le RAG TF-IDF est purement lexical en mode offline.
-
-**Impact :**
-- La pertinence dépend du vocabulaire partagé entre la question et le document.
-- Les synonymes ou reformulations éloignées peuvent mal matcher.
-- En mode offline (sans clé OpenAI), les réponses sont des extractions directes — pas une synthèse fluide.
-
-**Contournement :** Fournir une clé `OPENAI_API_KEY` valide dans `.env` pour activer GPT-4o-mini.
-
----
-
-## 6. 🌐 Pas de déploiement cloud configuré
-
-**Statut actuel :** Fonctionne uniquement en local (`http://127.0.0.1:8000`).
-
-**Impact :**
-- Le frontend ouvert en `file://` ne peut interroger qu'un backend local.
-- Un déploiement distant nécessite la configuration CORS et un serveur de fichiers statiques.
-
-**Feuille de route :** Configuration Render/Railway prévue en T-10 étendu.
-
----
-
-## 7. 📱 Responsive mais non optimisé mobile
-
-**Statut actuel :** L'interface s'adapte aux écrans mobiles mais n'est pas optimisée pour les interactions tactiles avancées.
-
-**Impact :**
-- Les boutons d'action (Copier, Simplifier, Approfondir) sont petits sur mobile.
-- L'expérience clavier virtuel peut décaler le layout.
-
----
-
-## Résumé
-
-| Limite | Sévérité | Feuille de route |
-|---|---|---|
-| Base de connaissances limitée | 🟡 Modérée | Ajouter des documents en continu |
-| Pas de vidéo réelle | 🟢 Faible | V2 |
-| Pas d'auth | 🟡 Modérée | V2 |
-| Pas de mémoire long-terme | 🟡 Modérée | V2 |
-| Qualité RAG offline | 🔴 Haute | Clé OpenAI recommandée |
-| Pas de déploiement cloud | 🟡 Modérée | T-10 étendu |
-| Mobile non optimisé | 🟢 Faible | V1.5 |
+La matrice détaillée des capacités se trouve dans [`project_status.md`](project_status.md). Les décisions et objectifs V1 se trouvent dans [`product/product_contract_v1.md`](product/product_contract_v1.md) et [`product/success_metrics_v1.md`](product/success_metrics_v1.md).

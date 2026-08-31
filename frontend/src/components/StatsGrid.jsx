@@ -1,4 +1,3 @@
-import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { EffectCoverflow } from "swiper/modules";
 
@@ -9,53 +8,53 @@ import "swiper/css/effect-coverflow";
 export function StatsGrid() {
   const cards = [
     {
-      title: "RAG HEALTH INDEX",
-      value: "98.2%",
-      footer: "ACTIVE DOCUMENT RETRIEVAL",
+      title: "PIPELINE VIDÉO",
+      value: "ACTIF",
+      footer: "TRAITEMENT LOCAL",
       details: [
-        "1024 chunks processed in real-time",
-        "Low vector distance (0.12 threshold)",
-        "Metadata mapping match active"
+        "Ingestion et validation disponibles",
+        "Vidéo annotée et JSON local",
+        "Métriques tactiques non calculées"
       ]
     },
     {
-      title: "EXPECTED THREAT (xT)",
-      value: "0.91 xT",
-      footer: "TACTICAL EXPECTED THREAT FLOW",
+      title: "DÉTECTEUR PAR DÉFAUT",
+      value: "HOG",
+      footer: "BASELINE PERSONNES SUR CPU",
       details: [
-        "Dangerous zone progression tracked",
-        "Deep threat vector calculation",
-        "High-availability flow prediction"
+        "Fonctionne sans poids externe",
+        "Détection du ballon indisponible",
+        "Précision football non benchmarkée"
       ]
     },
     {
-      title: "DEFENSIVE COMPACTNESS",
-      value: "12.4m",
-      footer: "BLOC DEFENSIVE COHERENCE",
+      title: "DÉTECTEUR FACULTATIF",
+      value: "YOLO",
+      footer: "CONFIGURATION EXPÉRIMENTALE",
       details: [
-        "Dynamic team compactness index",
-        "Defensive line coordinate tracking",
-        "Inter-line pass suppression active"
+        "Dépendances vidéo séparées",
+        "Poids local requis",
+        "Profil H250 non validé golden"
       ]
     },
     {
-      title: "PRESSING INTENSITY",
-      value: "7.8 PPDA",
-      footer: "PASSES PER DEFENSIVE ACTION",
+      title: "SUIVI TEMPOREL",
+      value: "EXP.",
+      footer: "OBSERVATIONS ET PRÉDICTIONS SÉPARÉES",
       details: [
-        "High opponent build-up pressure",
-        "Active pressing triggers registered",
-        "Defensive recovery coefficient: 1.25"
+        "Tracking personnes limité",
+        "Ballon couvert par tests synthétiques",
+        "Validation terrain absente"
       ]
     },
     {
-      title: "MODEL COHERENCE",
-      value: "94.6%",
-      footer: "PREDICTIVE TACTICAL ALIGNMENT",
+      title: "MÉTRIQUES TACTIQUES V1",
+      value: "ABSENT",
+      footer: "EN ATTENTE DES PRÉREQUIS",
       details: [
-        "Reinforced model state coherence",
-        "Context window optimization active",
-        "Transformer-based tactical routing"
+        "Équipes et calibration absentes",
+        "État de jeu 2D indisponible",
+        "Résultats non affichés comme calculés"
       ]
     }
   ];

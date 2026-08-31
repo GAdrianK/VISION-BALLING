@@ -1,4 +1,7 @@
 # BLUEPRINT ARCHITECTURAL : PLATFORME FOOTBALL IQ ASSISTANT (V2 PRO)
+
+> **Statut : proposition / non normatif / non implémenté.** Ce blueprint ne décrit pas l'architecture actuelle. Consulter [`project_status.md`](project_status.md) pour l'état vérifié.
+
 ## Système Hybride de Big Data : RAG Sémantique & Event Data Quantitatif
 
 **Auteur :** Ingénierie Logicielle & Analyse Tactique Élite  

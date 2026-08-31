@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import Lenis from "lenis";
 import { marked } from "marked";
 import StadiumScene from "./components/StadiumScene";
@@ -13,30 +13,30 @@ const prompts = [
 const modes = ["Coach", "Analyste", "Supporter"];
 
 const metrics = [
-  { value: "7.8", unit: "PPDA", label: "Intensité du pressing", delta: "−1.4", tone: "lime" },
-  { value: "0.91", unit: "xT", label: "Menace attendue", delta: "+24%", tone: "cyan" },
-  { value: "12.4", unit: "m", label: "Compacité du bloc", delta: "Optimal", tone: "violet" },
-  { value: "94.6", unit: "%", label: "Confiance du modèle", delta: "+2.1", tone: "orange" },
+  { value: "ACTIF", unit: "", label: "Pipeline vidéo local", delta: "HOG · CPU", tone: "lime" },
+  { value: "OPTION", unit: "", label: "Détecteur configurable", delta: "Poids local requis", tone: "cyan" },
+  { value: "EXP.", unit: "", label: "Suivi temporel", delta: "Non validé golden", tone: "violet" },
+  { value: "ABSENT", unit: "", label: "Métriques tactiques V1", delta: "Non calculées", tone: "orange" },
 ];
 
 const capabilities = [
   {
     index: "01",
-    title: "Questionnez le match",
-    copy: "Posez une question en langage naturel. Le moteur comprend les phases, les zones et le contexte tactique.",
-    tag: "NLP + RAG",
+    title: "Interrogez le corpus local",
+    copy: "Le moteur documentaire retrouve des passages du corpus local et affiche leurs sources disponibles.",
+    tag: "RAG LOCAL",
   },
   {
     index: "02",
-    title: "Croisez les signaux",
-    copy: "Documents, événements et métriques sont rapprochés pour produire une lecture fiable, sourcée et exploitable.",
-    tag: "DATA FUSION",
+    title: "Inspectez le pipeline vidéo",
+    copy: "L'API expose les détections observées, les prédictions temporelles éventuelles et les artefacts locaux.",
+    tag: "VIDÉO EXPÉRIMENTALE",
   },
   {
     index: "03",
-    title: "Décidez plus vite",
-    copy: "Les données brutes deviennent des recommandations claires pour le staff, l'analyste ou le supporter.",
-    tag: "LIVE INSIGHT",
+    title: "Validez avant d'interpréter",
+    copy: "Les sorties restent assistées et doivent être confrontées à la vidéo et aux limites documentées.",
+    tag: "POST-MATCH",
   },
 ];
 
@@ -233,7 +233,6 @@ function RadarChart({ chartData }) {
         <svg width="270" height="270" viewBox="0 0 270 270" style={{ overflow: "visible" }}>
           <defs>
             {players.map((_, pIdx) => {
-              const color = COLORS[pIdx % COLORS.length];
               return (
                 <filter id={`glow-${pIdx}`} key={`filter-${pIdx}`} x="-20%" y="-20%" width="140%" height="140%">
                   <feGaussianBlur stdDeviation="2" result="blur" />
@@ -313,7 +312,6 @@ export default function App() {
   const [thinking, setThinking] = useState(false);
   const [copied, setCopied] = useState(false);
   const [clock, setClock] = useState("LIVE");
-  const [fps, setFps] = useState(144);
   const [messages, setMessages] = useState([
     {
       role: "assistant",
@@ -355,25 +353,6 @@ export default function App() {
       if (rafId) cancelAnimationFrame(rafId);
       if (lenis) lenis.destroy();
     };
-  }, []);
-
-  // Real-time FPS counter
-  useEffect(() => {
-    let last = performance.now();
-    let count = 0;
-    let rafId;
-    const loop = () => {
-      count++;
-      const now = performance.now();
-      if (now - last >= 1000) {
-        setFps(Math.round(count * 1000 / (now - last)));
-        count = 0;
-        last = now;
-      }
-      rafId = requestAnimationFrame(loop);
-    };
-    rafId = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(rafId);
   }, []);
 
   // Update clock
@@ -547,7 +526,7 @@ export default function App() {
           </nav>
 
           <div className="header-actions">
-            <div className="live-pill"><i /> RAG LOCAL &nbsp;·&nbsp; {fps} FPS</div>
+            <div className="live-pill"><i /> PROTOTYPE V1 &nbsp;·&nbsp; POST-MATCH</div>
             <a className="header-cta" href="#assistant" onClick={(e) => {
               e.preventDefault();
               document.getElementById("assistant")?.scrollIntoView({ behavior: "smooth" });
@@ -564,10 +543,10 @@ export default function App() {
 
         <section className="hero" id="top">
           <div className="hero-copy">
-            <div className="hero-kicker reveal-one"><i /> Football intelligence system <span>v0.9</span></div>
+            <div className="hero-kicker reveal-one"><i /> Football analysis prototype <span>V1</span></div>
             <h1 className="reveal-two">Le match parle.<br /><span>Nous le décodons.</span></h1>
             <p className="hero-description reveal-three">
-              Un assistant IA tactique qui transforme vos données, rapports et événements de match en décisions de jeu instantanées.
+              Un prototype local pour examiner des documents et des sorties vidéo, en gardant les observations, prédictions et limites visibles.
             </p>
             <div className="hero-actions reveal-four">
               <a className="primary-button" href="#assistant" onClick={(e) => {
@@ -580,9 +559,9 @@ export default function App() {
               }}><span className="play">▶</span> Voir comment ça fonctionne</a>
             </div>
             <div className="trust-row reveal-four">
-              <div><strong>49</strong><span>documents indexés</span></div>
-              <div><strong>12ms</strong><span>temps de recherche</span></div>
-              <div><strong>100%</strong><span>traitement local</span></div>
+              <div><strong>LOCAL</strong><span>corpus documentaire</span></div>
+              <div><strong>API</strong><span>pipeline vidéo</span></div>
+              <div><strong>V1</strong><span>prototype en construction</span></div>
             </div>
           </div>
 
@@ -595,8 +574,8 @@ export default function App() {
               <div className="orb-core"><BrainMark /></div>
               <div className="orb-glow" />
             </div>
-            <div className="floating-data data-a"><span>xT FLOW</span><strong>0.91</strong><i>+24%</i></div>
-            <div className="floating-data data-b"><span>CONFIDENCE</span><strong>94.6%</strong><i>VERIFIED</i></div>
+            <div className="floating-data data-a"><span>PIPELINE VIDÉO</span><strong>LOCAL</strong><i>EXPÉRIMENTAL</i></div>
+            <div className="floating-data data-b"><span>RAG</span><strong>LOCAL</strong><i>CORPUS BORNÉ</i></div>
           </div>
 
           <div className="scroll-cue"><span>Scroll to decode</span><i /></div>
@@ -630,13 +609,13 @@ export default function App() {
                   ))}
                 </div>
               </div>
-              <div className="console-status"><i /> EN LIGNE <span>{clock}</span></div>
+              <div className="console-status"><i /> INTERFACE LOCALE <span>{clock}</span></div>
             </div>
 
             <div className="console-grid">
               <div className="chat-panel">
                 <div className="chat-head">
-                  <div><span>SESSION ACTIVE</span><strong>Analyse tactique #024</strong></div>
+                  <div><span>SESSION ACTIVE</span><strong>Session locale</strong></div>
                   <button type="button" onClick={copyLatest}>{copied ? "Copié ✓" : "Copier l’analyse"}</button>
                 </div>
                 <div className="message-list" aria-live="polite" ref={messageListRef}>
@@ -685,7 +664,7 @@ export default function App() {
                       onClick={() => setActiveTab("map")} 
                       className={activeTab === "map" ? "active" : ""}
                     >
-                      MAP TACTIQUE
+                      Démonstration visuelle — données non calculées
                     </button>
                     <button 
                       type="button" 
@@ -698,14 +677,14 @@ export default function App() {
                     </button>
                   </div>
                   {activeTab === "map" ? (
-                    <div className="legend"><i /> Possession haute</div>
+                    <div className="legend"><i /> Données non calculées</div>
                   ) : (
-                    <div className="legend"><i style={{ backgroundColor: "var(--cyan)", boxShadow: "0 0 8px var(--cyan)" }} /> Comparatif IA</div>
+                    <div className="legend"><i style={{ backgroundColor: "var(--cyan)", boxShadow: "0 0 8px var(--cyan)" }} /> Comparatif issu de l’API</div>
                   )}
                 </div>
 
                 {activeTab === "map" ? (
-                  <div className="pitch" aria-label="Carte tactique du match">
+                  <div className="pitch" aria-label="Démonstration visuelle — données non calculées">
                     <div className="pitch-line center-line" />
                     <div className="center-circle" />
                     <div className="box box-left" />
@@ -727,9 +706,9 @@ export default function App() {
                 <div className="pitch-bottom">
                   {activeTab === "map" ? (
                     <>
-                      <div><span>Phase détectée</span><strong>Pressing haut</strong></div>
-                      <div><span>Fenêtre</span><strong>60’—75’</strong></div>
-                      <div><span>Confiance</span><strong>94.6%</strong></div>
+                      <div><span>Origine</span><strong>Illustration statique</strong></div>
+                      <div><span>Données vidéo</span><strong>Non connectées</strong></div>
+                      <div><span>Métriques tactiques</span><strong>Indisponibles</strong></div>
                     </>
                   ) : (
                     <>
@@ -761,7 +740,7 @@ export default function App() {
               <span className="section-index">03 / INTELLIGENCE</span>
               <h2>Voir ce que les autres<br /><em>ne voient pas.</em></h2>
             </div>
-            <div className="section-badge"><i /> LIVE MATCH MODEL</div>
+            <div className="section-badge"><i /> PROTOTYPE POST-MATCH</div>
           </div>
 
           <div className="metric-grid">
@@ -776,11 +755,11 @@ export default function App() {
           </div>
 
           <div className="insight-banner glass-panel">
-            <div className="insight-visual"><span>60’</span><i /><i /><i /><i /><i /></div>
+            <div className="insight-visual"><span>V1</span><i /><i /><i /><i /><i /></div>
             <div className="insight-copy">
-              <span>INSIGHT DÉTECTÉ • MINUTE 60</span>
-              <h3>Le pressing adverse ouvre une fenêtre de <em>14 mètres</em> dans le demi-espace gauche.</h3>
-              <p>Signal croisé sur 4 sources tactiques — confiance élevée.</p>
+              <span>ÉTAT ACTUEL DU PROTOTYPE</span>
+              <h3>Les métriques tactiques restent <em>à construire et à valider</em> sur le protocole golden.</h3>
+              <p>Les sorties disponibles sont des détections, des traces de suivi et des artefacts locaux.</p>
             </div>
             <a href="#assistant" className="icon-button" aria-label="Analyser cet insight" onClick={(e) => {
               e.preventDefault();
@@ -813,9 +792,9 @@ export default function App() {
 
         <section className="closing-section section-wrap">
           <div className="closing-glow" />
-          <span className="section-index">READY FOR KICK-OFF</span>
-          <h2>Votre lecture du jeu<br />commence <em>maintenant.</em></h2>
-          <p>Interrogez vos données. Comprenez le match. Prenez l’avantage.</p>
+          <span className="section-index">PROTOTYPE V1</span>
+          <h2>Explorez les sorties.<br /><em>Validez les preuves.</em></h2>
+          <p>Interrogez le corpus local et inspectez les résultats vidéo sans dépasser leurs garanties.</p>
           <a className="primary-button large" href="#assistant" onClick={(e) => {
             e.preventDefault();
             document.getElementById("assistant")?.scrollIntoView({ behavior: "smooth" });
@@ -827,8 +806,8 @@ export default function App() {
             e.preventDefault();
             document.getElementById("edra-root-canvas")?.scrollTo({ top: 0, behavior: "smooth" });
           }}><BrainMark /><span>IA FOOT</span><em>ALPHA</em></a>
-          <p>Intelligence tactique augmentée.</p>
-          <div><span>RAG ENGINE ONLINE</span><span>© 2026</span></div>
+          <p>Analyse football assistée, post-match.</p>
+          <div><span>RAG LOCAL</span><span>© 2026</span></div>
         </footer>
       </main>
     </div>

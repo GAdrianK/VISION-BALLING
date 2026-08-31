@@ -1,5 +1,7 @@
 # 🚀 Sprint 02 — Déploiement & Feedback Testeurs
 
+> **Statut : historique / non normatif.** Ce plan de sprint ne décrit pas l'état actuel. Consulter [`../project_status.md`](../project_status.md) et [`../video-analysis.md`](../video-analysis.md).
+
 **Durée estimée :** 2 à 3 semaines  
 **Objectif principal :** Rendre le MVP accessible à 3–5 testeurs externes (coachs, utilisateurs football) et collecter du feedback réel pour améliorer le système.
 
