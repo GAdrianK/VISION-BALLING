@@ -2,12 +2,15 @@ from __future__ import annotations
 
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import Mock
 
 import numpy as np
 import pytest
 from app.video_analysis.backends import (
     build_audio_remux_command,
+    build_video_normalization_command,
     diagnose_video_backend,
+    run_command,
 )
 from app.video_analysis.detectors import (
     OpenCVHOGPersonDetector,
@@ -186,6 +189,9 @@ def test_ffmpeg_command_produces_browser_compatible_mp4(tmp_path: Path):
     assert command[command.index("-preset") + 1] == "veryfast"
     assert command[command.index("-crf") + 1] == "20"
     assert command[command.index("-pix_fmt") + 1] == "yuv420p"
+    assert command[command.index("-tag:v") + 1] == "avc1"
+    assert command[command.index("-fps_mode") + 1] == "cfr"
+    assert command[command.index("-avoid_negative_ts") + 1] == "make_non_negative"
     assert command[command.index("-c:a") + 1] == "aac"
     assert command[command.index("-movflags") + 1] == "+faststart"
     assert [
@@ -195,3 +201,39 @@ def test_ffmpeg_command_produces_browser_compatible_mp4(tmp_path: Path):
     ] == ["0:v:0", "1:a:0?"]
     assert "-shortest" in command
     assert "copy" not in command
+
+
+def test_ffmpeg_command_normalizes_silent_output_too(tmp_path: Path):
+    command = build_video_normalization_command(
+        "ffmpeg",
+        tmp_path / "annotated_silent.mp4",
+        tmp_path / "annotated.mp4",
+        fps=25,
+        preserve_audio=False,
+    )
+
+    assert command[command.index("-c:v") + 1] == "libx264"
+    assert command[command.index("-pix_fmt") + 1] == "yuv420p"
+    assert command[command.index("-tag:v") + 1] == "avc1"
+    assert command[command.index("-r") + 1] == "25"
+    assert command[command.index("-fps_mode") + 1] == "cfr"
+    assert command[command.index("-avoid_negative_ts") + 1] == "make_non_negative"
+    assert "-an" in command
+    assert "-c:a" not in command
+    assert command.count("-i") == 1
+
+
+def test_command_runner_never_uses_a_shell(monkeypatch: pytest.MonkeyPatch):
+    completed = Mock()
+    monkeypatch.setattr("app.video_analysis.backends.subprocess.run", completed)
+
+    run_command(["ffmpeg", "-version"], timeout=5)
+
+    completed.assert_called_once_with(
+        ["ffmpeg", "-version"],
+        capture_output=True,
+        text=True,
+        check=True,
+        timeout=5,
+        shell=False,
+    )

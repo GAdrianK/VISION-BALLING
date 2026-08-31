@@ -11,7 +11,7 @@ from pathlib import Path
 import cv2
 
 from app.video_analysis.backends import (
-    build_audio_remux_command,
+    build_video_normalization_command,
     diagnose_video_backend,
     run_command,
 )
@@ -242,29 +242,35 @@ class VideoPipeline:
             warnings.append(
                 "Les track IDs sont expérimentaux et peuvent changer après une occlusion."
             )
+        final_video_backend = "opencv-mp4v-fallback"
         if backend.ffmpeg_available:
-            if self.preserve_audio:
-                ffmpeg_path = shutil.which("ffmpeg")
-                assert ffmpeg_path
-                try:
-                    run_command(
-                        build_audio_remux_command(
-                            ffmpeg_path, silent_path, source, annotated_path
-                        ),
-                        timeout=max(30, metadata.duration_seconds * 2),
-                    )
-                    silent_path.unlink(missing_ok=True)
-                except (OSError, subprocess.SubprocessError):
-                    shutil.move(silent_path, annotated_path)
-                    warnings.append(
-                        "FFmpeg n'a pas pu préserver l'audio ; vidéo silencieuse conservée."
-                    )
-            else:
+            ffmpeg_path = shutil.which("ffmpeg")
+            assert ffmpeg_path
+            try:
+                run_command(
+                    build_video_normalization_command(
+                        ffmpeg_path=ffmpeg_path,
+                        intermediate_video=silent_path,
+                        source_video=source if self.preserve_audio else None,
+                        destination=annotated_path,
+                        fps=metadata.fps,
+                        preserve_audio=self.preserve_audio,
+                    ),
+                    timeout=max(30, metadata.duration_seconds * 2),
+                )
+                silent_path.unlink(missing_ok=True)
+                final_video_backend = "ffmpeg-libx264"
+            except (OSError, subprocess.SubprocessError):
                 shutil.move(silent_path, annotated_path)
+                warnings.append(
+                    "La normalisation FFmpeg a échoué : le fallback OpenCV ne "
+                    "satisfait pas la garantie de compatibilité navigateur."
+                )
         else:
             shutil.move(silent_path, annotated_path)
             warnings.append(
-                "FFmpeg absent : fallback OpenCV actif, la vidéo annotée est sans audio."
+                "FFmpeg absent : fallback OpenCV actif ; cette sortie ne satisfait "
+                "pas la garantie de compatibilité navigateur."
             )
 
         duration = time.monotonic() - started_at
@@ -297,7 +303,7 @@ class VideoPipeline:
                 tracker_version=tracker_metadata.get("version"),
                 tracking_enabled=tracker_metadata["enabled"],
                 ffmpeg_version=backend.ffmpeg_version,
-                video_backend=backend.video_backend,
+                video_backend=final_video_backend,
                 frame_sample_rate=self.frame_interval,
             ),
             detections=detections,
