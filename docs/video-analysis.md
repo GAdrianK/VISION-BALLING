@@ -2,7 +2,7 @@
 
 > **Statut : documentation technique actuelle, non normative.** Le périmètre et les garanties V1 sont définis par les documents de `docs/product/` et l'ADR 0001.
 
-Le module `backend/app/video_analysis/` fournit un pipeline local versionné `0.3.0` et un schéma de résultat `1.2.0`. Il valide une vidéo, échantillonne ses frames, exécute le détecteur configuré, applique éventuellement des trackers, produit un JSON et crée une vidéo annotée.
+Le module `backend/app/video_analysis/` fournit un pipeline local versionné `0.4.0` et un schéma de résultat `1.3.0`. Il valide une vidéo, échantillonne ses frames, exécute le détecteur configuré, applique éventuellement des trackers, produit un JSON et crée une vidéo annotée.
 
 ## Composants
 
@@ -39,11 +39,12 @@ Le profil H250 est vérifié par des tests de mapping, pas validé sur les vidé
 | `VIDEO_MODEL_PATH` | `yolo11n.pt` | chemin du poids YOLO local |
 | `VIDEO_MODEL_PROFILE` | `coco` | sélectionne le profil de classes |
 | `VIDEO_DEVICE` | `cpu` | périphérique transmis au détecteur |
-| `VIDEO_FRAME_INTERVAL` | `10` | intervalle d'échantillonnage par défaut |
+| `VIDEO_FRAME_SAMPLE_RATE` | `10` | exécute une inférence toutes les N frames source ; ce n'est pas une valeur FPS |
 | `VIDEO_TRACKING_ENABLED` | `true` | active les trackers configurés |
 | `VIDEO_TRACKER` | `iou` | tracker de personnes |
-| `VIDEO_BALL_TRACK_MAX_MISSING_FRAMES` | `5` | limite des prédictions consécutives du ballon |
+| `VIDEO_BALL_TRACK_MAX_MISSING_SECONDS` | `0.2` | durée maximale d'extrapolation du ballon |
 | `VIDEO_BALL_TRACK_MAX_DISTANCE_RATIO` | `0.15` | filtre de déplacement relatif |
+| `VIDEO_BALL_TRAJECTORY_SECONDS` | `0.5` | durée approximative de l'historique de trajectoire affiché |
 | `VIDEO_PRESERVE_AUDIO` | `true` | demande la conservation de l'audio lors de l'encodage |
 | `VIDEO_KEEP_TEMPORARY_FILES` | `false` | conserve les frames et intermédiaires de diagnostic |
 | `VIDEO_RETAIN_SOURCE` | `true` | conserve la vidéo source pour une réanalyse reproductible |
@@ -69,6 +70,21 @@ Le JSON expose `ball_trajectory` avec les états `observed` et `predicted`. Le r
 
 Le résumé de classes expose notamment les nombres de détections de personnes et de ballon, les frames avec ballon, le taux apparent de détection et la confiance moyenne. Ces valeurs décrivent le comportement du pipeline ; elles ne sont pas des métriques tactiques.
 
+## Sampling, temporalité et frames
+
+`VIDEO_FRAME_SAMPLE_RATE=N` signifie qu'une inférence est exécutée sur les indices de frame divisibles par N. Toutes les frames restent lues, suivies et écrites. Le tracker ballon avance donc à la cadence source, indépendamment de la fréquence d'inférence.
+
+Les durées du tracker sont configurées en secondes. Après validation de la vidéo, elles sont converties en frames source par `ceil(secondes × FPS source validé)`. Le plafond évite de raccourcir la durée demandée ; une durée positive très faible produit au moins une frame. Les valeurs configurées et effectives sont enregistrées dans `PipelineMetadata`.
+
+Le résultat distingue désormais :
+
+- `frames_read` : lectures OpenCV réussies ;
+- `frames_inferred` : appels réels à `detector.detect()` ;
+- `frames_interpolated` : positions ballon `predicted` sans observation correspondante ;
+- `frames_written` : appels à `VideoWriter.write()`.
+
+`frames_analyzed` est conservé pour compatibilité et vaut exactement `frames_inferred`. Il est déprécié au profit des compteurs explicites.
+
 ## Routes
 
 - `GET /api/video-analysis/diagnostics/backend`
@@ -92,7 +108,7 @@ Ils sont écrits dans le stockage local configuré et ignorés par Git. La sourc
 
 ## Reproductibilité et cache
 
-Le SHA-256 de la source ne suffit pas à identifier un résultat. Le service calcule désormais une `analysis_key` déterministe à partir du SHA source, du checksum modèle, de la version pipeline et d'un JSON canonique trié. Ce JSON contient uniquement les paramètres ayant un effet sur le run : détecteur et modèle, seuils effectifs, sampling, tracker et paramètres du tracker ballon, profil de normalisation vidéo, audio et version du normaliseur.
+Le SHA-256 de la source ne suffit pas à identifier un résultat. Le service calcule désormais une `analysis_key` déterministe à partir du SHA source, du checksum modèle, de la version pipeline et d'un JSON canonique trié. Ce JSON contient uniquement les paramètres ayant un effet sur le run : détecteur et modèle, seuils effectifs, sampling, tracker, durées configurées du tracker ballon, profil de normalisation vidéo, audio et version du normaliseur.
 
 Pour YOLO, le device fait partie de l'identité car CPU et accélérateurs peuvent produire des différences numériques affectant les détections. Le device HOG, fixé au CPU, n'est pas dupliqué dans la configuration canonique. Les chemins absolus, répertoires temporaires et secrets sont exclus.
 
@@ -104,7 +120,9 @@ Seul un job terminé portant la même `analysis_key` est réutilisé. Les ancien
 
 Quand FFmpeg est disponible, la vidéo finale passe toujours par une normalisation `libx264`, `yuv420p`, tag `avc1`, cadence source explicite en CFR, timestamps non négatifs et `+faststart`, avec ou sans conservation de l'audio. Les commandes utilisent une liste d'arguments et `shell=False`.
 
-Sans FFmpeg, ou si la normalisation échoue, le fichier `mp4v` OpenCV est conservé avec un warning explicite : il ne satisfait pas la garantie de compatibilité navigateur. Un smoke test synthétique vérifie avec ffprobe H.264, `avc1`, `yuv420p`, FPS, durée et timestamp initial ; il est skippé explicitement lorsque FFmpeg ou ffprobe manque. La validation Chrome, Firefox et Edge reste prévue au chapitre 2B.
+Sans FFmpeg, ou si la normalisation échoue, le fichier `mp4v` OpenCV est conservé avec un warning explicite : il ne satisfait pas la garantie de compatibilité navigateur. Un smoke test synthétique vérifie avec ffprobe H.264, `avc1`, `yuv420p`, FPS, durée et timestamp initial ; il est skippé explicitement lorsque FFmpeg ou ffprobe manque. La validation navigateur réelle est exécutée sur chaque navigateur local disponible et reste bloquée pour les navigateurs absents.
+
+Le harness léger `scripts/browser_video_probe.py` ouvre une vraie sortie du pipeline dans un navigateur Chromium installé. Il attend `loadedmetadata` puis `loadeddata`, exige des dimensions strictement positives et échoue sur timeout ou erreur de décodage. Un navigateur absent reste `BLOCKED` ; ffprobe ne remplace jamais cette validation.
 
 ## Limites
 

@@ -1,7 +1,7 @@
 # ADR 0003 — Reproductibilité du pipeline vidéo
 
-- Statut : accepté pour le chapitre 2A
-- Date : 2026-08-31
+- Statut : accepté pour le chapitre 2
+- Date : 2026-09-01
 - Portée : pipeline vidéo local et artefacts associés
 
 ## Contexte
@@ -38,7 +38,7 @@ Quand aucun poids n'existe, comme pour OpenCV HOG, le checksum est dérivé de f
 
 Le commit Git est résolu dans cet ordre : `VIDEO_GIT_SHA` valide sur 40 caractères hexadécimaux, `git rev-parse HEAD`, puis la valeur littérale `unknown`. L'absence de `.git` n'empêche jamais le traitement.
 
-Le pipeline passe de `0.2.0` à `0.3.0`. Le schéma passe de `1.1.0` à `1.2.0`, car les jobs et résultats sérialisés gagnent une identité reproductible. Les champs nouveaux ont des valeurs par défaut ou sont optionnels ; les anciens jobs et résultats restent lisibles. Un ancien job sans `analysis_key` n'est pas réutilisé automatiquement, car son identité complète est inconnue.
+Le chapitre 2A a fait passer le pipeline de `0.2.0` à `0.3.0` et le schéma de `1.1.0` à `1.2.0`. La finalisation temporelle du chapitre 2B porte les versions à `0.4.0` et `1.3.0`. Les champs nouveaux ont des valeurs par défaut ou sont optionnels ; les anciens jobs et résultats restent lisibles. Un ancien job sans `analysis_key` n'est pas réutilisé automatiquement, car son identité complète est inconnue.
 
 ### Normalisation vidéo finale
 
@@ -50,6 +50,31 @@ Si FFmpeg manque ou échoue, le `mp4v` intermédiaire devient le fallback. Le r�
 
 `VIDEO_RETAIN_SOURCE=true` est le défaut. Tant qu'aucun stockage objet ne prend le relais, conserver la source est nécessaire pour relancer exactement une analyse. Ce choix augmente l'occupation disque et peut être désactivé explicitement. `VIDEO_KEEP_TEMPORARY_FILES` ne contrôle plus que les frames et intermédiaires de diagnostic ; il ne décide jamais de la suppression de la source.
 
+### Sampling unique
+
+`VIDEO_FRAME_SAMPLE_RATE` est l'unique source de vérité. Sa valeur N signifie « une inférence toutes les N frames source » et non « N FPS ». L'ancien paramètre `VIDEO_FRAME_INTERVAL` est supprimé du code actif et des exemples d'environnement. Les anciens résultats sérialisés portant `frame_interval` restent lisibles grâce à une migration de schéma vers `frame_sample_rate`, sans maintenir deux noms dans l'API interne.
+
+### Temporalité du tracker ballon
+
+`max_missing_frames` et `trajectory_length` restent des détails internes de l'algorithme, mais ne sont plus exposés comme configuration utilisateur. Ils représentaient des durées différentes selon le FPS. Les paramètres canoniques sont désormais `VIDEO_BALL_TRACK_MAX_MISSING_SECONDS` et `VIDEO_BALL_TRAJECTORY_SECONDS`.
+
+Après validation du FPS source, chaque durée est convertie avec la règle `ceil(secondes × FPS source validé)`. Le plafond garantit que la fenêtre demandée n'est pas raccourcie. Zéro désactive toute extrapolation manquante ; une durée de trajectoire doit être strictement positive. L'analysis key contient les secondes configurées, tandis que les métadonnées enregistrent aussi le nombre de frames effectivement utilisé.
+
+### Comptabilité des frames
+
+Le résultat expose quatre compteurs disjoints :
+
+- `frames_read`, nombre de lectures réussies ;
+- `frames_inferred`, nombre d'appels réels au détecteur ;
+- `frames_interpolated`, nombre de positions ballon prédites sans observation détecteur correspondante ;
+- `frames_written`, nombre de frames envoyées au writer.
+
+Pour la compatibilité, `frames_analyzed` reste sérialisé comme alias exact de `frames_inferred`. Il ne doit plus être interprété comme le nombre de frames lues ou écrites.
+
+### Validation navigateur
+
+Le smoke test ffprobe reste la vérification structurelle automatisée. La porte navigateur utilise en complément un harness sans dépendance E2E : une vraie vidéo générée par le pipeline est ouverte dans chaque navigateur Chromium local disponible, puis le test attend `loadedmetadata` et `loadeddata`, vérifie `videoWidth > 0`, `videoHeight > 0` et l'absence d'erreur de décodage. Un navigateur ou une vidéo golden absent est rapporté `BLOCKED`, jamais `PASS`.
+
 ## Conséquences
 
 - Le cache évite les réutilisations incorrectes entre configurations différentes.
@@ -59,6 +84,6 @@ Si FFmpeg manque ou échoue, le `mp4v` intermédiaire devient le fallback. Le r�
 - La conservation par défaut consomme davantage de disque jusqu'à l'introduction du stockage objet.
 - Les jobs anciens restent consultables mais ne bénéficient pas du nouveau cache.
 
-## Suite au chapitre 2B
+## Validation restante hors actifs disponibles
 
-Le chapitre 2B complétera cette décision avec un paramètre de sampling unique, des unités temporelles explicites pour les trackers, le comptage `frames_read / inferred / interpolated / written` et la validation Chrome, Firefox et Edge.
+La décision est implémentée. La validation produit complète reste conditionnée à la disponibilité de Firefox et des trois vidéos golden licenciées définies par le protocole produit.

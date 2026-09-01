@@ -158,7 +158,7 @@ La CI reproduit ces quatre contrôles. Aucune suite de tests frontend n'est déc
 
 ## Limites et garanties
 
-Le suivi du ballon n'est pas validé sur le terrain et aucune amélioration de qualité n'est revendiquée sans benchmark golden. La compatibilité navigateur de l'encodage doit encore être finalisée. Le stockage est local, la déduplication ne tient pas encore compte de toute la configuration et les tâches de fond ne survivent pas à un redémarrage du processus.
+Le suivi du ballon n'est pas validé sur le terrain et aucune amélioration de qualité n'est revendiquée sans benchmark golden. La sortie nominale est normalisée en H.264 et le cache tient compte de la configuration reproductible complète. La validation navigateur reste conditionnée à la matrice réellement disponible. Le stockage est local et les tâches de fond ne survivent pas à un redémarrage du processus.
 
 Voir [les limites connues](docs/known_limitations.md) et [l'état vérifiable du projet](docs/project_status.md) pour la matrice complète.
 

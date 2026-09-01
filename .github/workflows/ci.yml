@@ -6,6 +6,7 @@ on:
     branches:
       - main
       - chore/repository-consolidation
+      - feat/video-reproducibility
 
 permissions:
   contents: read
