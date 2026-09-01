@@ -3,12 +3,14 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections import deque
 from dataclasses import dataclass
-from math import hypot, sqrt
+from math import ceil, hypot, isfinite, sqrt
 from typing import Any, Literal
 
 import numpy as np
 
 from app.video_analysis.detectors import RawDetection
+
+TEMPORAL_FRAME_CONVERSION_RULE = "ceil(seconds * source_fps)"
 
 
 @dataclass(frozen=True)
@@ -25,6 +27,49 @@ class BallTrackPosition:
     state: Literal["observed", "predicted"]
     confidence: float | None
     class_name: Literal["sports ball"] = "sports ball"
+
+
+@dataclass(frozen=True)
+class BallTrackerTiming:
+    source_fps: float
+    max_missing_seconds: float
+    max_missing_frames_effective: int
+    trajectory_seconds: float
+    trajectory_frames_effective: int
+    conversion_rule: str = TEMPORAL_FRAME_CONVERSION_RULE
+
+
+def seconds_to_source_frames(
+    seconds: float, source_fps: float, *, minimum: int = 0
+) -> int:
+    if not isfinite(seconds) or seconds < 0:
+        raise ValueError("seconds doit être fini et supérieur ou égal à 0.")
+    if not isfinite(source_fps) or source_fps <= 0:
+        raise ValueError("source_fps doit être fini et strictement positif.")
+    if minimum < 0:
+        raise ValueError("minimum doit être supérieur ou égal à 0.")
+    return max(minimum, ceil(seconds * source_fps))
+
+
+def resolve_ball_tracker_timing(
+    *,
+    max_missing_seconds: float,
+    trajectory_seconds: float,
+    source_fps: float,
+) -> BallTrackerTiming:
+    if trajectory_seconds <= 0:
+        raise ValueError("trajectory_seconds doit être strictement positif.")
+    return BallTrackerTiming(
+        source_fps=source_fps,
+        max_missing_seconds=max_missing_seconds,
+        max_missing_frames_effective=seconds_to_source_frames(
+            max_missing_seconds, source_fps
+        ),
+        trajectory_seconds=trajectory_seconds,
+        trajectory_frames_effective=seconds_to_source_frames(
+            trajectory_seconds, source_fps, minimum=1
+        ),
+    )
 
 
 class BallTracker:

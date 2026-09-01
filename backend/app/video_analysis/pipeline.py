@@ -29,6 +29,7 @@ from app.video_analysis.schemas import (
 from app.video_analysis.trackers import (
     BallTracker,
     BallTrackPosition,
+    BallTrackerTiming,
     DisabledTracker,
     Tracker,
 )
@@ -41,17 +42,19 @@ class VideoPipeline:
     def __init__(
         self,
         detector: ObjectDetector,
-        frame_interval: int,
+        frame_sample_rate: int,
         tracker: Tracker | None = None,
         keep_extracted_frames: bool = False,
         preserve_audio: bool = True,
         max_processing_seconds: float = 0,
         ball_tracker: BallTracker | None = None,
+        ball_tracker_timing: BallTrackerTiming | None = None,
     ) -> None:
         self.detector = detector
         self.tracker = tracker or DisabledTracker()
         self.ball_tracker = ball_tracker or BallTracker()
-        self.frame_interval = max(1, frame_interval)
+        self.ball_tracker_timing = ball_tracker_timing
+        self.frame_sample_rate = max(1, frame_sample_rate)
         self.keep_extracted_frames = keep_extracted_frames
         self.preserve_audio = preserve_audio
         self.max_processing_seconds = max_processing_seconds
@@ -109,7 +112,10 @@ class VideoPipeline:
         ball_missing_frames = 0
         current_tracking_gap = 0
         longest_tracking_gap = 0
-        frames_analyzed = 0
+        frames_read = 0
+        frames_inferred = 0
+        frames_interpolated = 0
+        frames_written = 0
         frames_with_ball: set[int] = set()
         ball_confidences: list[float] = []
         person_count = 0
@@ -123,10 +129,12 @@ class VideoPipeline:
                 ok, frame = capture.read()
                 if not ok:
                     break
+                frames_read += 1
 
-                frame_analyzed = frame_index % self.frame_interval == 0
+                frame_analyzed = frame_index % self.frame_sample_rate == 0
                 raw_detections = []
                 if frame_analyzed:
+                    frames_inferred += 1
                     try:
                         raw_detections = self.detector.detect(frame)
                     except Exception as exc:
@@ -134,7 +142,6 @@ class VideoPipeline:
                             f"Erreur du détecteur à la frame {frame_index}: {exc}"
                         ) from exc
                     tracked_detections = self.tracker.update(frame, raw_detections)
-                    frames_analyzed += 1
                     frame_has_ball = False
                     for tracked in tracked_detections:
                         raw = tracked.detection
@@ -183,6 +190,7 @@ class VideoPipeline:
                         ball_observed_frames += 1
                     else:
                         ball_predicted_frames += 1
+                        frames_interpolated += 1
                     x1, y1, x2, y2 = ball_position.bbox
                     ball_trajectory.append(
                         BallTrajectoryPoint(
@@ -210,6 +218,7 @@ class VideoPipeline:
                         preview_written = cv2.imwrite(str(preview_path), frame)
 
                 writer.write(frame)
+                frames_written += 1
                 frame_index += 1
                 if (
                     self.max_processing_seconds > 0
@@ -275,25 +284,43 @@ class VideoPipeline:
             )
 
         duration = time.monotonic() - started_at
-        average_fps = frames_analyzed / duration if duration else 0
+        frames_analyzed = frames_inferred
+        average_fps = frames_inferred / duration if duration else 0
         ball_count = len(ball_confidences)
-        ball_rate = len(frames_with_ball) / frames_analyzed if frames_analyzed else 0
-        observed_coverage = ball_observed_frames / frame_index
+        ball_rate = len(frames_with_ball) / frames_inferred if frames_inferred else 0
+        observed_coverage = ball_observed_frames / frames_read
         effective_coverage = (
             ball_observed_frames + ball_predicted_frames
-        ) / frame_index
+        ) / frames_read
         logger.info(
             "video_processing_completed analysis_id=%s frames=%s detections=%s duration=%.3f",
             analysis_id,
-            frames_analyzed,
+            frames_inferred,
             len(detections),
             duration,
         )
         runtime_metadata = pipeline_metadata or PipelineMetadata(
             detector=detector_metadata["model_id"],
-            frame_interval=self.frame_interval,
+            frame_sample_rate=self.frame_sample_rate,
             device=detector_metadata.get("device", "unknown"),
         )
+        timing_updates = {}
+        if self.ball_tracker_timing is not None:
+            timing_updates = {
+                "ball_track_max_missing_seconds": (
+                    self.ball_tracker_timing.max_missing_seconds
+                ),
+                "ball_track_max_missing_frames_effective": (
+                    self.ball_tracker_timing.max_missing_frames_effective
+                ),
+                "ball_trajectory_seconds": (
+                    self.ball_tracker_timing.trajectory_seconds
+                ),
+                "ball_trajectory_frames_effective": (
+                    self.ball_tracker_timing.trajectory_frames_effective
+                ),
+                "temporal_conversion_rule": self.ball_tracker_timing.conversion_rule,
+            }
         runtime_metadata = runtime_metadata.model_copy(
             update={
                 "detector": (
@@ -310,8 +337,9 @@ class VideoPipeline:
                 "tracking_enabled": tracker_metadata["enabled"],
                 "ffmpeg_version": backend.ffmpeg_version,
                 "video_backend": final_video_backend,
-                "frame_sample_rate": self.frame_interval,
+                "frame_sample_rate": self.frame_sample_rate,
                 "source_fps": metadata.fps,
+                **timing_updates,
             }
         )
         return AnalysisResult(
@@ -333,6 +361,10 @@ class VideoPipeline:
             ),
             warnings=warnings,
             frames_analyzed=frames_analyzed,
+            frames_read=frames_read,
+            frames_inferred=frames_inferred,
+            frames_interpolated=frames_interpolated,
+            frames_written=frames_written,
             processing_duration_seconds=round(duration, 3),
             average_processing_fps=round(average_fps, 3),
             class_summary={

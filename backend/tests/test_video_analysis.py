@@ -67,7 +67,7 @@ def video_settings(tmp_path: Path) -> Settings:
         VIDEO_MIN_WIDTH=320,
         VIDEO_MIN_HEIGHT=240,
         VIDEO_MIN_FREE_DISK_MB=0,
-        VIDEO_FRAME_INTERVAL=2,
+        VIDEO_FRAME_SAMPLE_RATE=2,
         VIDEO_KEEP_TEMPORARY_FILES=True,
     )
 
@@ -118,11 +118,16 @@ def test_job_creation_status_progress_and_fake_detector(
     assert all(item.model_id == "fake-detector-v1" for item in result.detections)
     assert result.pipeline.source_sha256 == completed.source_sha256
     assert result.pipeline.analysis_key == completed.analysis_key
-    assert result.pipeline.pipeline_version == "0.3.0"
+    assert result.pipeline.pipeline_version == "0.4.0"
     assert result.pipeline.model_id == "fake-detector-v1"
     assert result.pipeline.model_checksum
     assert result.pipeline.git_sha != "unknown"
     assert result.pipeline.source_fps == pytest.approx(10)
+    assert result.pipeline.ball_track_max_missing_seconds == pytest.approx(0.2)
+    assert result.pipeline.ball_track_max_missing_frames_effective == 2
+    assert result.pipeline.ball_trajectory_seconds == pytest.approx(0.5)
+    assert result.pipeline.ball_trajectory_frames_effective == 5
+    assert result.pipeline.temporal_conversion_rule == "ceil(seconds * source_fps)"
     assert result.pipeline.canonical_config
     assert (service.storage.analysis_dir(created.analysis_id) / "annotated.mp4").is_file()
 
@@ -191,8 +196,8 @@ def test_predicted_ball_positions_do_not_count_as_detections(
             metadata["ball_detection"] = True
             return metadata
 
-    video_settings.VIDEO_FRAME_INTERVAL = 1
-    video_settings.VIDEO_BALL_TRACK_MAX_MISSING_FRAMES = 2
+    video_settings.VIDEO_FRAME_SAMPLE_RATE = 1
+    video_settings.VIDEO_BALL_TRACK_MAX_MISSING_SECONDS = 0.2
     service = VideoAnalysisService(video_settings, detector=BallGapDetector())
     created = upload(service, sample_video)
 
@@ -203,6 +208,11 @@ def test_predicted_ball_positions_do_not_count_as_detections(
     assert len(result.detections) == 1
     assert result.detections[0].class_name == "sports ball"
     assert result.class_summary["ball_detections"] == 1
+    assert result.frames_read == 10
+    assert result.frames_inferred == 10
+    assert result.frames_interpolated == 2
+    assert result.frames_written == 10
+    assert result.frames_analyzed == result.frames_inferred
     assert [point.state for point in result.ball_trajectory] == [
         "observed",
         "predicted",
@@ -248,6 +258,7 @@ def test_ball_tracking_uses_source_frame_cadence(
             return metadata
 
     video_settings.VIDEO_FRAME_SAMPLE_RATE = sample_rate
+    video_settings.VIDEO_BALL_TRACK_MAX_MISSING_SECONDS = 1
     service = VideoAnalysisService(video_settings, detector=BallDetector())
     created = upload(service, sample_video)
 
@@ -280,6 +291,32 @@ def test_ball_tracking_uses_source_frame_cadence(
     assert result.tracking_summary["effective_coverage"] == 1
     assert result.tracking_summary["longest_missing_gap"] == 0
     assert result.tracking_summary["reset_count"] == 0
+
+
+@pytest.mark.parametrize(
+    ("sample_rate", "expected_inferred"), [(1, 100), (10, 10)]
+)
+def test_frame_accounting_distinguishes_pipeline_operations(
+    tmp_path: Path,
+    video_settings: Settings,
+    sample_rate: int,
+    expected_inferred: int,
+):
+    source = make_video(tmp_path / "accounting.avi", frames=100, fps=25)
+    video_settings.VIDEO_FRAME_SAMPLE_RATE = sample_rate
+    service = VideoAnalysisService(video_settings, detector=FakeDetector())
+    created = upload(service, source)
+
+    service.process(created.analysis_id)
+    result = service.storage.load_result(created.analysis_id)
+
+    assert result is not None
+    assert result.frames_read == 100
+    assert result.frames_inferred == expected_inferred
+    assert result.frames_interpolated == 0
+    assert result.frames_written == 100
+    assert result.frames_read == result.frames_written
+    assert result.frames_analyzed == result.frames_inferred
 
 
 def test_service_propagates_video_model_profile(

@@ -56,7 +56,7 @@ def _config(
     settings: Settings,
     model: ModelIdentity | None = None,
     *,
-    pipeline_version: str = "0.3.0",
+    pipeline_version: str = "0.4.0",
 ) -> dict:
     tracker_name = settings.VIDEO_TRACKER if settings.VIDEO_TRACKING_ENABLED else "none"
     return build_canonical_config(
@@ -72,7 +72,7 @@ def _key(
     settings: Settings,
     model: ModelIdentity | None = None,
     *,
-    pipeline_version: str = "0.3.0",
+    pipeline_version: str = "0.4.0",
 ) -> str:
     identity = model or _model()
     return build_analysis_key(
@@ -98,6 +98,20 @@ def test_same_source_and_configuration_produce_same_analysis_key():
     assert _key(_settings()) == _key(_settings())
 
 
+def test_canonical_config_uses_sampling_and_tracker_durations_only():
+    config = _config(_settings())
+
+    assert config["sampling"] == {"frame_sample_rate": 3}
+    assert config["tracking"]["ball"] == {
+        "max_distance_ratio": 0.15,
+        "max_missing_seconds": 0.2,
+        "trajectory_seconds": 0.5,
+    }
+    serialized = canonical_config_json(config)
+    assert "max_missing_frames" not in serialized
+    assert "trajectory_length" not in serialized
+
+
 def test_threshold_change_produces_a_different_analysis_key():
     assert _key(_settings()) != _key(
         _settings(VIDEO_PERSON_CONFIDENCE_THRESHOLD=0.55)
@@ -114,8 +128,20 @@ def test_sampling_change_produces_a_different_analysis_key():
 
 def test_pipeline_version_change_produces_a_different_analysis_key():
     settings = _settings()
-    assert _key(settings, pipeline_version="0.3.0") != _key(
-        settings, pipeline_version="0.4.0"
+    assert _key(settings, pipeline_version="0.4.0") != _key(
+        settings, pipeline_version="0.5.0"
+    )
+
+
+def test_missing_duration_change_produces_a_different_analysis_key():
+    assert _key(_settings()) != _key(
+        _settings(VIDEO_BALL_TRACK_MAX_MISSING_SECONDS=0.4)
+    )
+
+
+def test_trajectory_duration_change_produces_a_different_analysis_key():
+    assert _key(_settings()) != _key(
+        _settings(VIDEO_BALL_TRAJECTORY_SECONDS=1.0)
     )
 
 
@@ -231,7 +257,7 @@ def test_reproducibility_structures_do_not_leak_api_keys():
     config = _config(settings)
     metadata = PipelineMetadata(
         detector="weights.pt",
-        frame_interval=3,
+        frame_sample_rate=3,
         device="cpu",
         source_sha256="source",
         analysis_key=_key(settings),

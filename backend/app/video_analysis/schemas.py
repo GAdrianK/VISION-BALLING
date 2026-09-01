@@ -6,8 +6,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field, model_validator
 
-SCHEMA_VERSION = "1.2.0"
-PIPELINE_VERSION = "0.3.0"
+SCHEMA_VERSION = "1.3.0"
+PIPELINE_VERSION = "0.4.0"
 
 
 class JobStatus(str, Enum):
@@ -61,7 +61,7 @@ class PipelineMetadata(BaseModel):
     pipeline_version: str = PIPELINE_VERSION
     detector: str
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    frame_interval: int = Field(ge=1)
+    frame_sample_rate: int = Field(default=1, ge=1)
     device: str
     detector_name: str | None = None
     detector_version: str | None = None
@@ -70,7 +70,6 @@ class PipelineMetadata(BaseModel):
     tracking_enabled: bool = False
     ffmpeg_version: str | None = None
     video_backend: str = "opencv"
-    frame_sample_rate: int | None = None
     source_sha256: str | None = None
     analysis_key: str | None = None
     git_sha: str = "unknown"
@@ -78,6 +77,13 @@ class PipelineMetadata(BaseModel):
     model_checksum: str | None = None
     thresholds: dict[str, float] = Field(default_factory=dict)
     source_fps: float | None = Field(default=None, gt=0)
+    ball_track_max_missing_seconds: float | None = Field(default=None, ge=0)
+    ball_track_max_missing_frames_effective: int | None = Field(
+        default=None, ge=0
+    )
+    ball_trajectory_seconds: float | None = Field(default=None, gt=0)
+    ball_trajectory_frames_effective: int | None = Field(default=None, ge=1)
+    temporal_conversion_rule: str | None = None
     canonical_config: dict[str, Any] = Field(default_factory=dict)
 
     @model_validator(mode="before")
@@ -91,6 +97,9 @@ class PipelineMetadata(BaseModel):
                 )
             if "version" not in normalized:
                 normalized["version"] = normalized["pipeline_version"]
+            if "frame_sample_rate" not in normalized and "frame_interval" in normalized:
+                normalized["frame_sample_rate"] = normalized["frame_interval"]
+            normalized.pop("frame_interval", None)
             return normalized
         return data
 
@@ -123,6 +132,10 @@ class AnalysisResult(BaseModel):
     artifacts: ArtifactSet = Field(default_factory=ArtifactSet)
     warnings: list[str] = Field(default_factory=list)
     frames_analyzed: int = 0
+    frames_read: int = Field(default=0, ge=0)
+    frames_inferred: int = Field(default=0, ge=0)
+    frames_interpolated: int = Field(default=0, ge=0)
+    frames_written: int = Field(default=0, ge=0)
     processing_duration_seconds: float = 0
     average_processing_fps: float = 0
     class_summary: dict[str, int | float] = Field(default_factory=dict)

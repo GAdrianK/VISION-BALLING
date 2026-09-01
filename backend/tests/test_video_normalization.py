@@ -61,7 +61,7 @@ def test_final_video_is_browser_normalized(
     output_dir.mkdir()
     pipeline = VideoPipeline(
         detector=EmptyDetector(),
-        frame_interval=2,
+        frame_sample_rate=2,
         preserve_audio=preserve_audio,
     )
 

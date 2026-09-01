@@ -83,13 +83,13 @@ def build_canonical_config(
     return {
         "detector": detector,
         "pipeline_version": pipeline_version,
-        "sampling": {"frame_sample_rate": settings.video_frame_sample_rate},
+        "sampling": {"frame_sample_rate": settings.VIDEO_FRAME_SAMPLE_RATE},
         "thresholds": thresholds,
         "tracking": {
             "ball": {
                 "max_distance_ratio": settings.VIDEO_BALL_TRACK_MAX_DISTANCE_RATIO,
-                "max_missing_frames": settings.VIDEO_BALL_TRACK_MAX_MISSING_FRAMES,
-                "trajectory_length": settings.VIDEO_BALL_TRAJECTORY_LENGTH,
+                "max_missing_seconds": settings.VIDEO_BALL_TRACK_MAX_MISSING_SECONDS,
+                "trajectory_seconds": settings.VIDEO_BALL_TRAJECTORY_SECONDS,
             },
             "enabled": tracking_enabled,
             "name": effective_tracker,

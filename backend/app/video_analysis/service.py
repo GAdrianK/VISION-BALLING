@@ -29,7 +29,12 @@ from app.video_analysis.schemas import (
     PipelineMetadata,
 )
 from app.video_analysis.storage import ResultStorage
-from app.video_analysis.trackers import BallTracker, Tracker, create_tracker
+from app.video_analysis.trackers import (
+    BallTracker,
+    Tracker,
+    create_tracker,
+    resolve_ball_tracker_timing,
+)
 from app.video_analysis.validation import VideoValidationError, VideoValidator
 
 logger = logging.getLogger("football.video_analysis")
@@ -67,11 +72,6 @@ class VideoAnalysisService:
             )
         )
         self._tracker_metadata = tracker.metadata() if tracker is not None else None
-        self.ball_tracker_factory = lambda: BallTracker(
-            max_missing_frames=settings.VIDEO_BALL_TRACK_MAX_MISSING_FRAMES,
-            max_distance_ratio=settings.VIDEO_BALL_TRACK_MAX_DISTANCE_RATIO,
-            trajectory_length=settings.VIDEO_BALL_TRAJECTORY_LENGTH,
-        )
         self.validator = VideoValidator(
             allowed_extensions=set(settings.video_extensions),
             max_size_bytes=settings.VIDEO_MAX_SIZE_MB * 1024 * 1024,
@@ -164,12 +164,28 @@ class VideoAnalysisService:
             self._update(job, JobStatus.VALIDATING, 5, "validating_video")
             logger.info("video_validation_started analysis_id=%s", analysis_id)
             metadata = self.validator.validate(source, original_filename)
+            ball_tracker_timing = resolve_ball_tracker_timing(
+                max_missing_seconds=self.settings.VIDEO_BALL_TRACK_MAX_MISSING_SECONDS,
+                trajectory_seconds=self.settings.VIDEO_BALL_TRAJECTORY_SECONDS,
+                source_fps=metadata.fps,
+            )
             self._update(job, JobStatus.PROCESSING, 20, "loading_detector")
             pipeline = VideoPipeline(
                 detector=self.detector,
                 tracker=self.tracker_factory(),
-                ball_tracker=self.ball_tracker_factory(),
-                frame_interval=self.settings.video_frame_sample_rate,
+                ball_tracker=BallTracker(
+                    max_missing_frames=(
+                        ball_tracker_timing.max_missing_frames_effective
+                    ),
+                    max_distance_ratio=(
+                        self.settings.VIDEO_BALL_TRACK_MAX_DISTANCE_RATIO
+                    ),
+                    trajectory_length=(
+                        ball_tracker_timing.trajectory_frames_effective
+                    ),
+                ),
+                ball_tracker_timing=ball_tracker_timing,
+                frame_sample_rate=self.settings.VIDEO_FRAME_SAMPLE_RATE,
                 keep_extracted_frames=self.settings.VIDEO_KEEP_TEMPORARY_FILES,
                 preserve_audio=self.settings.VIDEO_PRESERVE_AUDIO,
                 max_processing_seconds=self.settings.VIDEO_MAX_PROCESSING_SECONDS,
@@ -260,8 +276,7 @@ class VideoAnalysisService:
             detector=model.model_id,
             detector_name=model.detector_name,
             detector_version=model.detector_version,
-            frame_interval=self.settings.video_frame_sample_rate,
-            frame_sample_rate=self.settings.video_frame_sample_rate,
+            frame_sample_rate=self.settings.VIDEO_FRAME_SAMPLE_RATE,
             device=str(detector_metadata.get("device") or self.settings.VIDEO_DEVICE),
             tracker_name=tracker_name,
             tracker_version=tracker_version,
@@ -274,6 +289,10 @@ class VideoAnalysisService:
             model_id=model.model_id,
             model_checksum=model.model_checksum,
             thresholds=canonical_config["thresholds"],
+            ball_track_max_missing_seconds=(
+                self.settings.VIDEO_BALL_TRACK_MAX_MISSING_SECONDS
+            ),
+            ball_trajectory_seconds=self.settings.VIDEO_BALL_TRAJECTORY_SECONDS,
             canonical_config=canonical_config,
         )
 

@@ -43,8 +43,7 @@ class Settings(BaseSettings):
     VIDEO_MIN_WIDTH: int = 320
     VIDEO_MIN_HEIGHT: int = 240
     VIDEO_MIN_FREE_DISK_MB: int = 256
-    VIDEO_FRAME_INTERVAL: int = 10
-    VIDEO_FRAME_SAMPLE_RATE: int = 0
+    VIDEO_FRAME_SAMPLE_RATE: int = Field(default=10, ge=1)
     VIDEO_DETECTOR: str = "hog"
     VIDEO_MODEL_PATH: str = "yolo11n.pt"
     VIDEO_MODEL_PROFILE: str = "coco"
@@ -55,18 +54,18 @@ class Settings(BaseSettings):
     VIDEO_DEVICE: str = "cpu"
     VIDEO_TRACKING_ENABLED: bool = True
     VIDEO_TRACKER: str = "iou"
-    VIDEO_BALL_TRACK_MAX_MISSING_FRAMES: int = Field(default=5, ge=0)
+    VIDEO_BALL_TRACK_MAX_MISSING_SECONDS: float = Field(
+        default=0.2, ge=0, allow_inf_nan=False
+    )
     VIDEO_BALL_TRACK_MAX_DISTANCE_RATIO: float = Field(default=0.15, gt=0, le=1)
-    VIDEO_BALL_TRAJECTORY_LENGTH: int = Field(default=12, ge=1)
+    VIDEO_BALL_TRAJECTORY_SECONDS: float = Field(
+        default=0.5, gt=0, allow_inf_nan=False
+    )
     VIDEO_PRESERVE_AUDIO: bool = True
     VIDEO_MAX_PROCESSING_SECONDS: float = 0
     VIDEO_KEEP_TEMPORARY_FILES: bool = False
     VIDEO_RETAIN_SOURCE: bool = True
     VIDEO_GIT_SHA: str = ""
-
-    @property
-    def video_frame_sample_rate(self) -> int:
-        return self.VIDEO_FRAME_SAMPLE_RATE or self.VIDEO_FRAME_INTERVAL
 
     def get_kb_dir(self) -> str:
         if self.KNOWLEDGE_BASE_DIR:
