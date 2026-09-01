@@ -42,6 +42,7 @@ data/external/
 
 data/benchmarks/
 data/soccernet/
+/data/golden/
 *.gt.txt
 
 

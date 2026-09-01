@@ -1,0 +1,111 @@
+{
+  "manifest_version": "1.0.0",
+  "created_at": "2026-09-01T18:25:53Z",
+  "description": "Registre V1 des trois vidéos golden de VISION-BALLING. Aucun média réel et licencié n'était disponible lors de la création de ce manifeste.",
+  "data_directory_env": "VISION_BALLING_GOLDEN_DATA_DIR",
+  "videos": [
+    {
+      "id": "GOLDEN-01-BROADCAST",
+      "status": "BLOCKED_MISSING",
+      "version": "1.0.0",
+      "filename": "GOLDEN-01-BROADCAST.mp4",
+      "sha256": null,
+      "source_sha256": null,
+      "source_dataset": null,
+      "source_reference": null,
+      "license": null,
+      "usage_conditions": null,
+      "camera_type": "broadcast",
+      "difficulty_tags": [
+        "camera_pan",
+        "camera_zoom",
+        "partial_out_of_frame"
+      ],
+      "start_timestamp": null,
+      "end_timestamp": null,
+      "duration_seconds": null,
+      "fps": null,
+      "width": null,
+      "height": null,
+      "codec": null,
+      "container": null,
+      "file_size_bytes": null,
+      "checksum_collision_reason": null,
+      "pipeline_validation": {
+        "status": "NOT_RUN",
+        "validated_at": null,
+        "pipeline_version": null,
+        "analysis_key": null
+      }
+    },
+    {
+      "id": "GOLDEN-02-TACTICAL-WIDE",
+      "status": "BLOCKED_MISSING",
+      "version": "1.0.0",
+      "filename": "GOLDEN-02-TACTICAL-WIDE.mp4",
+      "sha256": null,
+      "source_sha256": null,
+      "source_dataset": null,
+      "source_reference": null,
+      "license": null,
+      "usage_conditions": null,
+      "camera_type": "tactical-wide",
+      "difficulty_tags": [
+        "small_players",
+        "small_ball",
+        "wide_field_coverage"
+      ],
+      "start_timestamp": null,
+      "end_timestamp": null,
+      "duration_seconds": null,
+      "fps": null,
+      "width": null,
+      "height": null,
+      "codec": null,
+      "container": null,
+      "file_size_bytes": null,
+      "checksum_collision_reason": null,
+      "pipeline_validation": {
+        "status": "NOT_RUN",
+        "validated_at": null,
+        "pipeline_version": null,
+        "analysis_key": null
+      }
+    },
+    {
+      "id": "GOLDEN-03-DIFFICULT",
+      "status": "BLOCKED_MISSING",
+      "version": "1.0.0",
+      "filename": "GOLDEN-03-DIFFICULT.mp4",
+      "sha256": null,
+      "source_sha256": null,
+      "source_dataset": null,
+      "source_reference": null,
+      "license": null,
+      "usage_conditions": null,
+      "camera_type": "difficult",
+      "difficulty_tags": [
+        "compression",
+        "occlusion",
+        "motion_blur",
+        "small_ball"
+      ],
+      "start_timestamp": null,
+      "end_timestamp": null,
+      "duration_seconds": null,
+      "fps": null,
+      "width": null,
+      "height": null,
+      "codec": null,
+      "container": null,
+      "file_size_bytes": null,
+      "checksum_collision_reason": null,
+      "pipeline_validation": {
+        "status": "NOT_RUN",
+        "validated_at": null,
+        "pipeline_version": null,
+        "analysis_key": null
+      }
+    }
+  ]
+}

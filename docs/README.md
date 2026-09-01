@@ -20,6 +20,7 @@ Cet index distingue les contrats qui font autorité de la documentation techniqu
 | [`project_status.md`](project_status.md) | Matrice vérifiable des capacités | Actuel | Preuve technique synthétique | Branche de consolidation | À maintenir avec le code |
 | [`video-analysis.md`](video-analysis.md) | Décrit le pipeline vidéo réellement présent | Actuel | Technique, sous le contrat produit | Pipeline 0.2.0 | À maintenir avec le pipeline |
 | [`known_limitations.md`](known_limitations.md) | Inventaire des limites confirmées | Actuel | Technique, sous le contrat produit | Branche de consolidation | À maintenir à chaque chapitre |
+| [`datasets/golden_videos_dataset_card_v1.md`](datasets/golden_videos_dataset_card_v1.md) | Décrit les sources, droits, biais, stockage et verrouillage des trois vidéos golden | Actuel, assets manquants | Technique, sous le protocole golden | Chapitre 3A | À versionner avec le manifeste |
 | [`development/branch_policy.md`](development/branch_policy.md) | Règles de contribution et d'intégration | Actuel | Oui pour le workflow du dépôt | Branche de consolidation | Aucun |
 | [`adr/0002-repository-source-of-truth.md`](adr/0002-repository-source-of-truth.md) | Enregistre la base consolidée et la hiérarchie documentaire | Accepté | Oui | Branche de consolidation | Aucun |
 
