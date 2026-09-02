@@ -86,11 +86,14 @@ def _matching_metadata(entry: dict) -> VideoMetadata:
 def test_committed_manifest_is_valid_and_complete() -> None:
     manifest = load_manifest(MANIFEST_PATH)
 
-    assert manifest["manifest_version"] == "1.0.0"
+    assert manifest["manifest_version"] == "1.1.0"
     assert [video["id"] for video in manifest["videos"]] == list(EXPECTED_IDS)
-    assert {video["status"] for video in manifest["videos"]} == {
-        "BLOCKED_MISSING"
-    }
+    assert {video["status"] for video in manifest["videos"]} == {"READY"}
+    assert all(video["sha256"] for video in manifest["videos"])
+    assert all(
+        video["pipeline_validation"]["status"] == "PASS"
+        for video in manifest["videos"]
+    )
 
 
 def test_duplicate_golden_id_is_rejected() -> None:
