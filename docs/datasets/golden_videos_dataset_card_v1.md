@@ -129,4 +129,33 @@ Trois extraits ne couvrent ni la diversité mondiale des stades et caméras, ni 
 
 Usage autorisé : validation et comparaison de versions dans le respect des licences et attributions enregistrées. L'intégration des médias à Git et leur emploi implicite pour l'entraînement sont interdits. Toute redistribution ou publication doit respecter directement la licence de la source concernée et conserver l'attribution et l'indication des modifications.
 
-Tout remplacement futur conserve l'ID logique, mais crée une nouvelle version immuable avec nouveau checksum et validation complète. Un changement silencieux de média, segment ou licence est interdit. Les annotations, splits, CVAT, entraînements et benchmark H250 relèvent des chapitres suivants.
+Tout remplacement futur conserve l'ID logique, mais crée une nouvelle version immuable avec nouveau checksum et validation complète. Un changement silencieux de média, segment ou licence est interdit. Les annotations humaines complètes, l'entraînement et le benchmark H250 relèvent des phases suivantes.
+
+## Protocole d'annotation interne V1
+
+Le Chapitre 3B fige un inventaire de 950 frames uniques, identifié par `golden_sha256 + frame_index` et réservé au rôle `golden_eval`. Il combine 656 frames sparse déterministes et six séquences tracking inspectées visuellement :
+
+| Golden | Stride sparse | Sparse | Tracking brut | Recouvrement | Total unique |
+|---|---:|---:|---:|---:|---:|
+| `GOLDEN-01-BROADCAST` | 25 | 240 | 100 | 4 | 336 |
+| `GOLDEN-02-TACTICAL-WIDE` | 25 | 240 | 100 | 4 | 336 |
+| `GOLDEN-03-DIFFICULT` | 8 | 176 | 116 | 14 | 278 |
+| **Total** | — | **656** | **316** | **18** | **950** |
+
+Les séquences retenues commencent à 20 s et 100 s pour G01, 60 s et 180 s pour G02, puis 14 s et 18 s pour G03. La dernière fenêtre G03 inclut volontairement un mouvement rapide de caméra, des occlusions au premier plan, la foule et une perte intermittente du terrain. Les deux fenêtres d'un même golden ne se chevauchent pas.
+
+Le schéma V1 prévoit `player`, `goalkeeper`, `referee`, `ball`, `ignore_person` et le polygone `ignore_region`; les équipes `team_a`, `team_b` ou `unknown`; les événements observables `pass`, `shot`, `ball_out` et `restart`; ainsi que `pitch_line` et `pitch_keypoint` sur un sous-ensemble de 30 frames existantes.
+
+Les supports CVAT sont générés en PNG lossless à résolution originale sous `data/golden/annotation_media/`. L'extraction réelle a produit 950 médias uniques, 12 listes de tâches et environ 5,27 Go de données privées. Aucun média ou export CVAT brut n'entre dans Git.
+
+Documents et points d'entrée :
+
+- inventaire : [`../../data/manifests/golden_frames_v1.csv`](../../data/manifests/golden_frames_v1.csv) ;
+- séquences : [`../../data/manifests/tracking_sequences_v1.json`](../../data/manifests/tracking_sequences_v1.json) ;
+- calibration : [`../../data/manifests/calibration_frames_v1.json`](../../data/manifests/calibration_frames_v1.json) ;
+- schéma : [`../../data/manifests/annotation_schema_v1.json`](../../data/manifests/annotation_schema_v1.json) ;
+- benchmark unique : [`../../data/manifests/internal_benchmark_v1.json`](../../data/manifests/internal_benchmark_v1.json) ;
+- règles CVAT et QA : [`golden_annotation_guidelines_v1.md`](golden_annotation_guidelines_v1.md) ;
+- séparation anti-fuite : [`internal_validation_split_policy_v1.md`](internal_validation_split_policy_v1.md).
+
+L'état `ANNOTATIONS_PENDING` est normal : aucune prédiction du modèle courant n'a été transformée en vérité terrain et aucune box artificielle n'a été créée. Après annotation humaine et QA, seul le package privé CVAT recevra une version et un SHA-256 dans le manifeste benchmark.
