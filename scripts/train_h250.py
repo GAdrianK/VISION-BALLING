@@ -6,6 +6,8 @@ from pathlib import Path
 
 from ultralytics import YOLO
 
+from h250_dataset import validate_h250_dataset
+
 ROOT = Path(__file__).resolve().parents[1]
 
 DEFAULT_CHECKPOINT = (
@@ -16,12 +18,19 @@ DEFAULT_CHECKPOINT = (
     / "weights"
     / "last.pt"
 )
-DEFAULT_DATA = ROOT / "data" / "external" / "h250" / "YOLO" / "data.yaml"
+DEFAULT_DATA_CANDIDATES = [
+    ROOT / "data" / "external" / "h250" / "YOLO" / "data.yaml",
+    Path("D:/datasets/h250/YOLO/data.yaml"),
+    ROOT / "data" / "external" / "h250" / "data.yaml",
+    Path("D:/datasets/h250/data.yaml"),
+]
+DEFAULT_DATA = next((p for p in DEFAULT_DATA_CANDIDATES if p.is_file()), DEFAULT_DATA_CANDIDATES[0])
+DEFAULT_PROJECT = Path("D:/runs/detect") if Path("D:/").exists() else ROOT / "runs" / "detect"
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Entraîner YOLO11 sur SoccerNet H250"
+        description="Entraîner YOLO11 sur SoccerNet H250 (optimisé détection ballon)"
     )
     parser.add_argument(
         "--weights",
@@ -41,17 +50,22 @@ def parse_args() -> argparse.Namespace:
         default=50,
         help="Nombre total d'époques pour un nouvel entraînement",
     )
-    parser.add_argument("--batch", type=int, default=8, help="Taille de batch")
+    parser.add_argument(
+        "--batch",
+        type=int,
+        default=4,
+        help="Taille de batch (défaut 4, adapté à 6 Go VRAM)",
+    )
     parser.add_argument(
         "--imgsz",
         type=int,
-        default=1280,
-        help="Taille des images",
+        default=960,
+        help="Taille des images (défaut 960 pour favoriser les petits ballons)",
     )
     parser.add_argument(
         "--patience",
         type=int,
-        default=20,
+        default=15,
         help="Patience pour l'arrêt anticipé",
     )
     parser.add_argument(
@@ -64,10 +78,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--project",
         type=Path,
-        default=ROOT / "runs" / "detect",
-        help="Dossier des résultats",
+        default=DEFAULT_PROJECT,
+        help="Dossier des résultats (D:/runs/detect si disponible)",
     )
-    parser.add_argument("--name", default="yolo11n_h250_e50_b8")
+    parser.add_argument("--name", default="yolo11n_h250_e50_imgsz960_b4")
     parser.add_argument(
         "--resume",
         action="store_true",
@@ -87,6 +101,18 @@ def parse_args() -> argparse.Namespace:
         "--deterministic",
         action=argparse.BooleanOptionalAction,
         default=True,
+    )
+    parser.add_argument(
+        "--close-mosaic",
+        type=int,
+        default=10,
+        help="Désactiver l'augmentation mosaic sur les N dernières époques",
+    )
+    parser.add_argument(
+        "--box-gain",
+        type=float,
+        default=7.5,
+        help="Pondération de la perte de bounding box (augmenter pour petits objets)",
     )
     return parser.parse_args()
 
@@ -111,36 +137,58 @@ def resolve_weights(args: argparse.Namespace) -> str:
 def main() -> None:
     args = parse_args()
 
-    if not args.resume and not args.data.is_file():
-        raise FileNotFoundError(f"Configuration du dataset introuvable : {args.data}")
+    data_path = args.data
+    if not args.resume and not data_path.is_file():
+        # Tentative de recherche automatique sur les candidats
+        resolved = next((p for p in DEFAULT_DATA_CANDIDATES if p.is_file()), None)
+        if resolved:
+            data_path = resolved
+        else:
+            raise FileNotFoundError(
+                f"Configuration du dataset introuvable : {args.data}. "
+                "Téléchargez d'abord H250 via 'python scripts/download_h250.py'."
+            )
 
     weights_path = resolve_weights(args)
+    dataset_summary = validate_h250_dataset(data_path) if not args.resume else None
 
     print(f"Poids initiaux : {weights_path}")
     print(f"Mode : {'reprise' if args.resume else 'nouvel entraînement'}")
+    print(f"Dataset : {data_path}")
+    print(f"Résolution : {args.imgsz}x{args.imgsz}, Batch : {args.batch}")
     print(f"Périphérique : {args.device}")
+    if dataset_summary:
+        split_counts = ", ".join(
+            f"{name}={values['images']}"
+            for name, values in dataset_summary["splits"].items()
+        )
+        print(f"Splits H250 validés : {split_counts}")
 
     model = YOLO(weights_path)
     if args.resume:
         model.train(resume=True, device=args.device)
         return
 
-    model.train(
-        data=str(args.data),
-        epochs=args.epochs,
-        batch=args.batch,
-        imgsz=args.imgsz,
-        patience=args.patience,
-        device=args.device,
-        workers=args.workers,
-        seed=args.seed,
-        deterministic=args.deterministic,
-        amp=args.amp,
-        cache=False,
-        project=str(args.project),
-        name=args.name,
-        exist_ok=args.exist_ok,
-    )
+    train_kwargs = {
+        "data": str(data_path),
+        "epochs": args.epochs,
+        "batch": args.batch,
+        "imgsz": args.imgsz,
+        "patience": args.patience,
+        "device": args.device,
+        "workers": args.workers,
+        "seed": args.seed,
+        "deterministic": args.deterministic,
+        "amp": args.amp,
+        "cache": False,
+        "project": str(args.project),
+        "name": args.name,
+        "exist_ok": args.exist_ok,
+        "close_mosaic": args.close_mosaic,
+        "box": args.box_gain,
+    }
+
+    model.train(**train_kwargs)
 
 
 if __name__ == "__main__":

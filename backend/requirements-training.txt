@@ -1,0 +1,5 @@
+# Environnement reproductible EXP-02.
+# Installer d'abord la roue PyTorch CUDA adaptée au GPU du PC cible.
+-r requirements.txt
+-r requirements-video.txt
+ultralytics==8.4.142

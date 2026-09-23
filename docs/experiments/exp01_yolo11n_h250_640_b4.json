@@ -1,0 +1,57 @@
+{
+  "experiment": "exp01_yolo11n_h250_640_b4",
+  "model_id": "yolo11n",
+  "resolution": 640,
+  "batch_size": 4,
+  "training": {
+    "duration_seconds": 24896.0,
+    "duration_hours": 6.92,
+    "peak_vram_allocated_mb": 1820.0,
+    "checkpoint_best_sha256": "590dcb69ee501bddc61de0cded5f40b0bf65c00d83c2ebbe8e5962a646eb9844",
+    "checkpoint_best_bytes": 5450643
+  },
+  "ultralytics_val": {
+    "map50": 0.7156,
+    "map50_95": 0.4606,
+    "precision": 0.8216,
+    "recall": 0.6955,
+    "per_class_map50": [
+      0.4561,
+      0.9751
+    ],
+    "per_class_map50_95": [
+      0.1941,
+      0.7271
+    ]
+  },
+  "canonical_benchmark_metrics": {
+    "mAP_50": 0.6565,
+    "macro_f1": 0.737,
+    "overall_precision": 0.7761,
+    "overall_recall": 0.7035,
+    "overall_f1": 0.738,
+    "ball": {
+      "ap50": 0.3827,
+      "precision": 0.577,
+      "recall": 0.4739,
+      "f1": 0.5204
+    },
+    "person": {
+      "ap50": 0.9303,
+      "precision": 0.9753,
+      "recall": 0.9331,
+      "f1": 0.9537
+    },
+    "fps": 39.99,
+    "duration_seconds": 68.172,
+    "peak_rss_mb": 1304.92
+  },
+  "provenance": {
+    "source_report_sha256": "3fe43fbd4047991503277515401393d13c474fa15550efb6ed6fd686f0765206",
+    "dataset_archive_sha256": "da2cca388ec51500c5c9ef4d974d7c28cb73b3a75e8c506299d2715028f8bc37",
+    "initial_model_sha256": "0ebbc80d4a7680d14987a577cd21342b65ecfd94632bd9a8da63ae6417644ee1",
+    "gpu": "NVIDIA GeForce RTX 2060",
+    "gpu_memory_mib": 6144,
+    "driver_version_observed_2026_09_23": "596.49"
+  }
+}

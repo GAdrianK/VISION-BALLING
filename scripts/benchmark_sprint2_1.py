@@ -64,7 +64,8 @@ def benchmark_detector_on_yolo(
         )
         detector.load()
 
-        for frame_gt in dataset:
+        total_count = len(dataset)
+        for idx, frame_gt in enumerate(dataset):
             f_idx = frame_gt.frame_index
             img = cv2.imread(str(frame_gt.image_path))
             if img is None:
@@ -72,6 +73,14 @@ def benchmark_detector_on_yolo(
 
             detections = detector.detect(img)
             predictions_by_frame[f_idx] = detections
+
+            if (idx + 1) % 250 == 0 or (idx + 1) == total_count:
+                elapsed = time.monotonic() - start_time
+                fps_current = (idx + 1) / max(0.001, elapsed)
+                print(
+                    f"    [YOLO Benchmark] Frame {idx + 1}/{total_count} "
+                    f"({fps_current:.1f} FPS, {elapsed:.1f}s)"
+                )
 
         duration = time.monotonic() - start_time
         peak_rss_mb = mem_tracker.get_peak_rss_mb()

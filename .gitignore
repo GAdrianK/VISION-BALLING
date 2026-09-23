@@ -11,6 +11,7 @@ backend/venv/
 backend/.venv/
 venv/
 ENV/
+.venv-training/
 
 # Configuration & Secrets
 backend/.env
