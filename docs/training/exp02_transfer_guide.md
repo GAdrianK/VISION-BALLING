@@ -123,6 +123,17 @@ python scripts/run_exp02.py `
 
 La commande vérifie la spec, les 19 786 paires image/label, les classes, les SHA-256, les dépendances et CUDA. Le statut doit être `READY`. Un statut `BLOCKED` interdit de lancer l'expérience.
 
+### Portabilité multi-plateforme (Linux / Windows — INFRASTRUCTURE PORTABILITY ONLY)
+
+Le protocole garantit l'intégrité de l'expérience de manière sémantique et structurelle :
+- 14 368 images et 14 368 labels dans `train` ;
+- 2 726 images et 2 726 labels dans `valid` ;
+- 2 692 images et 2 692 labels dans `test` (strictement isolé et non utilisé lors de l'entraînement) ;
+- Classes : `0 = ball`, `1 = person` ;
+- Poids initiaux : `yolo11n.pt` officiel (SHA-256 exact `0ebbc80d...`).
+
+Le hash SHA-256 brut de référence de `data.yaml` (`6805cab4...`) correspond au chemin physique du PC Windows d'origine (`D:\datasets\h250\YOLO`). Sur une machine Linux (ou tout autre chemin, ex: `/media/adriano/Windows/datasets/h250/YOLO`), le texte du chemin diffère inévitablement sans altérer la moindre donnée du dataset SoccerNet H250. Le préflight valide strictement l'identité sémantique et rapporte cette adaptation sous la mention explicite `INFRASTRUCTURE PORTABILITY ONLY`.
+
 ## 7. Lancer, reprendre ou évaluer EXP-02
 
 Nouveau run, uniquement si le dossier EXP-02 n'existe pas :

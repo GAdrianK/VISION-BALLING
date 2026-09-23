@@ -20,7 +20,7 @@ from h250_dataset import (  # noqa: E402
 )
 from download_h250 import extract_zip  # noqa: E402
 from prepare_exp02_transfer import _copy_verified  # noqa: E402
-from run_exp02 import _comparison, _require_mode_consistency, load_spec, parse_args  # noqa: E402
+from run_exp02 import _comparison, _require_mode_consistency, build_preflight, load_spec, parse_args  # noqa: E402
 
 
 def _build_tiny_h250(root: Path, *, names: str = "  0: ball\n  1: person\n") -> Path:
@@ -192,3 +192,111 @@ def test_committed_exp01_reference_matches_frozen_exp02_reference() -> None:
     assert canonical["macro_f1"] == reference["macro_f1"]
     assert canonical["ball"] == reference["ball"]
     assert canonical["person"] == reference["person"]
+
+
+def test_h250_rejects_wrong_split_counts(tmp_path: Path) -> None:
+    data_yaml = _build_tiny_h250(tmp_path / "h250")
+    with pytest.raises(H250ValidationError, match="Split train inattendu"):
+        validate_h250_dataset(
+            data_yaml,
+            root=tmp_path / "repo",
+            expected_counts={"train": 10, "valid": 1, "test": 1},
+        )
+
+
+def test_h250_rejects_missing_image_or_label_files(tmp_path: Path) -> None:
+    data_yaml = _build_tiny_h250(tmp_path / "h250")
+    # Delete a label file to create an un-paired dataset
+    (tmp_path / "h250" / "train" / "labels" / "frame.txt").unlink()
+    with pytest.raises(H250ValidationError, match="incohérent"):
+        validate_h250_dataset(
+            data_yaml,
+            root=tmp_path / "repo",
+            expected_counts={"train": 1, "valid": 1, "test": 1},
+        )
+
+
+def test_h250_rejects_test_split_selected_as_training_or_validation(tmp_path: Path) -> None:
+    root = tmp_path / "h250_leak"
+    root.mkdir(parents=True)
+    # Configure train pointing to test/images
+    leaked_yaml = root / "data.yaml"
+    leaked_yaml.write_text(
+        "path: .\n"
+        "train: test/images\n"
+        "val: valid/images\n"
+        "test: test/images\n"
+        "\n"
+        "names:\n"
+        "  0: ball\n"
+        "  1: person\n",
+        encoding="utf-8",
+    )
+    for split in ("valid", "test"):
+        images = root / split / "images"
+        labels = root / split / "labels"
+        images.mkdir(parents=True)
+        labels.mkdir(parents=True)
+        (images / "frame.jpg").write_bytes(b"data")
+        (labels / "frame.txt").write_text("0 0.5 0.5 0.1 0.1\n", encoding="utf-8")
+
+    with pytest.raises(H250ValidationError, match="Fuite interdite : le split test ne doit jamais servir au training"):
+        validate_h250_dataset(
+            leaked_yaml,
+            root=tmp_path / "repo",
+            expected_counts=None,
+        )
+
+
+def test_valid_linux_h250_dataset_passes_semantic_preflight(tmp_path: Path) -> None:
+    data_yaml = _build_tiny_h250(tmp_path / "linux_h250")
+    weights = tmp_path / "yolo11n.pt"
+    # Create fake weights matching expected sha for initial model
+    weights.write_bytes(b"dummy")
+    weights_sha = hashlib.sha256(weights.read_bytes()).hexdigest()
+
+    spec = load_spec(ROOT / "configs/training/exp02_yolo11n_h250_960_b4.json")
+    spec_copy = json.loads(json.dumps(spec))
+    spec_copy["initial_model"]["sha256"] = weights_sha
+    spec_copy["dataset"]["expected_split_counts"] = {"train": 1, "valid": 1, "test": 1}
+
+    args = parse_args([
+        "--data", str(data_yaml),
+        "--weights", str(weights),
+        "--check-only",
+        "--device", "cpu",
+    ])
+    preflight = build_preflight(args, spec_copy)
+    assert preflight["status"] == "READY"
+    assert "portability_notice" in preflight["data"]
+    assert "INFRASTRUCTURE PORTABILITY ONLY" in preflight["data"]["portability_notice"]
+    assert preflight["data"]["splits"]["train"]["images"] == 1
+    assert preflight["data"]["splits"]["valid"]["images"] == 1
+    assert preflight["data"]["splits"]["test"]["images"] == 1
+
+
+def test_exp02_hyperparameters_remain_frozen() -> None:
+    spec = load_spec(ROOT / "configs/training/exp02_yolo11n_h250_960_b4.json")
+    training = spec["training"]
+
+    assert training["epochs"] == 50
+    assert training["batch"] == 4
+    assert training["imgsz"] == 960
+    assert training["patience"] == 15
+    assert training["amp"] is True
+    assert training["seed"] == 42
+    assert training["deterministic"] is True
+    assert training["optimizer"] == "auto"
+    assert training["lr0"] == 0.01
+    assert training["lrf"] == 0.01
+    assert training["momentum"] == 0.937
+    assert training["weight_decay"] == 0.0005
+    assert training["warmup_epochs"] == 3.0
+    assert training["box"] == 7.5
+    assert training["cls"] == 0.5
+    assert training["dfl"] == 1.5
+    assert training["mosaic"] == 1.0
+    assert training["close_mosaic"] == 10
+    assert training["mixup"] == 0.0
+    assert training["copy_paste"] == 0.0
+    assert training.get("fraction", 1.0) == 1.0

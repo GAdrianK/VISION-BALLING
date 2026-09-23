@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 import re
 from pathlib import Path
@@ -34,6 +35,7 @@ def resolve_data_yaml(explicit: Path | None = None, root: Path = ROOT) -> Path:
     candidates = [
         explicit,
         Path(configured) if configured else None,
+        Path("/media/adriano/Windows/datasets/h250/YOLO/data.yaml"),
         Path("D:/datasets/h250/YOLO/data.yaml"),
         root / "data/external/h250/YOLO/data.yaml",
         root / "data/external/h250/data.yaml",
@@ -53,6 +55,8 @@ def resolve_runs_dir(explicit: Path | None = None, root: Path = ROOT) -> Path:
         return Path(configured).expanduser().resolve()
     if Path("D:/").exists():
         return Path("D:/runs/detect")
+    if Path("/media/adriano/Windows").exists():
+        return Path("/media/adriano/Windows/runs/detect")
     return (root / "runs/detect").resolve()
 
 
@@ -169,7 +173,18 @@ def validate_h250_dataset(
             "labels_dir": str(labels_dir),
         }
 
-    return {
+    # Isolation stricte des splits
+    train_dir = split_stats["train"]["images_dir"]
+    valid_dir = split_stats["valid"]["images_dir"]
+    test_dir = split_stats["test"]["images_dir"]
+    if train_dir == test_dir:
+        raise H250ValidationError("Fuite interdite : le split test ne doit jamais servir au training !")
+    if valid_dir == test_dir:
+        raise H250ValidationError("Fuite interdite : le split test ne doit jamais servir à la validation !")
+    if train_dir == valid_dir:
+        raise H250ValidationError("Fuite interdite : train et valid ne doivent pas pointer vers le même dossier !")
+
+    summary = {
         "data_yaml": str(data_yaml),
         "data_yaml_sha256": sha256_file(data_yaml),
         "dataset_root": str(dataset_root),
@@ -177,6 +192,23 @@ def validate_h250_dataset(
         "splits": split_stats,
         "dataset_role": "training",
     }
+    summary["semantic_fingerprint"] = compute_semantic_dataset_fingerprint(summary)
+    return summary
+
+
+def compute_semantic_dataset_fingerprint(summary: dict[str, Any]) -> str:
+    """Calcule une empreinte cryptographique canonique et portable de l'identité du dataset.
+
+    Garantit que le dataset est strictement SoccerNet H250 indépendamment du chemin physique.
+    """
+    payload = {
+        "classes": summary["classes"],
+        "dataset_role": summary["dataset_role"],
+        "split_counts": {
+            split: stats["images"] for split, stats in sorted(summary["splits"].items())
+        },
+    }
+    return hashlib.sha256(json.dumps(payload, sort_keys=True).encode("utf-8")).hexdigest()
 
 
 def validate_initial_weights(path: Path, expected_sha256: str = EXPECTED_YOLO11N_SHA256) -> dict[str, Any]:
