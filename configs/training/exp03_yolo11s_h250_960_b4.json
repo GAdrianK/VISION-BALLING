@@ -1,0 +1,163 @@
+{
+  "spec_version": "1.0.0",
+  "experiment_id": "exp03_yolo11s_h250_960_b4",
+  "status": "READY_TO_RUN",
+  "runtime": {
+    "python_min": "3.11",
+    "python_max_exclusive": "3.13",
+    "ultralytics": "8.4.142",
+    "torch": "CUDA build selected for target GPU"
+  },
+  "dataset": {
+    "name": "SoccerNet-v3 H250 YOLO",
+    "dataset_role": "training",
+    "classes": {
+      "0": "ball",
+      "1": "person"
+    },
+    "expected_split_counts": {
+      "train": 14368,
+      "valid": 2726,
+      "test": 2692
+    },
+    "archive_filename": "YOLO.zip",
+    "archive_bytes": 2544758991,
+    "archive_sha256": "da2cca388ec51500c5c9ef4d974d7c28cb73b3a75e8c506299d2715028f8bc37",
+    "data_yaml_sha256": "6805cab4034ee99e7e141b40b33a908e0f265d4e0d529ada49a4449b80539864"
+  },
+  "initial_model": {
+    "model_id": "yolo11s",
+    "filename": "yolo11s.pt",
+    "bytes": 19313732,
+    "sha256": "85a76fe86dd8afe384648546b56a7a78580c7cb7b404fc595f97969322d502d5",
+    "fresh_start_required": true,
+    "forbidden_initial_checkpoint": "EXP-02 best.pt"
+  },
+  "training": {
+    "epochs": 50,
+    "batch": 4,
+    "imgsz": 960,
+    "patience": 15,
+    "device": "0",
+    "workers": 4,
+    "seed": 42,
+    "deterministic": true,
+    "amp": true,
+    "close_mosaic": 10,
+    "cache": false,
+    "exist_ok": true,
+    "optimizer": "auto",
+    "lr0": 0.01,
+    "lrf": 0.01,
+    "momentum": 0.937,
+    "weight_decay": 0.0005,
+    "warmup_epochs": 3.0,
+    "warmup_momentum": 0.8,
+    "warmup_bias_lr": 0.0,
+    "box": 7.5,
+    "cls": 0.5,
+    "dfl": 1.5,
+    "hsv_h": 0.015,
+    "hsv_s": 0.7,
+    "hsv_v": 0.4,
+    "degrees": 0.0,
+    "translate": 0.1,
+    "scale": 0.5,
+    "shear": 0.0,
+    "perspective": 0.0,
+    "flipud": 0.0,
+    "fliplr": 0.5,
+    "mosaic": 1.0,
+    "mixup": 0.0,
+    "copy_paste": 0.0
+  },
+  "evaluation": {
+    "split": "valid",
+    "iou_threshold": 0.5,
+    "canonical_evaluator": "backend/app/video_analysis/benchmark_metrics.py",
+    "required_metrics": [
+      "mAP_50",
+      "macro_f1",
+      "ball_precision",
+      "ball_recall",
+      "ball_f1",
+      "ball_ap50",
+      "person_f1",
+      "person_ap50",
+      "fps",
+      "peak_rss_mb"
+    ]
+  },
+  "references": {
+    "exp00": {
+      "mAP_50": 0.3691,
+      "macro_f1": 0.4774,
+      "ball": {
+        "precision": 0.5415,
+        "recall": 0.0948,
+        "f1": 0.1613,
+        "ap50": 0.069
+      },
+      "person": {
+        "precision": 0.9553,
+        "recall": 0.6787,
+        "f1": 0.7935,
+        "ap50": 0.6691
+      }
+    },
+    "exp01": {
+      "source": "docs/experiments/exp01_yolo11n_h250_640_b4.json",
+      "mAP_50": 0.6565,
+      "macro_f1": 0.737,
+      "fps": 39.99,
+      "ball": {
+        "precision": 0.577,
+        "recall": 0.4739,
+        "f1": 0.5204,
+        "ap50": 0.3827
+      },
+      "person": {
+        "precision": 0.9753,
+        "recall": 0.9331,
+        "f1": 0.9537,
+        "ap50": 0.9303
+      },
+      "checkpoint_best": {
+        "bytes": 5450643,
+        "sha256": "590dcb69ee501bddc61de0cded5f40b0bf65c00d83c2ebbe8e5962a646eb9844"
+      }
+    },
+    "exp02": {
+      "source": "docs/experiments/exp02_yolo11n_h250_960_b4.json",
+      "mAP_50": 0.7103,
+      "macro_f1": 0.7802,
+      "fps": 75.48,
+      "ball": {
+        "precision": 0.6289,
+        "recall": 0.5787,
+        "f1": 0.6027,
+        "ap50": 0.4865
+      },
+      "person": {
+        "precision": 0.9794,
+        "recall": 0.9368,
+        "f1": 0.9576,
+        "ap50": 0.9341
+      },
+      "checkpoint_best": {
+        "bytes": 5489299,
+        "sha256": "d2f23dee97207135b6c225e708864b4e1b6f7deb191f9d0f8410281091b56a45"
+      }
+    }
+  },
+  "privacy_and_split": {
+    "prohibited_training_sources": [
+      "data/golden",
+      "golden_eval",
+      "CVAT golden exports"
+    ],
+    "weights_in_git": false,
+    "dataset_in_git": false,
+    "runs_in_git": false
+  }
+}
