@@ -3,6 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from importlib import metadata
+from pathlib import Path
 from typing import Any, ClassVar
 
 import cv2
@@ -185,6 +186,122 @@ class UltralyticsYOLODetector(ObjectDetector):
         }
 
 
+class RFDETRDetector(ObjectDetector):
+    """Adaptateur RF-DETR pour l'évaluation canonique et l'inférence VISION-BALLING."""
+
+    H250_FOOTBALL_CLASS_MAP: ClassVar[dict[int, str]] = {
+        0: "sports ball",
+        1: "person",
+    }
+
+    def __init__(
+        self,
+        model_path: str,
+        device: str = "cuda",
+        resolution: int = 960,
+        person_threshold: float = 0.45,
+        ball_threshold: float = 0.25,
+        class_map: dict[int, str] | None = None,
+        optimize_inference: bool = True,
+    ) -> None:
+        self.model_path = model_path
+        self.model_id = Path(model_path).name
+        self.device = device
+        self.resolution = resolution
+        self.person_threshold = person_threshold
+        self.ball_threshold = ball_threshold
+        self.class_map = dict(class_map or self.H250_FOOTBALL_CLASS_MAP)
+        self.optimize_inference = optimize_inference
+        self._model: Any = None
+        self._version: str = "unknown"
+
+    def load(self) -> None:
+        try:
+            import importlib.metadata
+            import torch
+            import rfdetr
+            from rfdetr import RFDETRSmall
+        except ImportError as exc:
+            raise RuntimeError(
+                "Le détecteur rfdetr exige le paquet optionnel rfdetr. "
+                "Activez l'environnement .venv-rfdetr."
+            ) from exc
+
+        try:
+            self._version = importlib.metadata.version("rfdetr")
+        except Exception:
+            self._version = getattr(rfdetr, "__version__", "unknown")
+
+        ckpt_path = Path(self.model_path)
+        if not ckpt_path.is_file():
+            raise FileNotFoundError(f"Checkpoint RF-DETR introuvable : {ckpt_path}")
+
+        self._model = RFDETRSmall.from_checkpoint(str(ckpt_path), resolution=self.resolution)
+        if self.optimize_inference and torch.cuda.is_available() and self.device in ("0", "cuda", "cuda:0"):
+            try:
+                self._model.inference(compile=False, dtype=torch.float16)
+            except Exception:
+                pass
+
+    def detect(self, frame: np.ndarray) -> list[RawDetection]:
+        if self._model is None:
+            raise RuntimeError("Le détecteur RF-DETR doit être chargé avant detect().")
+
+        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) if frame.ndim == 3 else frame
+        min_thresh = min(self.person_threshold, self.ball_threshold)
+
+        dets = self._model.predict(
+            rgb_frame,
+            threshold=min_thresh,
+            include_source_image=False,
+        )
+
+        detections: list[RawDetection] = []
+        if len(dets) == 0:
+            return detections
+
+        for xyxy, conf, cls_id in zip(dets.xyxy, dets.confidence, dets.class_id):
+            cid = int(cls_id)
+            c_conf = float(conf)
+            class_name = self.class_map.get(cid)
+            if class_name not in {"person", "sports ball", "ball"}:
+                continue
+
+            if class_name == "person":
+                role, threshold = "player_candidate", self.person_threshold
+            else:
+                role, threshold = "ball_candidate", self.ball_threshold
+
+            if c_conf < threshold:
+                continue
+
+            x1, y1, x2, y2 = (int(round(v)) for v in xyxy)
+            canonical_name = "sports ball" if class_name in ("sports ball", "ball") else "person"
+            detections.append(
+                RawDetection(
+                    class_name=canonical_name,
+                    football_role=role,
+                    confidence=c_conf,
+                    bbox=(x1, y1, x2, y2),
+                )
+            )
+        return detections
+
+    def metadata(self) -> dict[str, Any]:
+        return {
+            "name": "rfdetr",
+            "version": self._version,
+            "model_id": self.model_id,
+            "provider": "RF-DETR",
+            "device": self.device,
+            "resolution": self.resolution,
+            "classes": ["person", "sports ball"],
+            "class_map": self.class_map,
+            "football_specific": True,
+            "ball_detection": True,
+        }
+
+
 def create_detector(
     name: str,
     *,
@@ -195,6 +312,7 @@ def create_detector(
     ball_threshold: float = 0.25,
     class_map: dict[int, str] | None = None,
     model_profile: str = "coco",
+    resolution: int = 960,
 ) -> ObjectDetector:
     normalized = name.strip().lower()
     if normalized in {"hog", "opencv-hog", "opencv-hog-default-people-detector"}:
@@ -207,5 +325,14 @@ def create_detector(
             ball_threshold=ball_threshold,
             class_map=class_map,
             model_profile=model_profile,
+        )
+    if normalized in {"rfdetr", "rf-detr", "rfdetr_small", "rf-detr-small"}:
+        return RFDETRDetector(
+            model_path=model_path,
+            device=device,
+            resolution=resolution,
+            person_threshold=person_threshold,
+            ball_threshold=ball_threshold,
+            class_map=class_map,
         )
     raise ValueError(f"Détecteur vidéo inconnu : {name}")
