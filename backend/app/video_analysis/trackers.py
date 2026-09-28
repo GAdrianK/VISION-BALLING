@@ -396,11 +396,31 @@ class SupervisionByteTrack(Tracker):
         return {"enabled": True, "name": "bytetrack", "version": self._version}
 
 
+# Chapter 5 Unified Re-exports
+from app.video_analysis.ball_tracker import BallTrackConfig, BallTrackManager
+from app.video_analysis.player_tracker import ByteTrackConfig, PlayerByteTrack
+from app.video_analysis.tracking_diagnostics import (
+    BallTrackingDiagnostics,
+    compute_ball_diagnostics,
+)
+from app.video_analysis.tracking_schemas import (
+    BallObservationState,
+    BallTrackObservation,
+    PlayerTrackObservation,
+    TrackingState,
+)
+from app.video_analysis.tracking_visualizer import (
+    draw_ball_track,
+    draw_player_tracks,
+    visualize_frame_tracks,
+)
+
+
 def create_tracker(enabled: bool, name: str) -> Tracker:
     if not enabled or name.strip().lower() == "none":
         return DisabledTracker()
     if name.strip().lower() == "iou":
         return IoUTracker()
-    if name.strip().lower() == "bytetrack":
+    if name.strip().lower() in ("bytetrack", "bytetrack_player"):
         return SupervisionByteTrack()
     raise ValueError(f"Tracker vidéo inconnu : {name}")
