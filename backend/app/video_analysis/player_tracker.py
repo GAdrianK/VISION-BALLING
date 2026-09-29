@@ -78,6 +78,7 @@ class PlayerByteTrack:
         timestamp: float,
         detections: list[RawDetection],
         source_detector: str = "rf-detr-small",
+        frame_image: np.ndarray | None = None,
     ) -> list[PlayerTrackObservation]:
         """
         Updates player tracks from raw detections.
@@ -94,7 +95,6 @@ class PlayerByteTrack:
             empty_sv = self._sv.Detections.empty()
             self._tracker.update_with_detections(empty_sv)
             return []
-
 
         boxes = np.array([detections[i].bbox for i in person_indices], dtype=float)
         confs = np.array([detections[i].confidence for i in person_indices], dtype=float)
@@ -137,5 +137,144 @@ class PlayerByteTrack:
             "name": "bytetrack_player",
             "supervision_version": self._supervision_version,
             "target_class": "person",
+        })
+        return data
+
+
+@dataclass(frozen=True)
+class BoTSORTConfig:
+    """Explicit, frozen configuration for Player BoT-SORT challenger."""
+
+    track_high_thresh: float = 0.45       # Matches high confidence person activation threshold
+    track_low_thresh: float = 0.10        # Low-confidence threshold for BoT-SORT 2nd stage association
+    new_track_thresh: float = 0.45        # Confirm new track threshold
+    track_buffer: int = 30                # Frames to keep lost tracks alive (~1.2s at 25 fps)
+    match_thresh: float = 0.8             # IoU matching threshold
+    fuse_score: bool = True               # Fuse detection score with motion/IoU for matching
+    gmc_method: str = "sparseOptFlow"     # Camera motion compensation: sparseOptFlow|none
+    proximity_thresh: float = 0.5         # Min IoU to consider tracks proximate
+    appearance_thresh: float = 0.8        # Min appearance similarity
+    with_reid: bool = False               # Strictly disabled (EXP-08)
+    model: str = "none"                   # No appearance encoder model
+    frame_rate: float = 25.0              # FPS of input sequence
+    version: str = "1.0.0"
+
+
+class PlayerBoTSORT:
+    """
+    Player tracking challenger using BoT-SORT without appearance ReID.
+    Treats player tracking strictly independently from ball tracking.
+    Uses motion association with Camera Motion Compensation (GMC).
+    Preserves original detector confidences.
+    """
+
+    def __init__(self, config: BoTSORTConfig | None = None) -> None:
+        self.config = config or BoTSORTConfig()
+        try:
+            from ultralytics.trackers.bot_sort import BOTSORT
+            from ultralytics.engine.results import Boxes
+        except ImportError as exc:
+            raise RuntimeError(
+                "Le tracker BoT-SORT exige le paquet ultralytics. "
+                "Installez backend/requirements-training.txt."
+            ) from exc
+
+        self._bot_sort_cls = BOTSORT
+        self._boxes_cls = Boxes
+        self.reset()
+
+    def reset(self) -> None:
+        """Resets tracker internal state and track ID counter."""
+        import types
+
+        args = types.SimpleNamespace(
+            tracker_type="botsort",
+            track_high_thresh=self.config.track_high_thresh,
+            track_low_thresh=self.config.track_low_thresh,
+            new_track_thresh=self.config.new_track_thresh,
+            track_buffer=self.config.track_buffer,
+            match_thresh=self.config.match_thresh,
+            fuse_score=self.config.fuse_score,
+            gmc_method=self.config.gmc_method,
+            proximity_thresh=self.config.proximity_thresh,
+            appearance_thresh=self.config.appearance_thresh,
+            with_reid=self.config.with_reid,
+            model=self.config.model,
+            frame_rate=self.config.frame_rate,
+        )
+        self._tracker = self._bot_sort_cls(args)
+
+    def update_tracks(
+        self,
+        frame_index: int,
+        timestamp: float,
+        detections: list[RawDetection],
+        source_detector: str = "rf-detr-small",
+        frame_image: np.ndarray | None = None,
+    ) -> list[PlayerTrackObservation]:
+        """
+        Updates player tracks from raw detections.
+        Filters strictly for class_name == 'person' and confidence > track_low_thresh.
+        Preserves original detector confidences.
+        """
+        person_detections = [
+            d
+            for d in detections
+            if d.class_name == "person" and d.confidence > self.config.track_low_thresh
+        ]
+        if not person_detections:
+            import torch
+
+            empty_boxes = self._boxes_cls(
+                torch.zeros((0, 6), dtype=torch.float32), orig_shape=(1080, 1920)
+            )
+            self._tracker.update(empty_boxes, img=frame_image)
+            return []
+
+        import torch
+
+        boxes_tensor = torch.tensor(
+            [[*d.bbox, d.confidence, 0] for d in person_detections],
+            dtype=torch.float32,
+        )
+        boxes = self._boxes_cls(boxes_tensor, orig_shape=(1080, 1920))
+
+        tracked_output = self._tracker.update(boxes, img=frame_image)
+        if len(tracked_output) == 0:
+            return []
+
+        observations: list[PlayerTrackObservation] = []
+        for row in tracked_output:
+            track_id = int(row[4])
+            conf = float(row[5])
+            bbox = (float(row[0]), float(row[1]), float(row[2]), float(row[3]))
+            det_idx = int(row[7]) if len(row) > 7 else -1
+            if 0 <= det_idx < len(person_detections):
+                raw_det = person_detections[det_idx]
+                conf = float(raw_det.confidence)
+
+            obs = PlayerTrackObservation(
+                track_id=track_id,
+                frame_index=frame_index,
+                timestamp=timestamp,
+                bbox=bbox,
+                confidence=conf,
+                class_id=1,
+                class_name="person",
+                source_detector=source_detector,
+                tracking_state=TrackingState.CONFIRMED,
+            )
+            observations.append(obs)
+
+        return observations
+
+    def metadata(self) -> dict[str, Any]:
+        """Returns complete, frozen provenance and parameters."""
+        data = asdict(self.config)
+        data.update({
+            "name": "botsort_player_no_reid",
+            "target_class": "person",
+            "camera_motion_compensation": self.config.gmc_method,
+            "reid_enabled": False,
         })
         return data
