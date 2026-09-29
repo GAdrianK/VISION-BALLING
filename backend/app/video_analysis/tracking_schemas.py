@@ -47,6 +47,12 @@ class PlayerTrackObservation:
         }
 
 
+class BallLifecycleState(str, Enum):
+    ACTIVE = "ACTIVE"
+    LOST = "LOST"
+    TERMINATED = "TERMINATED"
+
+
 @dataclass(frozen=True)
 class BallTrackObservation:
     """Unified common schema for a ball track observation at a specific frame."""
@@ -61,6 +67,8 @@ class BallTrackObservation:
     confidence: float | None = None
     source_detector: str | None = None
     source_frame_detections: tuple[int, ...] = ()
+    track_id: int | None = None
+    lifecycle_state: BallLifecycleState = BallLifecycleState.ACTIVE
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -76,4 +84,6 @@ class BallTrackObservation:
             "confidence": self.confidence,
             "source_detector": self.source_detector,
             "source_frame_detections": list(self.source_frame_detections),
+            "track_id": self.track_id,
+            "lifecycle_state": self.lifecycle_state.value,
         }
