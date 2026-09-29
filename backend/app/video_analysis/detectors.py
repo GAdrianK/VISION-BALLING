@@ -24,7 +24,7 @@ class ObjectDetector(ABC):
         """Charge les ressources du détecteur."""
 
     @abstractmethod
-    def detect(self, frame: np.ndarray) -> list[RawDetection]:
+    def detect(self, frame: np.ndarray, **kwargs: Any) -> list[RawDetection]:
         """Retourne uniquement les objets effectivement détectés."""
 
     @abstractmethod
@@ -243,12 +243,24 @@ class RFDETRDetector(ObjectDetector):
             except Exception:
                 pass
 
-    def detect(self, frame: np.ndarray) -> list[RawDetection]:
+    def detect(
+        self,
+        frame: np.ndarray,
+        *,
+        person_min_confidence: float | None = None,
+        ball_min_confidence: float | None = None,
+    ) -> list[RawDetection]:
         if self._model is None:
             raise RuntimeError("Le détecteur RF-DETR doit être chargé avant detect().")
 
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) if frame.ndim == 3 else frame
-        min_thresh = min(self.person_threshold, self.ball_threshold)
+        eff_person_thresh = (
+            self.person_threshold if person_min_confidence is None else person_min_confidence
+        )
+        eff_ball_thresh = (
+            self.ball_threshold if ball_min_confidence is None else ball_min_confidence
+        )
+        min_thresh = min(eff_person_thresh, eff_ball_thresh)
 
         dets = self._model.predict(
             rgb_frame,
@@ -268,9 +280,9 @@ class RFDETRDetector(ObjectDetector):
                 continue
 
             if class_name == "person":
-                role, threshold = "player_candidate", self.person_threshold
+                role, threshold = "player_candidate", eff_person_thresh
             else:
-                role, threshold = "ball_candidate", self.ball_threshold
+                role, threshold = "ball_candidate", eff_ball_thresh
 
             if c_conf < threshold:
                 continue
@@ -286,6 +298,21 @@ class RFDETRDetector(ObjectDetector):
                 )
             )
         return detections
+
+    def detect_for_tracking(
+        self,
+        frame: np.ndarray,
+        *,
+        person_min_confidence: float = 0.10,
+        ball_min_confidence: float = 0.25,
+    ) -> list[RawDetection]:
+        """Expose person detections down to 0.10 for ByteTrack second stage, preserving ball at 0.25."""
+        return self.detect(
+            frame,
+            person_min_confidence=person_min_confidence,
+            ball_min_confidence=ball_min_confidence,
+        )
+
 
     def metadata(self) -> dict[str, Any]:
         return {

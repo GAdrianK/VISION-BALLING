@@ -325,3 +325,109 @@ def test_visualizer_rendering() -> None:
     assert annotated.shape == img.shape
     # Non-empty pixels after drawing
     assert annotated.sum() > 0
+
+
+# ==============================================================================
+# BYTETRACK TWO-STAGE INPUT FLOW & CONFIDENCE INTEGRATION TESTS
+# ==============================================================================
+
+from app.video_analysis.player_tracker import filter_detections_for_tracking
+
+
+def test_tracking_input_confidence_filtering() -> None:
+    """
+    Verifies that tracking input adapter:
+    - Retains person detections at [0.20, 0.44, 0.45, 0.80]
+    - Excludes person detections <= 0.10 (e.g. 0.05)
+    - Retains ball detections >= 0.25 and excludes ball detections < 0.25
+    """
+    raw_dets = [
+        _make_person((10, 10, 30, 30), conf=0.05),
+        _make_person((40, 10, 60, 30), conf=0.20),
+        _make_person((70, 10, 90, 30), conf=0.44),
+        _make_person((100, 10, 120, 30), conf=0.45),
+        _make_person((130, 10, 150, 30), conf=0.80),
+        _make_ball((200, 10, 220, 30), conf=0.15),
+        _make_ball((230, 10, 250, 30), conf=0.25),
+    ]
+
+    tracking_input = filter_detections_for_tracking(raw_dets)
+    person_confs = [round(d.confidence, 2) for d in tracking_input if d.class_name == "person"]
+    ball_confs = [round(d.confidence, 2) for d in tracking_input if d.class_name in ("sports ball", "ball")]
+
+    # Persons: excludes 0.05, retains 0.20, 0.44, 0.45, 0.80
+    assert 0.05 not in person_confs
+    assert person_confs == [0.20, 0.44, 0.45, 0.80]
+
+    # Ball: excludes 0.15, retains 0.25
+    assert 0.15 not in ball_confs
+    assert ball_confs == [0.25]
+
+
+def test_bytetrack_preserves_original_confidences() -> None:
+    """Verifies that ByteTrack preserves original float confidence values without mutation or rounding."""
+    tracker = PlayerByteTrack(ByteTrackConfig(track_activation_threshold=0.45))
+    dets = [
+        _make_person((100, 100, 150, 200), conf=0.87654),
+        _make_person((300, 100, 350, 200), conf=0.65432),
+    ]
+    tracks = tracker.update_tracks(frame_index=0, timestamp=0.0, detections=dets)
+    assert len(tracks) == 2
+    confs = {round(t.confidence, 5) for t in tracks}
+    assert confs == {0.87654, 0.65432}
+
+
+def test_bytetrack_low_confidence_cannot_initialize_track() -> None:
+    """
+    Verifies that a detection in ]0.10, 0.45[ (e.g. 0.35) CANNOT initialize a new track
+    through the high-confidence activation path.
+    """
+    tracker = PlayerByteTrack(ByteTrackConfig(track_activation_threshold=0.45))
+    low_conf_det = [_make_person((100, 100, 150, 200), conf=0.35)]
+
+    # Frame 0: solitary low-confidence detection
+    t0 = tracker.update_tracks(frame_index=0, timestamp=0.0, detections=low_conf_det)
+    assert len(t0) == 0, "A low-confidence detection alone must not create a track"
+
+    # Frame 1: another low-confidence detection
+    t1 = tracker.update_tracks(frame_index=1, timestamp=0.033, detections=low_conf_det)
+    assert len(t1) == 0, "Low-confidence detections cannot self-confirm into a valid track"
+
+
+def test_bytetrack_second_stage_recovers_track_with_low_confidence() -> None:
+    """
+    Verifies that a track initialized with high confidence (>= 0.45) CAN be
+    associated and maintained in the subsequent frame by a low-confidence detection (0.10 < conf < 0.45).
+    """
+    tracker = PlayerByteTrack(ByteTrackConfig(track_activation_threshold=0.45, minimum_consecutive_frames=1))
+
+    # Frame 0: High-confidence detection initializes track
+    d0 = [_make_person((100, 100, 150, 200), conf=0.85)]
+    t0 = tracker.update_tracks(frame_index=0, timestamp=0.0, detections=d0)
+    assert len(t0) == 1
+    init_id = t0[0].track_id
+
+    # Frame 1: Low-confidence detection (e.g. conf=0.30 in ]0.10, 0.45[) overlapping the track
+    # ByteTrack second-stage association associates this detection with the existing track!
+    d1 = [_make_person((102, 101, 152, 201), conf=0.30)]
+    t1 = tracker.update_tracks(frame_index=1, timestamp=0.033, detections=d1)
+    assert len(t1) == 1
+    assert t1[0].track_id == init_id
+    assert t1[0].confidence == pytest.approx(0.30, abs=1e-3)
+
+
+def test_canonical_detection_evaluation_retains_0_45_threshold() -> None:
+    """
+    Verifies that RFDETRDetector.detect() without optional kwargs keeps the canonical
+    person_threshold=0.45 and ball_threshold=0.25 intact.
+    """
+    from app.video_analysis.detectors import RFDETRDetector
+    detector = RFDETRDetector(model_path="/fake/path.pth")
+    assert detector.person_threshold == 0.45
+    assert detector.ball_threshold == 0.25
+
+
+def test_ball_tracking_threshold_remains_0_25() -> None:
+    """Verifies that BallTrackConfig retains min_detection_confidence=0.25."""
+    cfg = BallTrackConfig()
+    assert cfg.min_detection_confidence == 0.25

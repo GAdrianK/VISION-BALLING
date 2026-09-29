@@ -14,11 +14,31 @@ class ByteTrackConfig:
     """Explicit, frozen configuration for Player ByteTrack baseline."""
 
     track_activation_threshold: float = 0.45  # Matches locked canonical person threshold
-    lost_track_buffer: int = 30               # Retain lost tracks for ~1s at 30 fps
+    low_confidence_threshold: float = 0.10    # Low-confidence threshold for ByteTrack 2nd stage association
+    lost_track_buffer: int = 30               # Retain lost tracks for ~1s at 30 fps (or 25 frames at 25 fps)
     minimum_matching_threshold: float = 0.8   # Standard ByteTrack IoU association threshold
     frame_rate: float = 30.0                  # FPS of input sequence
     minimum_consecutive_frames: int = 1       # Confirmation age in consecutive frames
-    version: str = "1.0.0"
+    version: str = "1.1.0"
+
+
+def filter_detections_for_tracking(
+    detections: list[RawDetection],
+    *,
+    person_min_confidence: float = 0.10,
+    ball_min_confidence: float = 0.25,
+) -> list[RawDetection]:
+    """
+    Tracking-specific detection adapter:
+    - Exposes person detections with confidence > 0.10 for ByteTrack's 2-stage association.
+    - Exposes ball detections with confidence >= 0.25 for BallTrackManager.
+    """
+    return [
+        d
+        for d in detections
+        if (d.class_name == "person" and d.confidence > person_min_confidence)
+        or (d.class_name in ("sports ball", "ball") and d.confidence >= ball_min_confidence)
+    ]
 
 
 class PlayerByteTrack:
@@ -61,17 +81,20 @@ class PlayerByteTrack:
     ) -> list[PlayerTrackObservation]:
         """
         Updates player tracks from raw detections.
-        Filters strictly for class_name == 'person'.
+        Filters strictly for class_name == 'person' and confidence > low_confidence_threshold.
         Preserves original detector confidences.
         """
         person_indices = [
-            i for i, d in enumerate(detections) if d.class_name == "person"
+            i
+            for i, d in enumerate(detections)
+            if d.class_name == "person" and d.confidence > self.config.low_confidence_threshold
         ]
         if not person_indices:
             # Still invoke tracker with empty detections to advance lost-track buffers
             empty_sv = self._sv.Detections.empty()
             self._tracker.update_with_detections(empty_sv)
             return []
+
 
         boxes = np.array([detections[i].bbox for i in person_indices], dtype=float)
         confs = np.array([detections[i].confidence for i in person_indices], dtype=float)
