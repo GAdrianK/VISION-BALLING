@@ -243,17 +243,23 @@ class RFDETRDetector(ObjectDetector):
             except Exception:
                 pass
 
-    def detect(
+    def detect_with_timings(
         self,
         frame: np.ndarray,
         *,
         person_min_confidence: float | None = None,
         ball_min_confidence: float | None = None,
-    ) -> list[RawDetection]:
+    ) -> tuple[list[RawDetection], dict[str, float]]:
+        """Performs single RF-DETR inference while recording exact per-stage latencies."""
         if self._model is None:
             raise RuntimeError("Le détecteur RF-DETR doit être chargé avant detect().")
 
+        import time
+
+        t0 = time.perf_counter()
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) if frame.ndim == 3 else frame
+        t1 = time.perf_counter()
+
         eff_person_thresh = (
             self.person_threshold if person_min_confidence is None else person_min_confidence
         )
@@ -267,37 +273,72 @@ class RFDETRDetector(ObjectDetector):
             threshold=min_thresh,
             include_source_image=False,
         )
+        t2 = time.perf_counter()
 
         detections: list[RawDetection] = []
-        if len(dets) == 0:
-            return detections
+        if len(dets) > 0:
+            for xyxy, conf, cls_id in zip(dets.xyxy, dets.confidence, dets.class_id):
+                cid = int(cls_id)
+                c_conf = float(conf)
+                class_name = self.class_map.get(cid)
+                if class_name not in {"person", "sports ball", "ball"}:
+                    continue
 
-        for xyxy, conf, cls_id in zip(dets.xyxy, dets.confidence, dets.class_id):
-            cid = int(cls_id)
-            c_conf = float(conf)
-            class_name = self.class_map.get(cid)
-            if class_name not in {"person", "sports ball", "ball"}:
-                continue
+                if class_name == "person":
+                    role, threshold = "player_candidate", eff_person_thresh
+                else:
+                    role, threshold = "ball_candidate", eff_ball_thresh
 
-            if class_name == "person":
-                role, threshold = "player_candidate", eff_person_thresh
-            else:
-                role, threshold = "ball_candidate", eff_ball_thresh
+                if c_conf < threshold:
+                    continue
 
-            if c_conf < threshold:
-                continue
-
-            x1, y1, x2, y2 = (int(round(v)) for v in xyxy)
-            canonical_name = "sports ball" if class_name in ("sports ball", "ball") else "person"
-            detections.append(
-                RawDetection(
-                    class_name=canonical_name,
-                    football_role=role,
-                    confidence=c_conf,
-                    bbox=(x1, y1, x2, y2),
+                x1, y1, x2, y2 = (int(round(v)) for v in xyxy)
+                canonical_name = "sports ball" if class_name in ("sports ball", "ball") else "person"
+                detections.append(
+                    RawDetection(
+                        class_name=canonical_name,
+                        football_role=role,
+                        confidence=c_conf,
+                        bbox=(x1, y1, x2, y2),
+                    )
                 )
-            )
-        return detections
+        t3 = time.perf_counter()
+
+        timings = {
+            "preprocess_ms": (t1 - t0) * 1000.0,
+            "inference_ms": (t2 - t1) * 1000.0,
+            "postprocess_ms": (t3 - t2) * 1000.0,
+            "total_detector_ms": (t3 - t0) * 1000.0,
+        }
+        return detections, timings
+
+    def detect(
+        self,
+        frame: np.ndarray,
+        *,
+        person_min_confidence: float | None = None,
+        ball_min_confidence: float | None = None,
+    ) -> list[RawDetection]:
+        dets, _ = self.detect_with_timings(
+            frame,
+            person_min_confidence=person_min_confidence,
+            ball_min_confidence=ball_min_confidence,
+        )
+        return dets
+
+    def detect_for_tracking_with_timings(
+        self,
+        frame: np.ndarray,
+        *,
+        person_min_confidence: float = 0.10,
+        ball_min_confidence: float = 0.25,
+    ) -> tuple[list[RawDetection], dict[str, float]]:
+        """Expose detections down to tracking floors with exact timing breakdown."""
+        return self.detect_with_timings(
+            frame,
+            person_min_confidence=person_min_confidence,
+            ball_min_confidence=ball_min_confidence,
+        )
 
     def detect_for_tracking(
         self,
@@ -307,11 +348,13 @@ class RFDETRDetector(ObjectDetector):
         ball_min_confidence: float = 0.25,
     ) -> list[RawDetection]:
         """Expose person detections down to 0.10 for ByteTrack second stage, preserving ball at 0.25."""
-        return self.detect(
+        dets, _ = self.detect_for_tracking_with_timings(
             frame,
             person_min_confidence=person_min_confidence,
             ball_min_confidence=ball_min_confidence,
         )
+        return dets
+
 
 
     def metadata(self) -> dict[str, Any]:

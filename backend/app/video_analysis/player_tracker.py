@@ -202,7 +202,24 @@ class PlayerBoTSORT:
             model=self.config.model,
             frame_rate=self.config.frame_rate,
         )
+        self._last_gmc_time_ms: float = 0.0
         self._tracker = self._bot_sort_cls(args)
+        if hasattr(self._tracker, "gmc") and hasattr(self._tracker.gmc, "apply"):
+            orig_apply = self._tracker.gmc.apply
+
+            def timed_apply(*a: Any, **kw: Any) -> Any:
+                import time
+                t0 = time.perf_counter()
+                res = orig_apply(*a, **kw)
+                self._last_gmc_time_ms = (time.perf_counter() - t0) * 1000.0
+                return res
+
+            self._tracker.gmc.apply = timed_apply
+
+    @property
+    def last_gmc_time_ms(self) -> float:
+        """Returns execution time of optical flow GMC on most recent update in ms."""
+        return self._last_gmc_time_ms
 
     def update_tracks(
         self,
@@ -217,6 +234,7 @@ class PlayerBoTSORT:
         Filters strictly for class_name == 'person' and confidence > track_low_thresh.
         Preserves original detector confidences.
         """
+        self._last_gmc_time_ms = 0.0
         person_detections = [
             d
             for d in detections
@@ -278,3 +296,61 @@ class PlayerBoTSORT:
             "reid_enabled": False,
         })
         return data
+
+
+# ==============================================================================
+# CHAPTER 5 ARCHITECTURAL DECISION: PRODUCTION PLAYER TRACKER
+# ==============================================================================
+# Following EXP-08 controlled benchmark across 6 SoccerNet Tracking sequences
+# (4,500 frames), BoT-SORT with Camera Motion Compensation (sparseOptFlow GMC)
+# without appearance ReID decisively outperformed ByteTrack:
+#   - HOTA: 0.7465 -> 0.7708 (+0.0243)
+#   - AssA: 0.6224 -> 0.6578 (+0.0354)
+#   - IDF1: 0.7232 -> 0.7528 (+0.0296)
+#   - ID Switches: 82.2 -> 64.8 per sequence (-21.1%)
+#
+# Therefore, PlayerBoTSORT (gmc_method="sparseOptFlow", with_reid=False) is
+# locked as the default Chapter 5 player tracker.
+#
+# ByteTrack (PlayerByteTrack) is preserved in full as:
+#   1. Historical baseline (EXP-05)
+#   2. High-throughput fallback (570+ FPS)
+#   3. Regression reference
+# ==============================================================================
+
+DEFAULT_PLAYER_TRACKER_TYPE: str = "botsort"
+
+
+def create_player_tracker(
+    tracker_type: str = DEFAULT_PLAYER_TRACKER_TYPE,
+    *,
+    fps: float = 25.0,
+    gmc_method: str = "sparseOptFlow",
+    track_buffer: int = 30,
+) -> PlayerBoTSORT | PlayerByteTrack:
+    """
+    Factory function for Chapter 5 player tracking.
+    Defaults to locked production tracker: PlayerBoTSORT + sparseOptFlow GMC.
+    Supports 'bytetrack' as historical reference and ultra-fast fallback.
+    """
+    normalized = tracker_type.strip().lower()
+    if normalized in ("botsort", "botsort_player", "default"):
+        config = BoTSORTConfig(
+            frame_rate=fps,
+            gmc_method=gmc_method,
+            track_buffer=track_buffer,
+            with_reid=False,
+            model="none",
+        )
+        return PlayerBoTSORT(config=config)
+    elif normalized in ("bytetrack", "bytetrack_player"):
+        bt_config = ByteTrackConfig(
+            frame_rate=fps,
+            lost_track_buffer=track_buffer,
+        )
+        return PlayerByteTrack(config=bt_config)
+    else:
+        raise ValueError(
+            f"Unknown player tracker type '{tracker_type}'. "
+            f"Supported: 'botsort' (default production), 'bytetrack' (fallback)."
+        )

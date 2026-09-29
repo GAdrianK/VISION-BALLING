@@ -396,14 +396,68 @@ class SupervisionByteTrack(Tracker):
         return {"enabled": True, "name": "bytetrack", "version": self._version}
 
 
+class BoTSORTTracker(Tracker):
+    """Production Chapter 5 tracker adapter wrapping PlayerBoTSORT."""
+
+    def __init__(self, gmc_method: str = "sparseOptFlow", fps: float = 25.0) -> None:
+        from app.video_analysis.player_tracker import BoTSORTConfig, PlayerBoTSORT
+
+        self._cfg = BoTSORTConfig(gmc_method=gmc_method, frame_rate=fps, with_reid=False)
+        self._tracker = PlayerBoTSORT(config=self._cfg)
+        self._frame_index = 0
+        self._fps = fps
+
+    def reset(self) -> None:
+        self._frame_index = 0
+        self._tracker.reset()
+
+    def update(
+        self, frame: np.ndarray, detections: list[RawDetection]
+    ) -> list[TrackedDetection]:
+        self._frame_index += 1
+        timestamp = self._frame_index / self._fps
+        tracks = self._tracker.update_tracks(
+            self._frame_index,
+            timestamp,
+            detections,
+            frame_image=frame,
+        )
+        tracks_by_bbox: dict[tuple[int, int, int, int], int] = {
+            tuple(int(round(v)) for v in t.bbox): t.track_id
+            for t in tracks
+        }
+        result: list[TrackedDetection] = []
+        for det in detections:
+            if det.class_name == "person":
+                tid = tracks_by_bbox.get(det.bbox)
+                result.append(TrackedDetection(det, tid))
+            else:
+                result.append(TrackedDetection(det, None))
+        return result
+
+    def metadata(self) -> dict[str, Any]:
+        meta = self._tracker.metadata()
+        meta["enabled"] = True
+        return meta
+
+
 # Chapter 5 Unified Re-exports
-from app.video_analysis.ball_tracker import BallTrackConfig, BallTrackManager
-from app.video_analysis.player_tracker import ByteTrackConfig, PlayerByteTrack
+from app.video_analysis.ball_tracker import BallTrackConfig, BallTrackManager, create_ball_track_config_v2
+from app.video_analysis.player_tracker import (
+    DEFAULT_PLAYER_TRACKER_TYPE,
+    BoTSORTConfig,
+    ByteTrackConfig,
+    PlayerBoTSORT,
+    PlayerByteTrack,
+    create_player_tracker,
+    filter_detections_for_tracking,
+)
 from app.video_analysis.tracking_diagnostics import (
     BallTrackingDiagnostics,
     compute_ball_diagnostics,
 )
 from app.video_analysis.tracking_schemas import (
+    BallLifecycleState,
     BallObservationState,
     BallTrackObservation,
     PlayerTrackObservation,
@@ -419,8 +473,11 @@ from app.video_analysis.tracking_visualizer import (
 def create_tracker(enabled: bool, name: str) -> Tracker:
     if not enabled or name.strip().lower() == "none":
         return DisabledTracker()
-    if name.strip().lower() == "iou":
+    normalized = name.strip().lower()
+    if normalized == "iou":
         return IoUTracker()
-    if name.strip().lower() in ("bytetrack", "bytetrack_player"):
+    if normalized in ("bytetrack", "bytetrack_player"):
         return SupervisionByteTrack()
+    if normalized in ("botsort", "botsort_player", "default"):
+        return BoTSORTTracker()
     raise ValueError(f"Tracker vidéo inconnu : {name}")

@@ -87,3 +87,82 @@ class BallTrackObservation:
             "track_id": self.track_id,
             "lifecycle_state": self.lifecycle_state.value,
         }
+
+
+@dataclass(frozen=True)
+class FrameTrackingRuntime:
+    """Detailed per-stage runtime breakdown for a single processed frame in milliseconds."""
+
+    decode_ms: float = 0.0
+    preprocess_ms: float = 0.0
+    detector_inference_ms: float = 0.0
+    detector_postprocess_ms: float = 0.0
+    detector_ms: float = 0.0
+    gmc_ms: float = 0.0
+    player_tracking_ms: float = 0.0
+    ball_tracking_ms: float = 0.0
+    rendering_ms: float = 0.0
+    encoding_ms: float = 0.0
+    output_ms: float = 0.0
+    total_ms: float = 0.0
+
+    def to_dict(self) -> dict[str, float]:
+        return {
+            "decode_ms": round(self.decode_ms, 3),
+            "preprocess_ms": round(self.preprocess_ms, 3),
+            "detector_inference_ms": round(self.detector_inference_ms, 3),
+            "detector_postprocess_ms": round(self.detector_postprocess_ms, 3),
+            "detector_ms": round(self.detector_ms, 3),
+            "gmc_ms": round(self.gmc_ms, 3),
+            "player_tracking_ms": round(self.player_tracking_ms, 3),
+            "ball_tracking_ms": round(self.ball_tracking_ms, 3),
+            "rendering_ms": round(self.rendering_ms, 3),
+            "encoding_ms": round(self.encoding_ms, 3),
+            "output_ms": round(self.output_ms, 3),
+            "total_ms": round(self.total_ms, 3),
+        }
+
+
+@dataclass(frozen=True)
+class FrameTrackingResult:
+    """
+    Unified common output contract for a single video frame.
+    Strictly isolated: no team labels, jersey numbers, pitch coordinates, or actions.
+    """
+
+    frame_index: int
+    timestamp: float
+    players: list[PlayerTrackObservation]
+    ball: BallTrackObservation | None
+    runtime: FrameTrackingRuntime
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "frame_index": self.frame_index,
+            "timestamp": round(self.timestamp, 6),
+            "players": [
+                {
+                    "track_id": p.track_id,
+                    "bbox": list(p.bbox),
+                    "confidence": round(p.confidence, 4),
+                    "tracking_state": p.tracking_state.value,
+                }
+                for p in self.players
+            ],
+            "ball": {
+                "track_id": self.ball.track_id,
+                "bbox": list(self.ball.bbox),
+                "center": {"x": round(self.ball.position[0], 2), "y": round(self.ball.position[1], 2)},
+                "confidence": round(self.ball.confidence, 4) if self.ball.confidence is not None else None,
+                "observation_state": self.ball.observation_state.value,
+                "velocity": {
+                    "vx": round(self.ball.velocity[0], 2),
+                    "vy": round(self.ball.velocity[1], 2),
+                }
+                if self.ball.velocity
+                else None,
+            }
+            if self.ball is not None
+            else None,
+            "runtime": self.runtime.to_dict(),
+        }
