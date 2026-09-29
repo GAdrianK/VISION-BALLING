@@ -1,0 +1,242 @@
+{
+  "experiment": "exp05_soccernet_tracking_baseline",
+  "description": "SoccerNet Tracking 2023 baseline using locked RF-DETR Small (960px) + PlayerByteTrack + BallTrackManager",
+  "provenance": {
+    "git_head": "ef37e6813584fddfa11f4a56cd6d2e06f53b7c00",
+    "detector_architecture": "RF-DETR Small",
+    "detector_resolution": 960,
+    "checkpoint_path": "/media/adriano/Windows/runs/detect/exp04_rfdetr_small_h250_960/checkpoint_best_total.pth",
+    "checkpoint_sha256": "c1a1d88b74edc5ddefa7da4581e2848c4c58c3938d88ad4a1b615f071752ffff",
+    "canonical_detector_person_threshold": 0.45,
+    "canonical_detector_ball_threshold": 0.25,
+    "tracking_person_low_confidence_floor": 0.1,
+    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU"
+  },
+  "configurations": {
+    "player_tracker": {
+      "type": "PlayerByteTrack",
+      "config": {
+        "track_activation_threshold": 0.45,
+        "low_confidence_threshold": 0.1,
+        "lost_track_buffer": 30,
+        "minimum_matching_threshold": 0.8,
+        "frame_rate": 25.0,
+        "minimum_consecutive_frames": 1,
+        "version": "1.1.0"
+      }
+    },
+    "ball_tracker": {
+      "type": "BallTrackManager",
+      "config": {
+        "min_detection_confidence": 0.25,
+        "max_gap_interpolation": 15,
+        "max_velocity_pixels_per_frame": 120.0,
+        "spatial_gate_base_distance": 150.0,
+        "trajectory_history_length": 300,
+        "fps": 25.0,
+        "version": "1.0.0"
+      }
+    },
+    "evaluation": {
+      "engine": "built_in (TrackingEvaluator)",
+      "iou_threshold": 0.5,
+      "class_metadata_status": "A (100% reliable track_id -> role mapping via gameinfo.ini)"
+    }
+  },
+  "macro_metrics": {
+    "class_agnostic": {
+      "hota_0_5": 0.7583,
+      "deta_0_5": 0.8566,
+      "assa_0_5": 0.673,
+      "idf1": 0.7567
+    },
+    "person": {
+      "hota_0_5": 0.7891,
+      "deta_0_5": 0.9126,
+      "assa_0_5": 0.6843,
+      "idf1": 0.7792
+    },
+    "ball": {
+      "hota_0_5": 0.2583,
+      "deta_0_5": 0.2655,
+      "assa_0_5": 0.2519,
+      "idf1": 0.3976,
+      "mean_temporal_track_coverage": 0.9973
+    },
+    "throughput": {
+      "total_frames": 2250,
+      "total_detection_time_seconds": 62.105,
+      "total_tracking_time_seconds": 6.101,
+      "macro_fps_tracking_only": 368.8,
+      "macro_fps_end_to_end": 32.99
+    }
+  },
+  "per_sequence_results": {
+    "SNMOT-060": {
+      "num_frames": 750,
+      "fps": 25.0,
+      "roles_summary": {
+        "total_gt_tracklets": 26,
+        "person_gt_tracklets": 25,
+        "ball_gt_tracklets": 1
+      },
+      "class_agnostic": {
+        "hota_0_5": 0.7297,
+        "deta_0_5": 0.8523,
+        "assa_0_5": 0.6247,
+        "idf1": 0.743,
+        "num_gt_tracks": 26,
+        "num_pred_tracks": 70
+      },
+      "person": {
+        "hota_0_5": 0.7545,
+        "deta_0_5": 0.8984,
+        "assa_0_5": 0.6337,
+        "idf1": 0.7591,
+        "num_gt_tracks": 25,
+        "num_pred_tracks": 69
+      },
+      "ball": {
+        "hota_0_5": 0.2983,
+        "deta_0_5": 0.2983,
+        "assa_0_5": 0.2983,
+        "idf1": 0.4596,
+        "num_gt_tracks": 1,
+        "num_pred_tracks": 1,
+        "diagnostics": {
+          "total_frames": 750,
+          "observed_detection_frames": 665,
+          "observed_detection_coverage": 0.8867,
+          "temporal_track_frames": 750,
+          "temporal_track_coverage": 1.0,
+          "recovered_short_gaps": 26,
+          "recovered_frames_count": 85,
+          "incorrect_interpolation_count": 0,
+          "track_fragmentation": 0,
+          "longest_continuous_track": 750,
+          "positional_error_mean": null,
+          "rejected_velocity_jumps": 24
+        }
+      },
+      "throughput": {
+        "detection_time_seconds": 21.235,
+        "tracking_time_seconds": 2.158,
+        "total_time_seconds": 23.393,
+        "fps_tracking_only": 347.59,
+        "fps_end_to_end": 32.06
+      },
+      "visual_artifact": "/media/adriano/Windows/runs/tracking/exp05/SNMOT-060_baseline.mp4"
+    },
+    "SNMOT-061": {
+      "num_frames": 750,
+      "fps": 25.0,
+      "roles_summary": {
+        "total_gt_tracklets": 27,
+        "person_gt_tracklets": 25,
+        "ball_gt_tracklets": 2
+      },
+      "class_agnostic": {
+        "hota_0_5": 0.7091,
+        "deta_0_5": 0.8358,
+        "assa_0_5": 0.6016,
+        "idf1": 0.6909,
+        "num_gt_tracks": 27,
+        "num_pred_tracks": 57
+      },
+      "person": {
+        "hota_0_5": 0.7453,
+        "deta_0_5": 0.9066,
+        "assa_0_5": 0.6127,
+        "idf1": 0.72,
+        "num_gt_tracks": 25,
+        "num_pred_tracks": 56
+      },
+      "ball": {
+        "hota_0_5": 0.1832,
+        "deta_0_5": 0.2049,
+        "assa_0_5": 0.1639,
+        "idf1": 0.2796,
+        "num_gt_tracks": 2,
+        "num_pred_tracks": 1,
+        "diagnostics": {
+          "total_frames": 750,
+          "observed_detection_frames": 647,
+          "observed_detection_coverage": 0.8627,
+          "temporal_track_frames": 745,
+          "temporal_track_coverage": 0.9933,
+          "recovered_short_gaps": 36,
+          "recovered_frames_count": 98,
+          "incorrect_interpolation_count": 0,
+          "track_fragmentation": 0,
+          "longest_continuous_track": 745,
+          "positional_error_mean": null,
+          "rejected_velocity_jumps": 43
+        }
+      },
+      "throughput": {
+        "detection_time_seconds": 20.339,
+        "tracking_time_seconds": 1.829,
+        "total_time_seconds": 22.168,
+        "fps_tracking_only": 410.05,
+        "fps_end_to_end": 33.83
+      },
+      "visual_artifact": "/media/adriano/Windows/runs/tracking/exp05/SNMOT-061_baseline.mp4"
+    },
+    "SNMOT-062": {
+      "num_frames": 750,
+      "fps": 25.0,
+      "roles_summary": {
+        "total_gt_tracklets": 24,
+        "person_gt_tracklets": 23,
+        "ball_gt_tracklets": 1
+      },
+      "class_agnostic": {
+        "hota_0_5": 0.836,
+        "deta_0_5": 0.8816,
+        "assa_0_5": 0.7927,
+        "idf1": 0.8362,
+        "num_gt_tracks": 24,
+        "num_pred_tracks": 42
+      },
+      "person": {
+        "hota_0_5": 0.8674,
+        "deta_0_5": 0.9329,
+        "assa_0_5": 0.8065,
+        "idf1": 0.8585,
+        "num_gt_tracks": 23,
+        "num_pred_tracks": 41
+      },
+      "ball": {
+        "hota_0_5": 0.2934,
+        "deta_0_5": 0.2934,
+        "assa_0_5": 0.2934,
+        "idf1": 0.4536,
+        "num_gt_tracks": 1,
+        "num_pred_tracks": 1,
+        "diagnostics": {
+          "total_frames": 750,
+          "observed_detection_frames": 697,
+          "observed_detection_coverage": 0.9293,
+          "temporal_track_frames": 749,
+          "temporal_track_coverage": 0.9987,
+          "recovered_short_gaps": 22,
+          "recovered_frames_count": 52,
+          "incorrect_interpolation_count": 0,
+          "track_fragmentation": 0,
+          "longest_continuous_track": 749,
+          "positional_error_mean": null,
+          "rejected_velocity_jumps": 14
+        }
+      },
+      "throughput": {
+        "detection_time_seconds": 20.531,
+        "tracking_time_seconds": 2.114,
+        "total_time_seconds": 22.645,
+        "fps_tracking_only": 354.77,
+        "fps_end_to_end": 33.12
+      },
+      "visual_artifact": "/media/adriano/Windows/runs/tracking/exp05/SNMOT-062_baseline.mp4"
+    }
+  },
+  "conclusion": "EXP-05 baseline established on SoccerNet Tracking 2023. Baseline locked."
+}
