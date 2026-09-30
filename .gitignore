@@ -15,6 +15,8 @@ ENV/
 .venv-training/
 .venv-rfdetr
 .venv-rfdetr/
+.venv-reid
+.venv-reid/
 
 # Configuration & Secrets
 backend/.env

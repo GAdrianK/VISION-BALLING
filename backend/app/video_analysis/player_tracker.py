@@ -168,8 +168,13 @@ class PlayerBoTSORT:
     Preserves original detector confidences.
     """
 
-    def __init__(self, config: BoTSORTConfig | None = None) -> None:
+    def __init__(
+        self,
+        config: BoTSORTConfig | None = None,
+        appearance_encoder: Any = None,
+    ) -> None:
         self.config = config or BoTSORTConfig()
+        self.appearance_encoder = appearance_encoder
         try:
             from ultralytics.trackers.bot_sort import BOTSORT
             from ultralytics.engine.results import Boxes
@@ -187,6 +192,7 @@ class PlayerBoTSORT:
         """Resets tracker internal state and track ID counter."""
         import types
 
+        model_arg = "auto" if self.config.with_reid else "none"
         args = types.SimpleNamespace(
             tracker_type="botsort",
             track_high_thresh=self.config.track_high_thresh,
@@ -199,11 +205,12 @@ class PlayerBoTSORT:
             proximity_thresh=self.config.proximity_thresh,
             appearance_thresh=self.config.appearance_thresh,
             with_reid=self.config.with_reid,
-            model=self.config.model,
+            model=model_arg,
             frame_rate=self.config.frame_rate,
         )
         self._last_gmc_time_ms: float = 0.0
         self._tracker = self._bot_sort_cls(args)
+
         if hasattr(self._tracker, "gmc") and hasattr(self._tracker.gmc, "apply"):
             orig_apply = self._tracker.gmc.apply
 
@@ -228,11 +235,13 @@ class PlayerBoTSORT:
         detections: list[RawDetection],
         source_detector: str = "rf-detr-small",
         frame_image: np.ndarray | None = None,
+        detection_features: np.ndarray | None = None,
     ) -> list[PlayerTrackObservation]:
         """
         Updates player tracks from raw detections.
         Filters strictly for class_name == 'person' and confidence > track_low_thresh.
         Preserves original detector confidences.
+        Supports both precomputed detection_features and live appearance_encoder embedding.
         """
         self._last_gmc_time_ms = 0.0
         person_detections = [
@@ -257,7 +266,16 @@ class PlayerBoTSORT:
         )
         boxes = self._boxes_cls(boxes_tensor, orig_shape=(1080, 1920))
 
-        tracked_output = self._tracker.update(boxes, img=frame_image)
+        # Handle ReID appearance features
+        feats: np.ndarray | None = None
+        if self.config.with_reid:
+            if detection_features is not None:
+                feats = detection_features
+            elif self.appearance_encoder is not None and frame_image is not None and len(person_detections) > 0:
+                bboxes_xyxy = [d.bbox for d in person_detections]
+                feats = self.appearance_encoder.encode_bboxes(frame_image, bboxes_xyxy)
+
+        tracked_output = self._tracker.update(boxes, img=frame_image, feats=feats)
         if len(tracked_output) == 0:
             return []
 
@@ -290,10 +308,15 @@ class PlayerBoTSORT:
         """Returns complete, frozen provenance and parameters."""
         data = asdict(self.config)
         data.update({
-            "name": "botsort_player_no_reid",
+            "name": "botsort_player_with_reid" if self.config.with_reid else "botsort_player_no_reid",
             "target_class": "person",
             "camera_motion_compensation": self.config.gmc_method,
-            "reid_enabled": False,
+            "reid_enabled": bool(self.config.with_reid and self.appearance_encoder is not None),
+            "appearance_model": (
+                "prtreid-soccernet-baseline"
+                if (self.config.with_reid and self.appearance_encoder is not None)
+                else "none"
+            ),
         })
         return data
 
