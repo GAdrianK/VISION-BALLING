@@ -154,27 +154,45 @@ class BoTSORTConfig:
     gmc_method: str = "sparseOptFlow"     # Camera motion compensation: sparseOptFlow|none
     proximity_thresh: float = 0.5         # Min IoU to consider tracks proximate
     appearance_thresh: float = 0.8        # Min appearance similarity
-    with_reid: bool = False               # Strictly disabled (EXP-08)
-    model: str = "none"                   # No appearance encoder model
+    with_reid: bool = False               # Appearance ReID enabled
+    model: str = "none"                   # Appearance encoder model
     frame_rate: float = 25.0              # FPS of input sequence
+    conditional_reid: bool = False        # Selective inference triggered on ambiguity (EXP-11)
+    conditional_overlap_iou: float = 0.15 # Detection-to-detection overlap threshold
+    conditional_competition_iou: float = 0.20 # Detection-to-track competition threshold
+    conditional_reacquisition_iou: float = 0.10 # Lost track proximity threshold
     version: str = "1.0.0"
 
 
 class PlayerBoTSORT:
     """
-    Player tracking challenger using BoT-SORT without appearance ReID.
+    Player tracking challenger using BoT-SORT with optional appearance ReID.
     Treats player tracking strictly independently from ball tracking.
     Uses motion association with Camera Motion Compensation (GMC).
     Preserves original detector confidences.
+    Supports unconditional (full) and conditional (selective) ReID policies.
     """
 
     def __init__(
         self,
         config: BoTSORTConfig | None = None,
         appearance_encoder: Any = None,
+        conditional_policy: Any = None,
     ) -> None:
         self.config = config or BoTSORTConfig()
         self.appearance_encoder = appearance_encoder
+        self.conditional_policy = conditional_policy
+        if self.config.conditional_reid and self.conditional_policy is None:
+            from app.video_analysis.conditional_reid import ConditionalReIDConfig, ConditionalReIDPolicy
+            cond_cfg = ConditionalReIDConfig(
+                enabled=True,
+                appearance_thresh=self.config.appearance_thresh,
+                proximity_thresh=self.config.proximity_thresh,
+                detection_overlap_iou=self.config.conditional_overlap_iou,
+                track_competition_iou=self.config.conditional_competition_iou,
+                lost_reacquisition_iou=self.config.conditional_reacquisition_iou,
+            )
+            self.conditional_policy = ConditionalReIDPolicy(cond_cfg)
         try:
             from ultralytics.trackers.bot_sort import BOTSORT
             from ultralytics.engine.results import Boxes
@@ -189,7 +207,7 @@ class PlayerBoTSORT:
         self.reset()
 
     def reset(self) -> None:
-        """Resets tracker internal state and track ID counter."""
+        """Resets tracker internal state, track ID counter, and appearance memory."""
         import types
 
         model_arg = "auto" if self.config.with_reid else "none"
@@ -210,6 +228,9 @@ class PlayerBoTSORT:
         )
         self._last_gmc_time_ms: float = 0.0
         self._tracker = self._bot_sort_cls(args)
+
+        if self.conditional_policy is not None:
+            self.conditional_policy.reset()
 
         if hasattr(self._tracker, "gmc") and hasattr(self._tracker.gmc, "apply"):
             orig_apply = self._tracker.gmc.apply
@@ -241,7 +262,7 @@ class PlayerBoTSORT:
         Updates player tracks from raw detections.
         Filters strictly for class_name == 'person' and confidence > track_low_thresh.
         Preserves original detector confidences.
-        Supports both precomputed detection_features and live appearance_encoder embedding.
+        Supports full and conditional ReID appearance embedding.
         """
         self._last_gmc_time_ms = 0.0
         person_detections = [
@@ -267,13 +288,38 @@ class PlayerBoTSORT:
         boxes = self._boxes_cls(boxes_tensor, orig_shape=(1080, 1920))
 
         # Handle ReID appearance features
-        feats: np.ndarray | None = None
+        feats: torch.Tensor | None = None
         if self.config.with_reid:
+            from app.video_analysis.reid_encoder import extract_player_crop
+
+            n_p = len(person_detections)
+            if self.conditional_policy is not None:
+                active = getattr(self._tracker, "tracked_stracks", [])
+                lost = getattr(self._tracker, "lost_stracks", [])
+                reid_mask, _ = self.conditional_policy.evaluate_ambiguity(
+                    person_detections, active, lost, frame_index
+                )
+            else:
+                reid_mask = np.ones(n_p, dtype=bool)
+
             if detection_features is not None:
-                feats = detection_features
-            elif self.appearance_encoder is not None and frame_image is not None and len(person_detections) > 0:
-                bboxes_xyxy = [d.bbox for d in person_detections]
-                feats = self.appearance_encoder.encode_bboxes(frame_image, bboxes_xyxy)
+                feat_dim = detection_features.shape[1] if detection_features.ndim > 1 else 256
+                masked = np.zeros((n_p, feat_dim), dtype=np.float32)
+                if len(detection_features) == n_p:
+                    masked[reid_mask] = detection_features[reid_mask]
+                feats = torch.as_tensor(masked, dtype=torch.float32)
+            elif self.appearance_encoder is not None and frame_image is not None and n_p > 0:
+                masked = np.zeros((n_p, 256), dtype=np.float32)
+                trig_indices = [i for i, req in enumerate(reid_mask) if req]
+                if trig_indices:
+                    trig_crops = [
+                        extract_player_crop(frame_image, person_detections[i].bbox)
+                        for i in trig_indices
+                    ]
+                    encoded = self.appearance_encoder.encode_crops(trig_crops)
+                    for idx_pos, orig_idx in enumerate(trig_indices):
+                        masked[orig_idx] = encoded[idx_pos]
+                feats = torch.as_tensor(masked, dtype=torch.float32)
 
         tracked_output = self._tracker.update(boxes, img=frame_image, feats=feats)
         if len(tracked_output) == 0:
@@ -308,13 +354,18 @@ class PlayerBoTSORT:
         """Returns complete, frozen provenance and parameters."""
         data = asdict(self.config)
         data.update({
-            "name": "botsort_player_with_reid" if self.config.with_reid else "botsort_player_no_reid",
+            "name": (
+                "botsort_player_conditional_reid"
+                if (self.config.with_reid and self.config.conditional_reid)
+                else ("botsort_player_with_reid" if self.config.with_reid else "botsort_player_no_reid")
+            ),
             "target_class": "person",
             "camera_motion_compensation": self.config.gmc_method,
-            "reid_enabled": bool(self.config.with_reid and self.appearance_encoder is not None),
+            "reid_enabled": bool(self.config.with_reid),
+            "conditional_reid": bool(self.config.conditional_reid),
             "appearance_model": (
                 "prtreid-soccernet-baseline"
-                if (self.config.with_reid and self.appearance_encoder is not None)
+                if self.config.with_reid
                 else "none"
             ),
         })
