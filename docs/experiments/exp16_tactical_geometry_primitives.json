@@ -161,7 +161,7 @@
     "wrong_team_outlier_robustness": {
       "mean_centroid_shift_m": 4.656010067865631,
       "median_centroid_shift_m": 0.0,
-      "median_robustness_gain_ratio": 46560.1006786563
+      "robustness_observation": "The injected outlier shifted the arithmetic centroid by 4.66 m while the coordinate-wise median centroid remained unchanged in this synthetic case."
     }
   },
   "visibility_effect_analysis": {
