@@ -1,0 +1,1703 @@
+{
+  "experiment": "EXP-20",
+  "description": "Defensive Block Height, Compactness & Team Shape Semantics Benchmark",
+  "timestamp": "2026-10-02T23:10:23",
+  "platform": "Linux-7.0.0-34-generic-x86_64-with-glibc2.39",
+  "python_version": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "config": {
+    "pitch_dimensions": {
+      "length_m": 105.0,
+      "width_m": 68.0,
+      "center_circle_radius_m": 9.15,
+      "penalty_area_length_m": 16.5,
+      "penalty_area_width_m": 40.32,
+      "goal_area_length_m": 5.5,
+      "goal_area_width_m": 18.32,
+      "penalty_spot_distance_m": 11.0
+    },
+    "low_block_ceiling_m": 35.0,
+    "high_block_floor_m": 52.5,
+    "centroid_low_ceiling_m": 42.0,
+    "centroid_high_floor_m": 58.0,
+    "min_players_for_block_semantics": 5,
+    "hysteresis_frames": 10,
+    "min_line_confidence": 0.35,
+    "enable_possession_diagnostic": true,
+    "possession_confidence_threshold": 0.65
+  },
+  "synthetic_verification": {
+    "deep_low_block": true,
+    "midfield_block": true,
+    "high_line": true,
+    "wide_low_block": true,
+    "narrow_high_block": true,
+    "four_line_compact_shape": true,
+    "stretched_shape": true
+  },
+  "perturbation_analysis": {
+    "coordinate_noise": {
+      "noise_0.10m": {
+        "mean_abs_error_m": 0.03249189337482847,
+        "max_abs_error_m": 0.08167015854508008,
+        "category_flips": 0
+      },
+      "noise_0.25m": {
+        "mean_abs_error_m": 0.077697699305279,
+        "max_abs_error_m": 0.22831713891481797,
+        "category_flips": 0
+      },
+      "noise_0.50m": {
+        "mean_abs_error_m": 0.1593459041478944,
+        "max_abs_error_m": 0.41243940402504364,
+        "category_flips": 0
+      }
+    },
+    "missing_defender": {
+      "height_error_m": 0.0,
+      "category_preserved": true
+    }
+  },
+  "grid_search_hysteresis_dev": {
+    "K=5": {
+      "switches_per_minute": 16.0,
+      "mean_duration_s": 3.333333333333333,
+      "accuracy": 0.5246666666666666,
+      "macro_f1": 0.5119538627149526
+    },
+    "K=10": {
+      "switches_per_minute": 14.0,
+      "mean_duration_s": 3.75,
+      "accuracy": 0.5473333333333333,
+      "macro_f1": 0.5353133569399565
+    },
+    "K=15": {
+      "switches_per_minute": 14.0,
+      "mean_duration_s": 3.75,
+      "accuracy": 0.5686666666666667,
+      "macro_f1": 0.5579008091217679
+    }
+  },
+  "overall_summary": {
+    "dev_mean_accuracy": 0.6956666666666665,
+    "dev_mean_macro_f1": 0.7656298456103657,
+    "holdout_mean_accuracy": 0.5258666666666667,
+    "holdout_mean_macro_f1": 0.5525474304433029,
+    "incremental_latency_ms": 0.08421066216437288,
+    "p95_latency_ms": 0.1265001005018954,
+    "budget_target_ms": 0.3,
+    "is_budget_compliant": true,
+    "total_frames_evaluated": 3000
+  },
+  "dev_sequences": {
+    "SNMOT-060": {
+      "gt_evaluation": {
+        "evaluable_frames": 1500,
+        "accuracy": 0.5473333333333333,
+        "balanced_accuracy": 0.6286512699278656,
+        "macro_f1": 0.5353133569399565,
+        "per_class": {
+          "LOW_BLOCK": {
+            "precision": 0.5925925925925926,
+            "recall": 0.6468085106382979,
+            "f1_score": 0.6185147507629705,
+            "support": 470
+          },
+          "MID_BLOCK": {
+            "precision": 0.7172413793103448,
+            "recall": 0.4622222222222222,
+            "f1_score": 0.5621621621621622,
+            "support": 900
+          },
+          "HIGH_BLOCK": {
+            "precision": 0.2927536231884058,
+            "recall": 0.7769230769230769,
+            "f1_score": 0.42526315789473684,
+            "support": 130
+          }
+        }
+      },
+      "spatial_summary": {
+        "team_0": {
+          "defensive_line_height": {
+            "mean_m": 50.027426849248734,
+            "p10_m": 42.145859856152484,
+            "p50_m": 49.426845748230704,
+            "p90_m": 60.95203784388819
+          },
+          "team_centroid_height": {
+            "mean_m": 61.28985335490105,
+            "p50_m": 61.34283343660168
+          },
+          "longitudinal_compactness": {
+            "mean_oriented_depth_m": 27.174028061739165,
+            "mean_p90_p10_spread_m": 19.08719263371719,
+            "mean_longitudinal_mad_m": 6.435311512736604
+          },
+          "lateral_compactness": {
+            "mean_width_m": 21.30817246122987,
+            "mean_p90_p10_spread_m": 14.831074688581847,
+            "mean_lateral_mad_m": 4.540364697035888
+          },
+          "area_compactness": {
+            "mean_hull_area_m2": 235.41850168208995,
+            "mean_hull_per_player_m2": 26.095247969159562
+          },
+          "inter_line_spacing": {
+            "mean_inter_line_distance_m": 13.66598073729243
+          },
+          "opponent_and_ball_distances": {
+            "mean_def_to_opp_attack_m": 5.293213665993183,
+            "mean_def_to_ball_distance_m": 11.451459727260819
+          },
+          "block_category_distribution": {
+            "LOW_BLOCK_pct": 0.0,
+            "MID_BLOCK_pct": 49.86666666666667,
+            "HIGH_BLOCK_pct": 46.0,
+            "UNKNOWN_pct": 4.133333333333333
+          },
+          "visibility_distribution": {
+            "HIGH_pct": 79.2,
+            "MEDIUM_pct": 20.8,
+            "LOW_pct": 0.0
+          }
+        },
+        "team_1": {
+          "defensive_line_height": {
+            "mean_m": 32.43351335767673,
+            "p10_m": 24.595808766434224,
+            "p50_m": 32.11065036844684,
+            "p90_m": 40.18519475897627
+          },
+          "team_centroid_height": {
+            "mean_m": 43.60344545083316,
+            "p50_m": 43.85230369871463
+          },
+          "longitudinal_compactness": {
+            "mean_oriented_depth_m": 26.916525021770283,
+            "mean_p90_p10_spread_m": 20.97332977919067,
+            "mean_longitudinal_mad_m": 7.375959589690705
+          },
+          "lateral_compactness": {
+            "mean_width_m": 27.839738081168896,
+            "mean_p90_p10_spread_m": 15.935705384297163,
+            "mean_lateral_mad_m": 4.52589174156051
+          },
+          "area_compactness": {
+            "mean_hull_area_m2": 351.2768987201202,
+            "mean_hull_per_player_m2": 39.97780506185858
+          },
+          "inter_line_spacing": {
+            "mean_inter_line_distance_m": 12.929921313552141
+          },
+          "opponent_and_ball_distances": {
+            "mean_def_to_opp_attack_m": 5.301041255316584,
+            "mean_def_to_ball_distance_m": 17.657296105258876
+          },
+          "block_category_distribution": {
+            "LOW_BLOCK_pct": 68.4,
+            "MID_BLOCK_pct": 27.46666666666667,
+            "HIGH_BLOCK_pct": 0.0,
+            "UNKNOWN_pct": 4.133333333333333
+          },
+          "visibility_distribution": {
+            "HIGH_pct": 54.53333333333333,
+            "MEDIUM_pct": 45.46666666666667,
+            "LOW_pct": 0.0
+          }
+        },
+        "total_frames": 750,
+        "total_transitions": 14
+      },
+      "temporal_stability": {
+        "switches_per_minute": 14.0,
+        "total_transitions": 14,
+        "mean_state_duration_frames": 93.75,
+        "mean_state_duration_seconds": 3.75,
+        "false_one_frame_transitions": 0
+      },
+      "timing": {
+        "mean_latency_ms": 0.12016272399341688,
+        "median_latency_ms": 0.11115949928353075,
+        "p95_latency_ms": 0.25335770133096946,
+        "max_latency_ms": 0.6474590009020176,
+        "total_frames": 750
+      }
+    },
+    "SNMOT-061": {
+      "gt_evaluation": {
+        "evaluable_frames": 300,
+        "accuracy": 0.36,
+        "balanced_accuracy": 0.36,
+        "macro_f1": 0.47629233511586455,
+        "per_class": {
+          "LOW_BLOCK": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          },
+          "MID_BLOCK": {
+            "precision": 0.6761904761904762,
+            "recall": 0.47333333333333333,
+            "f1_score": 0.5568627450980392,
+            "support": 150
+          },
+          "HIGH_BLOCK": {
+            "precision": 1.0,
+            "recall": 0.24666666666666667,
+            "f1_score": 0.39572192513368987,
+            "support": 150
+          }
+        }
+      },
+      "spatial_summary": {
+        "team_0": {
+          "defensive_line_height": {
+            "mean_m": 43.273409286234916,
+            "p10_m": 40.28102427869949,
+            "p50_m": 43.804990973615894,
+            "p90_m": 45.46357241449444
+          },
+          "team_centroid_height": {
+            "mean_m": 44.706099565376576,
+            "p50_m": 45.16590551283637
+          },
+          "longitudinal_compactness": {
+            "mean_oriented_depth_m": 14.282892511606546,
+            "mean_p90_p10_spread_m": 13.42640469491548,
+            "mean_longitudinal_mad_m": 4.769326380432403
+          },
+          "lateral_compactness": {
+            "mean_width_m": 32.853657975242996,
+            "mean_p90_p10_spread_m": 22.438808868258107,
+            "mean_lateral_mad_m": 5.805259363370279
+          },
+          "area_compactness": {
+            "mean_hull_area_m2": 200.66027886875872,
+            "mean_hull_per_player_m2": 25.08253485859484
+          },
+          "inter_line_spacing": {
+            "mean_inter_line_distance_m": 11.364629937301526
+          },
+          "opponent_and_ball_distances": {
+            "mean_def_to_opp_attack_m": 7.538453485863502,
+            "mean_def_to_ball_distance_m": 8.744480181055504
+          },
+          "block_category_distribution": {
+            "LOW_BLOCK_pct": 0.0,
+            "MID_BLOCK_pct": 47.333333333333336,
+            "HIGH_BLOCK_pct": 0.0,
+            "UNKNOWN_pct": 52.666666666666664
+          },
+          "visibility_distribution": {
+            "HIGH_pct": 100.0,
+            "MEDIUM_pct": 0.0,
+            "LOW_pct": 0.0
+          }
+        },
+        "team_1": {
+          "defensive_line_height": {
+            "mean_m": 53.25517667450346,
+            "p10_m": 50.74115253404868,
+            "p50_m": 53.859577757277336,
+            "p90_m": 56.42922830081024
+          },
+          "team_centroid_height": {
+            "mean_m": 55.98874196860279,
+            "p50_m": 56.26956906937272
+          },
+          "longitudinal_compactness": {
+            "mean_oriented_depth_m": 18.639420560424593,
+            "mean_p90_p10_spread_m": 13.169942159380657,
+            "mean_longitudinal_mad_m": 4.7105926525502
+          },
+          "lateral_compactness": {
+            "mean_width_m": 48.43841534263713,
+            "mean_p90_p10_spread_m": 24.180167438389166,
+            "mean_lateral_mad_m": 5.605148912276146
+          },
+          "area_compactness": {
+            "mean_hull_area_m2": 422.52864404493323,
+            "mean_hull_per_player_m2": 55.603746174562026
+          },
+          "inter_line_spacing": {
+            "mean_inter_line_distance_m": 11.64335087251369
+          },
+          "opponent_and_ball_distances": {
+            "mean_def_to_opp_attack_m": 5.545072247440226,
+            "mean_def_to_ball_distance_m": 9.093761601064514
+          },
+          "block_category_distribution": {
+            "LOW_BLOCK_pct": 0.0,
+            "MID_BLOCK_pct": 22.666666666666664,
+            "HIGH_BLOCK_pct": 24.666666666666668,
+            "UNKNOWN_pct": 52.666666666666664
+          },
+          "visibility_distribution": {
+            "HIGH_pct": 79.33333333333333,
+            "MEDIUM_pct": 20.666666666666668,
+            "LOW_pct": 0.0
+          }
+        },
+        "total_frames": 150,
+        "total_transitions": 3
+      },
+      "temporal_stability": {
+        "switches_per_minute": 15.0,
+        "total_transitions": 3,
+        "mean_state_duration_frames": 60.0,
+        "mean_state_duration_seconds": 2.4,
+        "false_one_frame_transitions": 0
+      },
+      "timing": {
+        "mean_latency_ms": 0.06200852003530599,
+        "median_latency_ms": 0.03869250031129923,
+        "p95_latency_ms": 0.10585745167190908,
+        "max_latency_ms": 0.1240539968421217,
+        "total_frames": 150
+      }
+    },
+    "SNMOT-062": {
+      "gt_evaluation": {
+        "evaluable_frames": 300,
+        "accuracy": 0.9866666666666667,
+        "balanced_accuracy": 0.9866666666666667,
+        "macro_f1": 0.9932885906040269,
+        "per_class": {
+          "LOW_BLOCK": {
+            "precision": 1.0,
+            "recall": 0.9866666666666667,
+            "f1_score": 0.9932885906040269,
+            "support": 150
+          },
+          "MID_BLOCK": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          },
+          "HIGH_BLOCK": {
+            "precision": 1.0,
+            "recall": 0.9866666666666667,
+            "f1_score": 0.9932885906040269,
+            "support": 150
+          }
+        }
+      },
+      "spatial_summary": {
+        "team_0": {
+          "defensive_line_height": {
+            "mean_m": 64.14040605403572,
+            "p10_m": 59.458985056109576,
+            "p50_m": 64.86464776212208,
+            "p90_m": 67.89608655089853
+          },
+          "team_centroid_height": {
+            "mean_m": 74.40557613235669,
+            "p50_m": 75.07551499777435
+          },
+          "longitudinal_compactness": {
+            "mean_oriented_depth_m": 21.39662708480649,
+            "mean_p90_p10_spread_m": 15.581935206158942,
+            "mean_longitudinal_mad_m": 5.588379690878291
+          },
+          "lateral_compactness": {
+            "mean_width_m": 18.705357366255992,
+            "mean_p90_p10_spread_m": 16.39078970662766,
+            "mean_lateral_mad_m": 6.160740457613692
+          },
+          "area_compactness": {
+            "mean_hull_area_m2": 216.86320456520767,
+            "mean_hull_per_player_m2": 27.395739774002394
+          },
+          "inter_line_spacing": {
+            "mean_inter_line_distance_m": 12.194927631942038
+          },
+          "opponent_and_ball_distances": {
+            "mean_def_to_opp_attack_m": 9.226428475127626,
+            "mean_def_to_ball_distance_m": 12.324603660049949
+          },
+          "block_category_distribution": {
+            "LOW_BLOCK_pct": 0.0,
+            "MID_BLOCK_pct": 0.0,
+            "HIGH_BLOCK_pct": 98.66666666666667,
+            "UNKNOWN_pct": 1.3333333333333335
+          },
+          "visibility_distribution": {
+            "HIGH_pct": 67.33333333333333,
+            "MEDIUM_pct": 32.666666666666664,
+            "LOW_pct": 0.0
+          }
+        },
+        "team_1": {
+          "defensive_line_height": {
+            "mean_m": 26.564616158181526,
+            "p10_m": 24.0687892993692,
+            "p50_m": 26.112314568545123,
+            "p90_m": 29.808713037607006
+          },
+          "team_centroid_height": {
+            "mean_m": 28.064268802554093,
+            "p50_m": 28.319568121960234
+          },
+          "longitudinal_compactness": {
+            "mean_oriented_depth_m": 14.82976007316176,
+            "mean_p90_p10_spread_m": 11.279565375809966,
+            "mean_longitudinal_mad_m": 3.852709447574265
+          },
+          "lateral_compactness": {
+            "mean_width_m": 19.57526405701317,
+            "mean_p90_p10_spread_m": 13.719651805172397,
+            "mean_lateral_mad_m": 4.311309378139224
+          },
+          "area_compactness": {
+            "mean_hull_area_m2": 146.9807528104045,
+            "mean_hull_per_player_m2": 16.648011458997782
+          },
+          "inter_line_spacing": {
+            "mean_inter_line_distance_m": 13.217173779107721
+          },
+          "opponent_and_ball_distances": {
+            "mean_def_to_opp_attack_m": 3.310077428170502,
+            "mean_def_to_ball_distance_m": 6.1954420819922085
+          },
+          "block_category_distribution": {
+            "LOW_BLOCK_pct": 98.66666666666667,
+            "MID_BLOCK_pct": 0.0,
+            "HIGH_BLOCK_pct": 0.0,
+            "UNKNOWN_pct": 1.3333333333333335
+          },
+          "visibility_distribution": {
+            "HIGH_pct": 98.0,
+            "MEDIUM_pct": 2.0,
+            "LOW_pct": 0.0
+          }
+        },
+        "total_frames": 150,
+        "total_transitions": 2
+      },
+      "temporal_stability": {
+        "switches_per_minute": 10.0,
+        "total_transitions": 2,
+        "mean_state_duration_frames": 75.0,
+        "mean_state_duration_seconds": 3.0,
+        "false_one_frame_transitions": 0
+      },
+      "timing": {
+        "mean_latency_ms": 0.10871077356569003,
+        "median_latency_ms": 0.10434599971631542,
+        "p95_latency_ms": 0.14400114960153584,
+        "max_latency_ms": 0.2035629986494314,
+        "total_frames": 150
+      }
+    },
+    "SNMOT-063": {
+      "gt_evaluation": {
+        "evaluable_frames": 300,
+        "accuracy": 0.7866666666666666,
+        "balanced_accuracy": 0.7866666666666666,
+        "macro_f1": 0.8805970149253731,
+        "per_class": {
+          "LOW_BLOCK": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          },
+          "MID_BLOCK": {
+            "precision": 1.0,
+            "recall": 0.7866666666666666,
+            "f1_score": 0.8805970149253731,
+            "support": 150
+          },
+          "HIGH_BLOCK": {
+            "precision": 1.0,
+            "recall": 0.7866666666666666,
+            "f1_score": 0.8805970149253731,
+            "support": 150
+          }
+        }
+      },
+      "spatial_summary": {
+        "team_0": {
+          "defensive_line_height": {
+            "mean_m": 43.97517255167722,
+            "p10_m": 42.6804228956302,
+            "p50_m": 43.55184330875853,
+            "p90_m": 46.03676559173212
+          },
+          "team_centroid_height": {
+            "mean_m": 43.797356479648634,
+            "p50_m": 43.36384730161962
+          },
+          "longitudinal_compactness": {
+            "mean_oriented_depth_m": 13.527775681838754,
+            "mean_p90_p10_spread_m": 11.217432382839297,
+            "mean_longitudinal_mad_m": 3.4064359691347685
+          },
+          "lateral_compactness": {
+            "mean_width_m": 32.653003393330344,
+            "mean_p90_p10_spread_m": 14.783133199786686,
+            "mean_lateral_mad_m": 5.0218322119902306
+          },
+          "area_compactness": {
+            "mean_hull_area_m2": 222.6822729551701,
+            "mean_hull_per_player_m2": 20.313379100081956
+          },
+          "inter_line_spacing": {
+            "mean_inter_line_distance_m": null
+          },
+          "opponent_and_ball_distances": {
+            "mean_def_to_opp_attack_m": 4.264704146684227,
+            "mean_def_to_ball_distance_m": 8.563327623302214
+          },
+          "block_category_distribution": {
+            "LOW_BLOCK_pct": 0.0,
+            "MID_BLOCK_pct": 78.66666666666666,
+            "HIGH_BLOCK_pct": 0.0,
+            "UNKNOWN_pct": 21.333333333333336
+          },
+          "visibility_distribution": {
+            "HIGH_pct": 100.0,
+            "MEDIUM_pct": 0.0,
+            "LOW_pct": 0.0
+          }
+        },
+        "team_1": {
+          "defensive_line_height": {
+            "mean_m": 56.29851197872551,
+            "p10_m": 54.31503418896978,
+            "p50_m": 57.20897786201277,
+            "p90_m": 58.51788413942168
+          },
+          "team_centroid_height": {
+            "mean_m": 57.48468720220235,
+            "p50_m": 57.729641621262346
+          },
+          "longitudinal_compactness": {
+            "mean_oriented_depth_m": 14.141655034263199,
+            "mean_p90_p10_spread_m": 8.766659535529113,
+            "mean_longitudinal_mad_m": 2.2199681672343625
+          },
+          "lateral_compactness": {
+            "mean_width_m": 17.47214157065068,
+            "mean_p90_p10_spread_m": 11.63782810729966,
+            "mean_lateral_mad_m": 2.86488814006973
+          },
+          "area_compactness": {
+            "mean_hull_area_m2": 126.28720312546096,
+            "mean_hull_per_player_m2": 18.55228238183935
+          },
+          "inter_line_spacing": {
+            "mean_inter_line_distance_m": 9.936424955312626
+          },
+          "opponent_and_ball_distances": {
+            "mean_def_to_opp_attack_m": 4.2557610056765975,
+            "mean_def_to_ball_distance_m": 5.635273079605251
+          },
+          "block_category_distribution": {
+            "LOW_BLOCK_pct": 0.0,
+            "MID_BLOCK_pct": 0.0,
+            "HIGH_BLOCK_pct": 78.66666666666666,
+            "UNKNOWN_pct": 21.333333333333336
+          },
+          "visibility_distribution": {
+            "HIGH_pct": 26.0,
+            "MEDIUM_pct": 74.0,
+            "LOW_pct": 0.0
+          }
+        },
+        "total_frames": 150,
+        "total_transitions": 2
+      },
+      "temporal_stability": {
+        "switches_per_minute": 10.0,
+        "total_transitions": 2,
+        "mean_state_duration_frames": 75.0,
+        "mean_state_duration_seconds": 3.0,
+        "false_one_frame_transitions": 0
+      },
+      "timing": {
+        "mean_latency_ms": 0.08823520676135861,
+        "median_latency_ms": 0.09845550084719434,
+        "p95_latency_ms": 0.12905655057693355,
+        "max_latency_ms": 0.2537180007493589,
+        "total_frames": 150
+      }
+    },
+    "SNMOT-064": {
+      "gt_evaluation": {
+        "evaluable_frames": 300,
+        "accuracy": 0.7,
+        "balanced_accuracy": 0.7,
+        "macro_f1": 0.8235294117647058,
+        "per_class": {
+          "LOW_BLOCK": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          },
+          "MID_BLOCK": {
+            "precision": 1.0,
+            "recall": 0.7,
+            "f1_score": 0.8235294117647058,
+            "support": 300
+          },
+          "HIGH_BLOCK": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          }
+        }
+      },
+      "spatial_summary": {
+        "team_0": {
+          "defensive_line_height": {
+            "mean_m": 40.979386556747244,
+            "p10_m": 37.04089616295615,
+            "p50_m": 41.12906319256812,
+            "p90_m": 45.594693207708865
+          },
+          "team_centroid_height": {
+            "mean_m": 41.519805802066344,
+            "p50_m": 41.05446937016414
+          },
+          "longitudinal_compactness": {
+            "mean_oriented_depth_m": 15.665600584355305,
+            "mean_p90_p10_spread_m": 12.251203966445779,
+            "mean_longitudinal_mad_m": 3.5965167795622492
+          },
+          "lateral_compactness": {
+            "mean_width_m": 28.175546618897698,
+            "mean_p90_p10_spread_m": 15.214278450109399,
+            "mean_lateral_mad_m": 4.118022662013198
+          },
+          "area_compactness": {
+            "mean_hull_area_m2": 134.09241224885767,
+            "mean_hull_per_player_m2": 11.68148539804686
+          },
+          "inter_line_spacing": {
+            "mean_inter_line_distance_m": 10.121178213380725
+          },
+          "opponent_and_ball_distances": {
+            "mean_def_to_opp_attack_m": 4.501994026291631,
+            "mean_def_to_ball_distance_m": 21.61892250583902
+          },
+          "block_category_distribution": {
+            "LOW_BLOCK_pct": 0.0,
+            "MID_BLOCK_pct": 79.33333333333333,
+            "HIGH_BLOCK_pct": 0.0,
+            "UNKNOWN_pct": 20.666666666666668
+          },
+          "visibility_distribution": {
+            "HIGH_pct": 100.0,
+            "MEDIUM_pct": 0.0,
+            "LOW_pct": 0.0
+          }
+        },
+        "team_1": {
+          "defensive_line_height": {
+            "mean_m": 49.40302211656875,
+            "p10_m": 45.12986711533431,
+            "p50_m": 48.55101378573488,
+            "p90_m": 56.4661942222384
+          },
+          "team_centroid_height": {
+            "mean_m": 55.44902064161447,
+            "p50_m": 55.87858151891488
+          },
+          "longitudinal_compactness": {
+            "mean_oriented_depth_m": 24.326366045786393,
+            "mean_p90_p10_spread_m": 20.899107380073392,
+            "mean_longitudinal_mad_m": 7.24799393924465
+          },
+          "lateral_compactness": {
+            "mean_width_m": 21.310946448885073,
+            "mean_p90_p10_spread_m": 15.169836516783207,
+            "mean_lateral_mad_m": 4.189852636268485
+          },
+          "area_compactness": {
+            "mean_hull_area_m2": 190.90928687626018,
+            "mean_hull_per_player_m2": 17.625645919529465
+          },
+          "inter_line_spacing": {
+            "mean_inter_line_distance_m": 17.66670163391687
+          },
+          "opponent_and_ball_distances": {
+            "mean_def_to_opp_attack_m": 9.964720421354636,
+            "mean_def_to_ball_distance_m": 9.903027257813207
+          },
+          "block_category_distribution": {
+            "LOW_BLOCK_pct": 0.0,
+            "MID_BLOCK_pct": 60.66666666666667,
+            "HIGH_BLOCK_pct": 18.666666666666668,
+            "UNKNOWN_pct": 20.666666666666668
+          },
+          "visibility_distribution": {
+            "HIGH_pct": 100.0,
+            "MEDIUM_pct": 0.0,
+            "LOW_pct": 0.0
+          }
+        },
+        "total_frames": 150,
+        "total_transitions": 4
+      },
+      "temporal_stability": {
+        "switches_per_minute": 20.0,
+        "total_transitions": 4,
+        "mean_state_duration_frames": 50.0,
+        "mean_state_duration_seconds": 2.0,
+        "false_one_frame_transitions": 0
+      },
+      "timing": {
+        "mean_latency_ms": 0.08700215337739792,
+        "median_latency_ms": 0.10021849993790966,
+        "p95_latency_ms": 0.11166560143465175,
+        "max_latency_ms": 0.1507239976490382,
+        "total_frames": 150
+      }
+    },
+    "SNMOT-065": {
+      "gt_evaluation": {
+        "evaluable_frames": 300,
+        "accuracy": 0.7933333333333333,
+        "balanced_accuracy": 0.7933333333333333,
+        "macro_f1": 0.8847583643122676,
+        "per_class": {
+          "LOW_BLOCK": {
+            "precision": 1.0,
+            "recall": 0.7933333333333333,
+            "f1_score": 0.8847583643122676,
+            "support": 150
+          },
+          "MID_BLOCK": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          },
+          "HIGH_BLOCK": {
+            "precision": 1.0,
+            "recall": 0.7933333333333333,
+            "f1_score": 0.8847583643122676,
+            "support": 150
+          }
+        }
+      },
+      "spatial_summary": {
+        "team_0": {
+          "defensive_line_height": {
+            "mean_m": 69.90072664323627,
+            "p10_m": 68.57441828653302,
+            "p50_m": 70.19088320909059,
+            "p90_m": 71.2943011448152
+          },
+          "team_centroid_height": {
+            "mean_m": 69.27916888728659,
+            "p50_m": 69.38484557334274
+          },
+          "longitudinal_compactness": {
+            "mean_oriented_depth_m": 21.731149202555677,
+            "mean_p90_p10_spread_m": 15.147443751319944,
+            "mean_longitudinal_mad_m": 5.314772363403549
+          },
+          "lateral_compactness": {
+            "mean_width_m": 24.162070627483363,
+            "mean_p90_p10_spread_m": 13.947828009979348,
+            "mean_lateral_mad_m": 3.504802173303741
+          },
+          "area_compactness": {
+            "mean_hull_area_m2": 143.69143714184648,
+            "mean_hull_per_player_m2": 12.087608087653432
+          },
+          "inter_line_spacing": {
+            "mean_inter_line_distance_m": null
+          },
+          "opponent_and_ball_distances": {
+            "mean_def_to_opp_attack_m": 1.8217992433919792,
+            "mean_def_to_ball_distance_m": 34.30109322923037
+          },
+          "block_category_distribution": {
+            "LOW_BLOCK_pct": 0.0,
+            "MID_BLOCK_pct": 0.0,
+            "HIGH_BLOCK_pct": 79.33333333333333,
+            "UNKNOWN_pct": 20.666666666666668
+          },
+          "visibility_distribution": {
+            "HIGH_pct": 100.0,
+            "MEDIUM_pct": 0.0,
+            "LOW_pct": 0.0
+          }
+        },
+        "team_1": {
+          "defensive_line_height": {
+            "mean_m": 32.378552422798805,
+            "p10_m": 29.64152192427601,
+            "p50_m": 32.42840584926867,
+            "p90_m": 34.172519090079014
+          },
+          "team_centroid_height": {
+            "mean_m": 32.47142366363395,
+            "p50_m": 32.390200486088006
+          },
+          "longitudinal_compactness": {
+            "mean_oriented_depth_m": 16.104856707854964,
+            "mean_p90_p10_spread_m": 13.410965676059607,
+            "mean_longitudinal_mad_m": 3.974430288328833
+          },
+          "lateral_compactness": {
+            "mean_width_m": 19.66834491701098,
+            "mean_p90_p10_spread_m": 9.427545821417706,
+            "mean_lateral_mad_m": 3.406307569608739
+          },
+          "area_compactness": {
+            "mean_hull_area_m2": 159.08819901676094,
+            "mean_hull_per_player_m2": 14.67351579493631
+          },
+          "inter_line_spacing": {
+            "mean_inter_line_distance_m": 12.1075396703567
+          },
+          "opponent_and_ball_distances": {
+            "mean_def_to_opp_attack_m": 1.6995246917201188,
+            "mean_def_to_ball_distance_m": 36.199527013068945
+          },
+          "block_category_distribution": {
+            "LOW_BLOCK_pct": 79.33333333333333,
+            "MID_BLOCK_pct": 0.0,
+            "HIGH_BLOCK_pct": 0.0,
+            "UNKNOWN_pct": 20.666666666666668
+          },
+          "visibility_distribution": {
+            "HIGH_pct": 100.0,
+            "MEDIUM_pct": 0.0,
+            "LOW_pct": 0.0
+          }
+        },
+        "total_frames": 150,
+        "total_transitions": 2
+      },
+      "temporal_stability": {
+        "switches_per_minute": 10.0,
+        "total_transitions": 2,
+        "mean_state_duration_frames": 75.0,
+        "mean_state_duration_seconds": 3.0,
+        "false_one_frame_transitions": 0
+      },
+      "timing": {
+        "mean_latency_ms": 0.08353395331747986,
+        "median_latency_ms": 0.09076099922822323,
+        "p95_latency_ms": 0.11415220051276252,
+        "max_latency_ms": 0.15901900042081252,
+        "total_frames": 150
+      }
+    }
+  },
+  "holdout_sequences": {
+    "SNMOT-066": {
+      "gt_evaluation": {
+        "evaluable_frames": 300,
+        "accuracy": 0.0,
+        "balanced_accuracy": 0.0,
+        "macro_f1": 0.0,
+        "per_class": {
+          "LOW_BLOCK": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 150
+          },
+          "MID_BLOCK": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          },
+          "HIGH_BLOCK": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 150
+          }
+        }
+      },
+      "spatial_summary": {
+        "team_0": {
+          "defensive_line_height": {
+            "mean_m": 38.01470050705026,
+            "p10_m": 37.32307975985142,
+            "p50_m": 37.98274493584379,
+            "p90_m": 38.751172708462846
+          },
+          "team_centroid_height": {
+            "mean_m": 37.940379026402155,
+            "p50_m": 37.993237320076034
+          },
+          "longitudinal_compactness": {
+            "mean_oriented_depth_m": 12.493847268560003,
+            "mean_p90_p10_spread_m": 8.64690274913306,
+            "mean_longitudinal_mad_m": 1.8815922871484037
+          },
+          "lateral_compactness": {
+            "mean_width_m": 21.013268517908227,
+            "mean_p90_p10_spread_m": 11.07365304165985,
+            "mean_lateral_mad_m": 3.1964052740987094
+          },
+          "area_compactness": {
+            "mean_hull_area_m2": 33.49356775083453,
+            "mean_hull_per_player_m2": 3.1970757231066878
+          },
+          "inter_line_spacing": {
+            "mean_inter_line_distance_m": null
+          },
+          "opponent_and_ball_distances": {
+            "mean_def_to_opp_attack_m": 4.326295662758968,
+            "mean_def_to_ball_distance_m": 25.883915845276576
+          },
+          "block_category_distribution": {
+            "LOW_BLOCK_pct": 0.0,
+            "MID_BLOCK_pct": 79.33333333333333,
+            "HIGH_BLOCK_pct": 0.0,
+            "UNKNOWN_pct": 20.666666666666668
+          },
+          "visibility_distribution": {
+            "HIGH_pct": 100.0,
+            "MEDIUM_pct": 0.0,
+            "LOW_pct": 0.0
+          }
+        },
+        "team_1": {
+          "defensive_line_height": {
+            "mean_m": 62.18945229233062,
+            "p10_m": 47.99105563128608,
+            "p50_m": 63.74154544477373,
+            "p90_m": 65.74927497674629
+          },
+          "team_centroid_height": {
+            "mean_m": 64.45250349771086,
+            "p50_m": 64.83781531892197
+          },
+          "longitudinal_compactness": {
+            "mean_oriented_depth_m": 21.904163783013598,
+            "mean_p90_p10_spread_m": 20.256316347751902,
+            "mean_longitudinal_mad_m": 4.648535421108323
+          },
+          "lateral_compactness": {
+            "mean_width_m": 33.12192017067669,
+            "mean_p90_p10_spread_m": 26.281916908295408,
+            "mean_lateral_mad_m": 5.120636916871908
+          },
+          "area_compactness": {
+            "mean_hull_area_m2": 331.88262103857454,
+            "mean_hull_per_player_m2": 26.64091078803014
+          },
+          "inter_line_spacing": {
+            "mean_inter_line_distance_m": 19.485256833245508
+          },
+          "opponent_and_ball_distances": {
+            "mean_def_to_opp_attack_m": 6.5288111141874285,
+            "mean_def_to_ball_distance_m": 18.885950987112256
+          },
+          "block_category_distribution": {
+            "LOW_BLOCK_pct": 0.0,
+            "MID_BLOCK_pct": 0.0,
+            "HIGH_BLOCK_pct": 79.33333333333333,
+            "UNKNOWN_pct": 20.666666666666668
+          },
+          "visibility_distribution": {
+            "HIGH_pct": 100.0,
+            "MEDIUM_pct": 0.0,
+            "LOW_pct": 0.0
+          }
+        },
+        "total_frames": 150,
+        "total_transitions": 2
+      },
+      "temporal_stability": {
+        "switches_per_minute": 10.0,
+        "total_transitions": 2,
+        "mean_state_duration_frames": 75.0,
+        "mean_state_duration_seconds": 3.0,
+        "false_one_frame_transitions": 0
+      },
+      "timing": {
+        "mean_latency_ms": 0.08469623351023377,
+        "median_latency_ms": 0.09194850099447649,
+        "p95_latency_ms": 0.11710205199051416,
+        "max_latency_ms": 0.15692499800934456,
+        "total_frames": 150
+      }
+    },
+    "SNMOT-067": {
+      "gt_evaluation": {
+        "evaluable_frames": 0,
+        "accuracy": 0.0,
+        "balanced_accuracy": 0.0,
+        "macro_f1": 0.0,
+        "per_class": {
+          "LOW_BLOCK": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          },
+          "MID_BLOCK": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          },
+          "HIGH_BLOCK": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          }
+        }
+      },
+      "spatial_summary": {
+        "team_0": {
+          "defensive_line_height": {
+            "mean_m": null,
+            "p10_m": null,
+            "p50_m": null,
+            "p90_m": null
+          },
+          "team_centroid_height": {
+            "mean_m": null,
+            "p50_m": null
+          },
+          "longitudinal_compactness": {
+            "mean_oriented_depth_m": null,
+            "mean_p90_p10_spread_m": NaN,
+            "mean_longitudinal_mad_m": NaN
+          },
+          "lateral_compactness": {
+            "mean_width_m": null,
+            "mean_p90_p10_spread_m": NaN,
+            "mean_lateral_mad_m": NaN
+          },
+          "area_compactness": {
+            "mean_hull_area_m2": null,
+            "mean_hull_per_player_m2": null
+          },
+          "inter_line_spacing": {
+            "mean_inter_line_distance_m": null
+          },
+          "opponent_and_ball_distances": {
+            "mean_def_to_opp_attack_m": null,
+            "mean_def_to_ball_distance_m": null
+          },
+          "block_category_distribution": {
+            "LOW_BLOCK_pct": 0.0,
+            "MID_BLOCK_pct": 0.0,
+            "HIGH_BLOCK_pct": 0.0,
+            "UNKNOWN_pct": 100.0
+          },
+          "visibility_distribution": {
+            "HIGH_pct": 100.0,
+            "MEDIUM_pct": 0.0,
+            "LOW_pct": 0.0
+          }
+        },
+        "team_1": {
+          "defensive_line_height": {
+            "mean_m": null,
+            "p10_m": null,
+            "p50_m": null,
+            "p90_m": null
+          },
+          "team_centroid_height": {
+            "mean_m": null,
+            "p50_m": null
+          },
+          "longitudinal_compactness": {
+            "mean_oriented_depth_m": null,
+            "mean_p90_p10_spread_m": NaN,
+            "mean_longitudinal_mad_m": NaN
+          },
+          "lateral_compactness": {
+            "mean_width_m": null,
+            "mean_p90_p10_spread_m": NaN,
+            "mean_lateral_mad_m": NaN
+          },
+          "area_compactness": {
+            "mean_hull_area_m2": null,
+            "mean_hull_per_player_m2": null
+          },
+          "inter_line_spacing": {
+            "mean_inter_line_distance_m": null
+          },
+          "opponent_and_ball_distances": {
+            "mean_def_to_opp_attack_m": null,
+            "mean_def_to_ball_distance_m": null
+          },
+          "block_category_distribution": {
+            "LOW_BLOCK_pct": 0.0,
+            "MID_BLOCK_pct": 0.0,
+            "HIGH_BLOCK_pct": 0.0,
+            "UNKNOWN_pct": 100.0
+          },
+          "visibility_distribution": {
+            "HIGH_pct": 100.0,
+            "MEDIUM_pct": 0.0,
+            "LOW_pct": 0.0
+          }
+        },
+        "total_frames": 150,
+        "total_transitions": 0
+      },
+      "temporal_stability": {
+        "switches_per_minute": 0.0,
+        "total_transitions": 0,
+        "mean_state_duration_frames": 150.0,
+        "mean_state_duration_seconds": 6.0,
+        "false_one_frame_transitions": 0
+      },
+      "timing": {
+        "mean_latency_ms": 0.030986206693341956,
+        "median_latency_ms": 0.028237996957614087,
+        "p95_latency_ms": 0.043642499440466054,
+        "max_latency_ms": 0.053470001148525625,
+        "total_frames": 150
+      }
+    },
+    "SNMOT-068": {
+      "gt_evaluation": {
+        "evaluable_frames": 300,
+        "accuracy": 0.9166666666666666,
+        "balanced_accuracy": 0.9166666666666667,
+        "macro_f1": 0.9551280498146488,
+        "per_class": {
+          "LOW_BLOCK": {
+            "precision": 1.0,
+            "recall": 0.9866666666666667,
+            "f1_score": 0.9932885906040269,
+            "support": 150
+          },
+          "MID_BLOCK": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          },
+          "HIGH_BLOCK": {
+            "precision": 1.0,
+            "recall": 0.8466666666666667,
+            "f1_score": 0.9169675090252708,
+            "support": 150
+          }
+        }
+      },
+      "spatial_summary": {
+        "team_0": {
+          "defensive_line_height": {
+            "mean_m": 71.8945572790209,
+            "p10_m": 60.53578905323374,
+            "p50_m": 74.12792164808806,
+            "p90_m": 80.7402619213929
+          },
+          "team_centroid_height": {
+            "mean_m": 79.00317501218467,
+            "p50_m": 80.07246455297258
+          },
+          "longitudinal_compactness": {
+            "mean_oriented_depth_m": 16.50905678977424,
+            "mean_p90_p10_spread_m": 12.722253736394324,
+            "mean_longitudinal_mad_m": 4.249979364450897
+          },
+          "lateral_compactness": {
+            "mean_width_m": 20.445977703423875,
+            "mean_p90_p10_spread_m": 16.133119407657276,
+            "mean_lateral_mad_m": 5.976700529813351
+          },
+          "area_compactness": {
+            "mean_hull_area_m2": 155.83604380690812,
+            "mean_hull_per_player_m2": 27.141369718003673
+          },
+          "inter_line_spacing": {
+            "mean_inter_line_distance_m": 12.96677526631395
+          },
+          "opponent_and_ball_distances": {
+            "mean_def_to_opp_attack_m": 4.85780903762664,
+            "mean_def_to_ball_distance_m": 15.796410090776622
+          },
+          "block_category_distribution": {
+            "LOW_BLOCK_pct": 0.0,
+            "MID_BLOCK_pct": 0.0,
+            "HIGH_BLOCK_pct": 84.66666666666667,
+            "UNKNOWN_pct": 15.333333333333332
+          },
+          "visibility_distribution": {
+            "HIGH_pct": 0.0,
+            "MEDIUM_pct": 88.0,
+            "LOW_pct": 12.0
+          }
+        },
+        "team_1": {
+          "defensive_line_height": {
+            "mean_m": 25.642815497242278,
+            "p10_m": 18.38841316081479,
+            "p50_m": 24.96600319927291,
+            "p90_m": 33.32996498934454
+          },
+          "team_centroid_height": {
+            "mean_m": 27.21165594315559,
+            "p50_m": 25.928006508821696
+          },
+          "longitudinal_compactness": {
+            "mean_oriented_depth_m": 17.926913673087213,
+            "mean_p90_p10_spread_m": 13.654101634707219,
+            "mean_longitudinal_mad_m": 4.072733546998546
+          },
+          "lateral_compactness": {
+            "mean_width_m": 19.18357953094862,
+            "mean_p90_p10_spread_m": 15.859463714305402,
+            "mean_lateral_mad_m": 5.257138259061186
+          },
+          "area_compactness": {
+            "mean_hull_area_m2": 158.06234785607992,
+            "mean_hull_per_player_m2": 18.10314817739327
+          },
+          "inter_line_spacing": {
+            "mean_inter_line_distance_m": 14.352503631895363
+          },
+          "opponent_and_ball_distances": {
+            "mean_def_to_opp_attack_m": 1.5661587848429057,
+            "mean_def_to_ball_distance_m": 15.846134882604861
+          },
+          "block_category_distribution": {
+            "LOW_BLOCK_pct": 98.66666666666667,
+            "MID_BLOCK_pct": 0.0,
+            "HIGH_BLOCK_pct": 0.0,
+            "UNKNOWN_pct": 1.3333333333333335
+          },
+          "visibility_distribution": {
+            "HIGH_pct": 70.66666666666667,
+            "MEDIUM_pct": 29.333333333333332,
+            "LOW_pct": 0.0
+          }
+        },
+        "total_frames": 150,
+        "total_transitions": 4
+      },
+      "temporal_stability": {
+        "switches_per_minute": 20.0,
+        "total_transitions": 4,
+        "mean_state_duration_frames": 50.0,
+        "mean_state_duration_seconds": 2.0,
+        "false_one_frame_transitions": 0
+      },
+      "timing": {
+        "mean_latency_ms": 0.0979871067587131,
+        "median_latency_ms": 0.09369100189360324,
+        "p95_latency_ms": 0.12442184979590805,
+        "max_latency_ms": 0.1803090017347131,
+        "total_frames": 150
+      }
+    },
+    "SNMOT-069": {
+      "gt_evaluation": {
+        "evaluable_frames": 1500,
+        "accuracy": 0.5826666666666667,
+        "balanced_accuracy": 0.5661904761904762,
+        "macro_f1": 0.5883620624510836,
+        "per_class": {
+          "LOW_BLOCK": {
+            "precision": 0.7056962025316456,
+            "recall": 0.5575,
+            "f1_score": 0.6229050279329609,
+            "support": 400
+          },
+          "MID_BLOCK": {
+            "precision": 0.5880829015544041,
+            "recall": 0.6485714285714286,
+            "f1_score": 0.6168478260869565,
+            "support": 700
+          },
+          "HIGH_BLOCK": {
+            "precision": 0.5628571428571428,
+            "recall": 0.4925,
+            "f1_score": 0.5253333333333332,
+            "support": 400
+          }
+        }
+      },
+      "spatial_summary": {
+        "team_0": {
+          "defensive_line_height": {
+            "mean_m": 46.36456977004917,
+            "p10_m": 36.41468065206978,
+            "p50_m": 45.83241301978217,
+            "p90_m": 57.605794715128994
+          },
+          "team_centroid_height": {
+            "mean_m": 50.46250913260436,
+            "p50_m": 53.616810159076174
+          },
+          "longitudinal_compactness": {
+            "mean_oriented_depth_m": 21.719768498625335,
+            "mean_p90_p10_spread_m": 17.879686809793853,
+            "mean_longitudinal_mad_m": 5.010618487596245
+          },
+          "lateral_compactness": {
+            "mean_width_m": 22.489154734907725,
+            "mean_p90_p10_spread_m": 16.979730551370626,
+            "mean_lateral_mad_m": 6.1077138956007095
+          },
+          "area_compactness": {
+            "mean_hull_area_m2": 274.55119973847263,
+            "mean_hull_per_player_m2": 37.02411846728943
+          },
+          "inter_line_spacing": {
+            "mean_inter_line_distance_m": 13.768948789222572
+          },
+          "opponent_and_ball_distances": {
+            "mean_def_to_opp_attack_m": 5.1370796812939705,
+            "mean_def_to_ball_distance_m": 18.996911095089732
+          },
+          "block_category_distribution": {
+            "LOW_BLOCK_pct": 0.0,
+            "MID_BLOCK_pct": 61.199999999999996,
+            "HIGH_BLOCK_pct": 34.66666666666667,
+            "UNKNOWN_pct": 4.133333333333333
+          },
+          "visibility_distribution": {
+            "HIGH_pct": 53.06666666666666,
+            "MEDIUM_pct": 46.93333333333333,
+            "LOW_pct": 0.0
+          }
+        },
+        "team_1": {
+          "defensive_line_height": {
+            "mean_m": 36.842855075552094,
+            "p10_m": 19.487839116485496,
+            "p50_m": 37.24169385432791,
+            "p90_m": 53.62037904173361
+          },
+          "team_centroid_height": {
+            "mean_m": 46.81661289137422,
+            "p50_m": 41.001313837338756
+          },
+          "longitudinal_compactness": {
+            "mean_oriented_depth_m": 26.305053135894866,
+            "mean_p90_p10_spread_m": 18.67719040988451,
+            "mean_longitudinal_mad_m": 6.687394786386897
+          },
+          "lateral_compactness": {
+            "mean_width_m": 28.303703610754003,
+            "mean_p90_p10_spread_m": 19.62152717726344,
+            "mean_lateral_mad_m": 6.523426017127481
+          },
+          "area_compactness": {
+            "mean_hull_area_m2": 427.7232405008483,
+            "mean_hull_per_player_m2": 52.984344856603826
+          },
+          "inter_line_spacing": {
+            "mean_inter_line_distance_m": 15.621049900021882
+          },
+          "opponent_and_ball_distances": {
+            "mean_def_to_opp_attack_m": 9.89058450672825,
+            "mean_def_to_ball_distance_m": 22.293158126857413
+          },
+          "block_category_distribution": {
+            "LOW_BLOCK_pct": 42.13333333333333,
+            "MID_BLOCK_pct": 41.733333333333334,
+            "HIGH_BLOCK_pct": 12.0,
+            "UNKNOWN_pct": 4.133333333333333
+          },
+          "visibility_distribution": {
+            "HIGH_pct": 63.46666666666667,
+            "MEDIUM_pct": 36.53333333333333,
+            "LOW_pct": 0.0
+          }
+        },
+        "total_frames": 750,
+        "total_transitions": 13
+      },
+      "temporal_stability": {
+        "switches_per_minute": 13.0,
+        "total_transitions": 13,
+        "mean_state_duration_frames": 100.0,
+        "mean_state_duration_seconds": 4.0,
+        "false_one_frame_transitions": 0
+      },
+      "timing": {
+        "mean_latency_ms": 0.10778657463864268,
+        "median_latency_ms": 0.10596450010780245,
+        "p95_latency_ms": 0.1458900502257165,
+        "max_latency_ms": 0.28064800062566064,
+        "total_frames": 750
+      }
+    },
+    "SNMOT-070": {
+      "gt_evaluation": {
+        "evaluable_frames": 300,
+        "accuracy": 0.14333333333333334,
+        "balanced_accuracy": 0.14333333333333334,
+        "macro_f1": 0.22595844934675519,
+        "per_class": {
+          "LOW_BLOCK": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          },
+          "MID_BLOCK": {
+            "precision": 0.6037735849056604,
+            "recall": 0.21333333333333335,
+            "f1_score": 0.31527093596059114,
+            "support": 150
+          },
+          "HIGH_BLOCK": {
+            "precision": 1.0,
+            "recall": 0.07333333333333333,
+            "f1_score": 0.13664596273291926,
+            "support": 150
+          }
+        }
+      },
+      "spatial_summary": {
+        "team_0": {
+          "defensive_line_height": {
+            "mean_m": 36.8985500331115,
+            "p10_m": 35.6574980182734,
+            "p50_m": 37.09562977627789,
+            "p90_m": 37.68546080518178
+          },
+          "team_centroid_height": {
+            "mean_m": 43.769605797294716,
+            "p50_m": 43.52586471231088
+          },
+          "longitudinal_compactness": {
+            "mean_oriented_depth_m": 20.258461671707867,
+            "mean_p90_p10_spread_m": 17.16811404253505,
+            "mean_longitudinal_mad_m": 7.148115346703138
+          },
+          "lateral_compactness": {
+            "mean_width_m": 26.52187967003403,
+            "mean_p90_p10_spread_m": 18.83541462698147,
+            "mean_lateral_mad_m": 7.567406426430924
+          },
+          "area_compactness": {
+            "mean_hull_area_m2": 342.7086272761027,
+            "mean_hull_per_player_m2": 52.02995323316151
+          },
+          "inter_line_spacing": {
+            "mean_inter_line_distance_m": 11.700947348566364
+          },
+          "opponent_and_ball_distances": {
+            "mean_def_to_opp_attack_m": 9.758870626881038,
+            "mean_def_to_ball_distance_m": 8.00326926122201
+          },
+          "block_category_distribution": {
+            "LOW_BLOCK_pct": 0.0,
+            "MID_BLOCK_pct": 21.333333333333336,
+            "HIGH_BLOCK_pct": 0.0,
+            "UNKNOWN_pct": 78.66666666666666
+          },
+          "visibility_distribution": {
+            "HIGH_pct": 0.0,
+            "MEDIUM_pct": 100.0,
+            "LOW_pct": 0.0
+          }
+        },
+        "team_1": {
+          "defensive_line_height": {
+            "mean_m": 54.357799969017925,
+            "p10_m": 44.90190419227874,
+            "p50_m": 57.311268260483104,
+            "p90_m": 62.863998274840995
+          },
+          "team_centroid_height": {
+            "mean_m": 65.20118554206773,
+            "p50_m": 64.53143314771395
+          },
+          "longitudinal_compactness": {
+            "mean_oriented_depth_m": 27.1420372694497,
+            "mean_p90_p10_spread_m": 22.80103621885293,
+            "mean_longitudinal_mad_m": 8.956014305747615
+          },
+          "lateral_compactness": {
+            "mean_width_m": 23.572021090562174,
+            "mean_p90_p10_spread_m": 18.088146430981027,
+            "mean_lateral_mad_m": 7.178813884194795
+          },
+          "area_compactness": {
+            "mean_hull_area_m2": 416.98705304872914,
+            "mean_hull_per_player_m2": 67.27635258284691
+          },
+          "inter_line_spacing": {
+            "mean_inter_line_distance_m": 15.016338945456436
+          },
+          "opponent_and_ball_distances": {
+            "mean_def_to_opp_attack_m": 4.3799661420382625,
+            "mean_def_to_ball_distance_m": 17.79128097592754
+          },
+          "block_category_distribution": {
+            "LOW_BLOCK_pct": 0.0,
+            "MID_BLOCK_pct": 14.000000000000002,
+            "HIGH_BLOCK_pct": 7.333333333333333,
+            "UNKNOWN_pct": 78.66666666666666
+          },
+          "visibility_distribution": {
+            "HIGH_pct": 0.0,
+            "MEDIUM_pct": 100.0,
+            "LOW_pct": 0.0
+          }
+        },
+        "total_frames": 150,
+        "total_transitions": 3
+      },
+      "temporal_stability": {
+        "switches_per_minute": 15.0,
+        "total_transitions": 3,
+        "mean_state_duration_frames": 60.0,
+        "mean_state_duration_seconds": 2.4,
+        "false_one_frame_transitions": 0
+      },
+      "timing": {
+        "mean_latency_ms": 0.04832729328578959,
+        "median_latency_ms": 0.02635950113472063,
+        "p95_latency_ms": 0.12388954892230676,
+        "max_latency_ms": 0.24475100144627504,
+        "total_frames": 150
+      }
+    },
+    "SNMOT-071": {
+      "gt_evaluation": {
+        "evaluable_frames": 300,
+        "accuracy": 0.9866666666666667,
+        "balanced_accuracy": 0.9866666666666667,
+        "macro_f1": 0.9932885906040269,
+        "per_class": {
+          "LOW_BLOCK": {
+            "precision": 1.0,
+            "recall": 0.9866666666666667,
+            "f1_score": 0.9932885906040269,
+            "support": 150
+          },
+          "MID_BLOCK": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          },
+          "HIGH_BLOCK": {
+            "precision": 1.0,
+            "recall": 0.9866666666666667,
+            "f1_score": 0.9932885906040269,
+            "support": 150
+          }
+        }
+      },
+      "spatial_summary": {
+        "team_0": {
+          "defensive_line_height": {
+            "mean_m": 77.03852363874313,
+            "p10_m": 74.78333256771958,
+            "p50_m": 77.57548842263279,
+            "p90_m": 78.47402635049974
+          },
+          "team_centroid_height": {
+            "mean_m": 77.23899667940641,
+            "p50_m": 77.70541590067364
+          },
+          "longitudinal_compactness": {
+            "mean_oriented_depth_m": 16.045907946490605,
+            "mean_p90_p10_spread_m": 12.813632268912121,
+            "mean_longitudinal_mad_m": 2.1701105398018856
+          },
+          "lateral_compactness": {
+            "mean_width_m": 17.318533867125186,
+            "mean_p90_p10_spread_m": 9.011140758684453,
+            "mean_lateral_mad_m": 2.2065911798651707
+          },
+          "area_compactness": {
+            "mean_hull_area_m2": 140.3890194858566,
+            "mean_hull_per_player_m2": 14.402500526152998
+          },
+          "inter_line_spacing": {
+            "mean_inter_line_distance_m": 10.127113229685241
+          },
+          "opponent_and_ball_distances": {
+            "mean_def_to_opp_attack_m": 4.33894631596485,
+            "mean_def_to_ball_distance_m": 13.542039010641233
+          },
+          "block_category_distribution": {
+            "LOW_BLOCK_pct": 0.0,
+            "MID_BLOCK_pct": 0.0,
+            "HIGH_BLOCK_pct": 98.66666666666667,
+            "UNKNOWN_pct": 1.3333333333333335
+          },
+          "visibility_distribution": {
+            "HIGH_pct": 96.66666666666667,
+            "MEDIUM_pct": 3.3333333333333335,
+            "LOW_pct": 0.0
+          }
+        },
+        "team_1": {
+          "defensive_line_height": {
+            "mean_m": 25.88116779783228,
+            "p10_m": 25.43688768232136,
+            "p50_m": 25.885026711827592,
+            "p90_m": 26.34711606519599
+          },
+          "team_centroid_height": {
+            "mean_m": 25.825194071359018,
+            "p50_m": 25.754844268321463
+          },
+          "longitudinal_compactness": {
+            "mean_oriented_depth_m": 6.018443660590845,
+            "mean_p90_p10_spread_m": 4.07473235066619,
+            "mean_longitudinal_mad_m": 0.5716289688865638
+          },
+          "lateral_compactness": {
+            "mean_width_m": 12.152949730680824,
+            "mean_p90_p10_spread_m": 6.200968913979559,
+            "mean_lateral_mad_m": 1.7901341811447826
+          },
+          "area_compactness": {
+            "mean_hull_area_m2": 26.808997619722987,
+            "mean_hull_per_player_m2": 2.662191106436634
+          },
+          "inter_line_spacing": {
+            "mean_inter_line_distance_m": null
+          },
+          "opponent_and_ball_distances": {
+            "mean_def_to_opp_attack_m": 4.119192732574058,
+            "mean_def_to_ball_distance_m": 17.386278871208916
+          },
+          "block_category_distribution": {
+            "LOW_BLOCK_pct": 98.66666666666667,
+            "MID_BLOCK_pct": 0.0,
+            "HIGH_BLOCK_pct": 0.0,
+            "UNKNOWN_pct": 1.3333333333333335
+          },
+          "visibility_distribution": {
+            "HIGH_pct": 92.66666666666666,
+            "MEDIUM_pct": 7.333333333333333,
+            "LOW_pct": 0.0
+          }
+        },
+        "total_frames": 150,
+        "total_transitions": 2
+      },
+      "temporal_stability": {
+        "switches_per_minute": 10.0,
+        "total_transitions": 2,
+        "mean_state_duration_frames": 75.0,
+        "mean_state_duration_seconds": 3.0,
+        "false_one_frame_transitions": 0
+      },
+      "timing": {
+        "mean_latency_ms": 0.09109120003510422,
+        "median_latency_ms": 0.08876700121618342,
+        "p95_latency_ms": 0.10496455051907104,
+        "max_latency_ms": 0.1341520001005847,
+        "total_frames": 150
+      }
+    }
+  }
+}

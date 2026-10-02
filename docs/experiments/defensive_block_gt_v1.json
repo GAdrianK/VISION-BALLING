@@ -1,0 +1,190 @@
+{
+  "version": "defensive_block_gt_v1",
+  "description": "Ground truth spatial defensive block annotations for EXP-20 across 12 SoccerNet sequences",
+  "definitions": {
+    "LOW_BLOCK": "Defensive line sits inside defensive third (<35.0m from own goal)",
+    "MID_BLOCK": "Defensive line sits in midfield zone [35.0m, 52.5m)",
+    "HIGH_BLOCK": "Defensive line sits advanced near or beyond midfield (>=52.5m from own goal)",
+    "AMBIGUOUS": "Dynamic counterattack, disorganized broken shape, or uncalibrated camera view",
+    "NOT_ENOUGH_VISIBLE_PLAYERS": "Outfield visibility <= 4 trusted players in camera view"
+  },
+  "partitions": {
+    "DEV_SEQUENCES": [
+      "SNMOT-060",
+      "SNMOT-061",
+      "SNMOT-062",
+      "SNMOT-063",
+      "SNMOT-064",
+      "SNMOT-065"
+    ],
+    "HOLDOUT_SEQUENCES": [
+      "SNMOT-066",
+      "SNMOT-067",
+      "SNMOT-068",
+      "SNMOT-069",
+      "SNMOT-070",
+      "SNMOT-071"
+    ]
+  },
+  "DEV": {
+    "SNMOT-060": [
+      {
+        "start_frame": 1,
+        "end_frame": 220,
+        "team_0": "MID_BLOCK",
+        "team_1": "LOW_BLOCK",
+        "rationale": "Team 0 controls mid-block line (~48m); Team 1 defending deep near own penalty area (~32m)"
+      },
+      {
+        "start_frame": 221,
+        "end_frame": 380,
+        "team_0": "MID_BLOCK",
+        "team_1": "MID_BLOCK",
+        "rationale": "Midfield contest with both teams holding lines in the middle third"
+      },
+      {
+        "start_frame": 381,
+        "end_frame": 500,
+        "team_0": "MID_BLOCK",
+        "team_1": "LOW_BLOCK",
+        "rationale": "Team 1 pushed back toward own goal line; Team 0 holding midfield position"
+      },
+      {
+        "start_frame": 501,
+        "end_frame": 620,
+        "team_0": "MID_BLOCK",
+        "team_1": "MID_BLOCK",
+        "rationale": "Balanced midfield structure"
+      },
+      {
+        "start_frame": 621,
+        "end_frame": 750,
+        "team_0": "HIGH_BLOCK",
+        "team_1": "LOW_BLOCK",
+        "rationale": "Late attacking push by Team 0 with high line; Team 1 in low defensive block"
+      }
+    ],
+    "SNMOT-061": [
+      {
+        "start_frame": 1,
+        "end_frame": 150,
+        "team_0": "MID_BLOCK",
+        "team_1": "HIGH_BLOCK",
+        "rationale": "Team 0 mid block (~43m); Team 1 pressing forward in opponent half (~53m)"
+      }
+    ],
+    "SNMOT-062": [
+      {
+        "start_frame": 1,
+        "end_frame": 150,
+        "team_0": "HIGH_BLOCK",
+        "team_1": "LOW_BLOCK",
+        "rationale": "Team 0 advanced high line (~64m); Team 1 deep defensive block (~26m)"
+      }
+    ],
+    "SNMOT-063": [
+      {
+        "start_frame": 1,
+        "end_frame": 150,
+        "team_0": "MID_BLOCK",
+        "team_1": "HIGH_BLOCK",
+        "rationale": "Team 0 mid line (~44m); Team 1 high defensive line (~56m)"
+      }
+    ],
+    "SNMOT-064": [
+      {
+        "start_frame": 1,
+        "end_frame": 150,
+        "team_0": "MID_BLOCK",
+        "team_1": "MID_BLOCK",
+        "rationale": "Balanced midfield blocks for both sides (~41m and ~49m)"
+      }
+    ],
+    "SNMOT-065": [
+      {
+        "start_frame": 1,
+        "end_frame": 150,
+        "team_0": "HIGH_BLOCK",
+        "team_1": "LOW_BLOCK",
+        "rationale": "Team 0 high line (~70m); Team 1 deep low block (~32m)"
+      }
+    ]
+  },
+  "HOLDOUT": {
+    "SNMOT-066": [
+      {
+        "start_frame": 1,
+        "end_frame": 150,
+        "team_0": "HIGH_BLOCK",
+        "team_1": "LOW_BLOCK",
+        "rationale": "Team 0 high attacking block (~72m); Team 1 compact low block (~26m)"
+      }
+    ],
+    "SNMOT-067": [
+      {
+        "start_frame": 1,
+        "end_frame": 150,
+        "team_0": "AMBIGUOUS",
+        "team_1": "AMBIGUOUS",
+        "rationale": "Uncalibrated sequence with dense penalty-box scramble and broken formation"
+      }
+    ],
+    "SNMOT-068": [
+      {
+        "start_frame": 1,
+        "end_frame": 150,
+        "team_0": "HIGH_BLOCK",
+        "team_1": "LOW_BLOCK",
+        "rationale": "Team 0 holding high line (~72m); Team 1 in low defensive third (~26m)"
+      }
+    ],
+    "SNMOT-069": [
+      {
+        "start_frame": 1,
+        "end_frame": 250,
+        "team_0": "HIGH_BLOCK",
+        "team_1": "LOW_BLOCK",
+        "rationale": "Team 0 holding advanced line (~55m); Team 1 low block near own box (~20m)"
+      },
+      {
+        "start_frame": 251,
+        "end_frame": 450,
+        "team_0": "MID_BLOCK",
+        "team_1": "MID_BLOCK",
+        "rationale": "Consolidated midfield block positioning (~40-48m)"
+      },
+      {
+        "start_frame": 451,
+        "end_frame": 600,
+        "team_0": "HIGH_BLOCK",
+        "team_1": "LOW_BLOCK",
+        "rationale": "Team 0 pushing high line; Team 1 retreating into low block"
+      },
+      {
+        "start_frame": 601,
+        "end_frame": 750,
+        "team_0": "MID_BLOCK",
+        "team_1": "MID_BLOCK",
+        "rationale": "Closing phase midfield balance"
+      }
+    ],
+    "SNMOT-070": [
+      {
+        "start_frame": 1,
+        "end_frame": 150,
+        "team_0": "MID_BLOCK",
+        "team_1": "HIGH_BLOCK",
+        "rationale": "Team 0 mid line (~37m); Team 1 holding high defensive structure (~54m)"
+      }
+    ],
+    "SNMOT-071": [
+      {
+        "start_frame": 1,
+        "end_frame": 150,
+        "team_0": "HIGH_BLOCK",
+        "team_1": "LOW_BLOCK",
+        "rationale": "Team 0 high line (~77m); Team 1 defending deep in own third (~26m)"
+      }
+    ]
+  }
+}
