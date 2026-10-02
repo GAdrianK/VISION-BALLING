@@ -71,9 +71,10 @@
       "total_incremental_overhead_ms": 0.6290963249815226
     }
   },
-  "selected_engine_specification": {
+    "selected_engine_specification": {
     "selected_smoothing_method": "KALMAN",
-    "justification": "Suppresses micro-jitter from 0.28m down to ~0.08m, guarantees causal continuous trajectories without batch delay, provides robust velocity estimation, and handles missing observations cleanly.",
+    "justification": "Kalman does NOT have the lowest stationary positional jitter (Polynomial is 0.0360m vs Kalman 0.0712m). Kalman is selected because it provides causal streaming, stable velocity estimation, dramatically lower acceleration noise (2.35 m/s² vs 63.97 m/s²), physical plausibility compliance, and low runtime (0.63 ms/frame).",
+    "physical_plausibility_note": "The 2.35 m/s² acceleration and 100% speed-threshold compliance are physical plausibility diagnostics, not biomechanical ground-truth validation.",
     "export_format": "Structured JSONL with frame-level entity observations and full provenance",
     "artifacts": {
       "jsonl_output_dir": "/media/adriano/Windows/runs/calibration/trajectories",
