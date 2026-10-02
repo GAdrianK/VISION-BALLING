@@ -601,7 +601,7 @@ def main() -> None:
     print(f"  P1 (+ Conditional ReID):         {p1_latency:.2f} ms ({p1_fps:.2f} FPS)")
     print(f"  P2 (+ Optimized ReID):           {p2_latency:.2f} ms ({p2_fps:.2f} FPS)")
     print(f"  P3 (+ Compiled RF-DETR):         {p3_latency:.2f} ms ({p3_fps:.2f} FPS)")
-    print(f"  P4 (+ Overlapped Prefetched IO): {p4_latency:.2f} ms ({p4_fps:.2f} FPS) -> REAL-TIME TARGET MET!")
+    print(f"  P4 (+ Overlapped Prefetched IO): {p4_latency:.2f} ms ({p4_fps:.2f} FPS) -> {'STRICT >=25 FPS TARGET MET' if p4_fps >= 25.0 else 'BELOW STRICT >=25 FPS TARGET (LOW-LATENCY LIVE MODE)'}")
 
     # Latency Percentiles for P4 Pipeline
     # Normal distribution with mean p4_latency, std ~2.5 ms
