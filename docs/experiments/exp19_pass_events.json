@@ -1,0 +1,541 @@
+{
+  "experiment_id": "EXP-19",
+  "description": "Pass Detection & Ball Event Trajectories Benchmark",
+  "timestamp": "2026-10-02 22:42:17",
+  "hardware_environment": {
+    "os": "Linux-7.0.0-34-generic-x86_64-with-glibc2.39",
+    "cpu": "x86_64",
+    "python_version": "3.12.3"
+  },
+  "locked_configuration": {
+    "min_release_ball_speed_px": 5.0,
+    "min_release_carrier_dist_px": 38.0,
+    "min_release_confidence": 0.3,
+    "reception_proximity_dist_px": 28.0,
+    "reception_max_ball_speed_px_s": 200.0,
+    "min_transit_frames": 2,
+    "max_transit_frames": 35,
+    "timeout_unresolved_frames": 35,
+    "max_ball_lost_frames": 12,
+    "self_recontrol_max_displacement_m": 4.0,
+    "self_recontrol_max_frames": 15,
+    "clearance_min_speed_ms": 16.0,
+    "clearance_min_displacement_m": 22.0,
+    "aerial_ground_jump_speed_ms": 25.0,
+    "min_event_confidence_threshold": 0.35,
+    "pitch_dimensions": {
+      "length_m": 105.0,
+      "width_m": 68.0,
+      "center_circle_radius_m": 9.15,
+      "penalty_area_length_m": 16.5,
+      "penalty_area_width_m": 40.32,
+      "goal_area_length_m": 5.5,
+      "goal_area_width_m": 18.32,
+      "penalty_spot_distance_m": 11.0
+    }
+  },
+  "synthetic_validation_results": {
+    "completed_pass_same_team": true,
+    "intercepted_pass_opponent": true,
+    "timeout_unresolved": true,
+    "clearance_candidate": true,
+    "dribble_rejection": true,
+    "aerial_jump_invalidation": true,
+    "id_switch_robustness": true
+  },
+  "dev_grid_search_max_transit_frames": {
+    "25": {
+      "max_transit_frames": 25,
+      "events_detected": 16,
+      "transfer_detection": {
+        "precision": 0.3,
+        "recall": 0.2727272727272727,
+        "f1": 0.28571428571428564,
+        "tp": 3,
+        "fp": 7,
+        "fn": 8,
+        "classification_accuracy_pct": 66.66666666666666
+      }
+    },
+    "35": {
+      "max_transit_frames": 35,
+      "events_detected": 16,
+      "transfer_detection": {
+        "precision": 0.3333333333333333,
+        "recall": 0.36363636363636365,
+        "f1": 0.34782608695652173,
+        "tp": 4,
+        "fp": 8,
+        "fn": 7,
+        "classification_accuracy_pct": 50.0
+      }
+    },
+    "45": {
+      "max_transit_frames": 45,
+      "events_detected": 16,
+      "transfer_detection": {
+        "precision": 0.3333333333333333,
+        "recall": 0.36363636363636365,
+        "f1": 0.34782608695652173,
+        "tp": 4,
+        "fp": 8,
+        "fn": 7,
+        "classification_accuracy_pct": 50.0
+      }
+    }
+  },
+  "evaluation_summary": {
+    "mode_a_end_to_end": {
+      "dev": {
+        "gt_events_count": 20,
+        "pred_events_count": 27,
+        "matched_events_count": 10,
+        "pass_transfer_detection": {
+          "precision": 0.4090909090909091,
+          "recall": 0.45,
+          "f1": 0.4285714285714286,
+          "tp": 9,
+          "fp": 13,
+          "fn": 11,
+          "classification_accuracy_pct": 44.44444444444444
+        },
+        "per_category_metrics": {
+          "PASS_COMPLETED": {
+            "tp": 2,
+            "fp": 10,
+            "fn": 10,
+            "precision": 0.16666666666666666,
+            "recall": 0.16666666666666666,
+            "f1": 0.16666666666666666,
+            "support": 12
+          },
+          "PASS_INTERCEPTED": {
+            "tp": 2,
+            "fp": 8,
+            "fn": 6,
+            "precision": 0.2,
+            "recall": 0.25,
+            "f1": 0.22222222222222224,
+            "support": 8
+          },
+          "CLEARANCE_CANDIDATE": {
+            "tp": 0,
+            "fp": 5,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "BALL_RELEASE_UNRESOLVED": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        },
+        "timing_errors": {
+          "release_frame_mean": 2.1,
+          "release_frame_median": 2.5,
+          "release_frame_p90": 4.1,
+          "release_ms_mean": 84.0,
+          "reception_frame_mean": 2.6,
+          "reception_frame_median": 1.5,
+          "reception_frame_p90": 6.1,
+          "reception_ms_mean": 104.0
+        },
+        "attribution_accuracy": {
+          "sender_team_accuracy_pct": 50.0,
+          "receiver_team_accuracy_pct": 60.0
+        },
+        "physical_trajectory_stats": {
+          "mean_displacement_m": 4.7735308026005985,
+          "median_displacement_m": 3.84182026934075,
+          "mean_forward_displacement_m": 0.5175034936217267,
+          "progressive_passes_pct": 55.55555555555556,
+          "aerial_suspected_count": 12
+        }
+      },
+      "holdout": {
+        "gt_events_count": 6,
+        "pred_events_count": 27,
+        "matched_events_count": 2,
+        "pass_transfer_detection": {
+          "precision": 0.041666666666666664,
+          "recall": 0.2,
+          "f1": 0.06896551724137931,
+          "tp": 1,
+          "fp": 23,
+          "fn": 4,
+          "classification_accuracy_pct": 100.0
+        },
+        "per_category_metrics": {
+          "PASS_COMPLETED": {
+            "tp": 1,
+            "fp": 15,
+            "fn": 1,
+            "precision": 0.0625,
+            "recall": 0.5,
+            "f1": 0.1111111111111111,
+            "support": 2
+          },
+          "PASS_INTERCEPTED": {
+            "tp": 0,
+            "fp": 8,
+            "fn": 3,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 3
+          },
+          "CLEARANCE_CANDIDATE": {
+            "tp": 0,
+            "fp": 2,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "BALL_RELEASE_UNRESOLVED": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        },
+        "timing_errors": {
+          "release_frame_mean": 1.0,
+          "release_frame_median": 1.0,
+          "release_frame_p90": 1.0,
+          "release_ms_mean": 40.0,
+          "reception_frame_mean": 1.0,
+          "reception_frame_median": 1.0,
+          "reception_frame_p90": 1.0,
+          "reception_ms_mean": 40.0
+        },
+        "attribution_accuracy": {
+          "sender_team_accuracy_pct": 50.0,
+          "receiver_team_accuracy_pct": 100.0
+        },
+        "physical_trajectory_stats": {
+          "mean_displacement_m": 5.411873137136284,
+          "median_displacement_m": 4.430071655988122,
+          "mean_forward_displacement_m": -1.2617259149206415,
+          "progressive_passes_pct": 40.0,
+          "aerial_suspected_count": 14
+        }
+      }
+    },
+    "mode_b_oracle_control_diagnostic": {
+      "dev": {
+        "gt_events_count": 20,
+        "pred_events_count": 36,
+        "matched_events_count": 18,
+        "pass_transfer_detection": {
+          "precision": 0.5,
+          "recall": 0.75,
+          "f1": 0.6,
+          "tp": 15,
+          "fp": 15,
+          "fn": 5,
+          "classification_accuracy_pct": 100.0
+        },
+        "per_category_metrics": {
+          "PASS_COMPLETED": {
+            "tp": 9,
+            "fp": 7,
+            "fn": 3,
+            "precision": 0.5625,
+            "recall": 0.75,
+            "f1": 0.6428571428571429,
+            "support": 12
+          },
+          "PASS_INTERCEPTED": {
+            "tp": 6,
+            "fp": 8,
+            "fn": 2,
+            "precision": 0.42857142857142855,
+            "recall": 0.75,
+            "f1": 0.5454545454545454,
+            "support": 8
+          },
+          "CLEARANCE_CANDIDATE": {
+            "tp": 0,
+            "fp": 6,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "BALL_RELEASE_UNRESOLVED": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        },
+        "timing_errors": {
+          "release_frame_mean": 0.9444444444444444,
+          "release_frame_median": 1.0,
+          "release_frame_p90": 1.0,
+          "release_ms_mean": 37.77777777777778,
+          "reception_frame_mean": 0.5,
+          "reception_frame_median": 0.0,
+          "reception_frame_p90": 3.0,
+          "reception_ms_mean": 20.0
+        },
+        "attribution_accuracy": {
+          "sender_team_accuracy_pct": 100.0,
+          "receiver_team_accuracy_pct": 83.33333333333334
+        },
+        "physical_trajectory_stats": {
+          "mean_displacement_m": 5.111404594258033,
+          "median_displacement_m": 3.6217295981650666,
+          "mean_forward_displacement_m": 1.193659154817863,
+          "progressive_passes_pct": 57.14285714285714,
+          "aerial_suspected_count": 15
+        }
+      },
+      "holdout": {
+        "gt_events_count": 6,
+        "pred_events_count": 29,
+        "matched_events_count": 5,
+        "pass_transfer_detection": {
+          "precision": 0.15384615384615385,
+          "recall": 0.8,
+          "f1": 0.25806451612903225,
+          "tp": 4,
+          "fp": 22,
+          "fn": 1,
+          "classification_accuracy_pct": 100.0
+        },
+        "per_category_metrics": {
+          "PASS_COMPLETED": {
+            "tp": 2,
+            "fp": 15,
+            "fn": 0,
+            "precision": 0.11764705882352941,
+            "recall": 1.0,
+            "f1": 0.21052631578947367,
+            "support": 2
+          },
+          "PASS_INTERCEPTED": {
+            "tp": 2,
+            "fp": 7,
+            "fn": 1,
+            "precision": 0.2222222222222222,
+            "recall": 0.6666666666666666,
+            "f1": 0.3333333333333333,
+            "support": 3
+          },
+          "CLEARANCE_CANDIDATE": {
+            "tp": 0,
+            "fp": 2,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "BALL_RELEASE_UNRESOLVED": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        },
+        "timing_errors": {
+          "release_frame_mean": 1.0,
+          "release_frame_median": 1.0,
+          "release_frame_p90": 1.0,
+          "release_ms_mean": 40.0,
+          "reception_frame_mean": 0.5,
+          "reception_frame_median": 0.5,
+          "reception_frame_p90": 1.0,
+          "reception_ms_mean": 20.0
+        },
+        "attribution_accuracy": {
+          "sender_team_accuracy_pct": 100.0,
+          "receiver_team_accuracy_pct": 100.0
+        },
+        "physical_trajectory_stats": {
+          "mean_displacement_m": 6.096924135162206,
+          "median_displacement_m": 3.6821448600848043,
+          "mean_forward_displacement_m": 0.28545331335515656,
+          "progressive_passes_pct": 47.82608695652174,
+          "aerial_suspected_count": 13
+        }
+      }
+    }
+  },
+  "per_sequence_breakdown": {
+    "dev": {
+      "SNMOT-060": {
+        "frames": 750,
+        "gt_count": 11,
+        "detected_count_mode_a": 16,
+        "detected_count_mode_b": 22,
+        "timing_ms": {
+          "mean_latency_ms": 0.03445589865926498,
+          "median_latency_ms": 0.024175000362447463,
+          "p95_latency_ms": 0.06711259939038426,
+          "total_frames": 750
+        }
+      },
+      "SNMOT-061": {
+        "frames": 150,
+        "gt_count": 3,
+        "detected_count_mode_a": 5,
+        "detected_count_mode_b": 6,
+        "timing_ms": {
+          "mean_latency_ms": 0.032891680045092166,
+          "median_latency_ms": 0.02583900095487479,
+          "p95_latency_ms": 0.05749499978264794,
+          "total_frames": 150
+        }
+      },
+      "SNMOT-062": {
+        "frames": 150,
+        "gt_count": 3,
+        "detected_count_mode_a": 3,
+        "detected_count_mode_b": 4,
+        "timing_ms": {
+          "mean_latency_ms": 0.036383406550157815,
+          "median_latency_ms": 0.045355000111158006,
+          "p95_latency_ms": 0.061915649894217474,
+          "total_frames": 150
+        }
+      },
+      "SNMOT-063": {
+        "frames": 150,
+        "gt_count": 3,
+        "detected_count_mode_a": 3,
+        "detected_count_mode_b": 4,
+        "timing_ms": {
+          "mean_latency_ms": 0.036812326604073554,
+          "median_latency_ms": 0.027195999791729264,
+          "p95_latency_ms": 0.07196454989752954,
+          "total_frames": 150
+        }
+      },
+      "SNMOT-064": {
+        "frames": 150,
+        "gt_count": 0,
+        "detected_count_mode_a": 0,
+        "detected_count_mode_b": 0,
+        "timing_ms": {
+          "mean_latency_ms": 0.022146213232190348,
+          "median_latency_ms": 0.01671099744271487,
+          "p95_latency_ms": 0.057760500931181014,
+          "total_frames": 150
+        }
+      },
+      "SNMOT-065": {
+        "frames": 150,
+        "gt_count": 0,
+        "detected_count_mode_a": 0,
+        "detected_count_mode_b": 0,
+        "timing_ms": {
+          "mean_latency_ms": 0.013884693398722447,
+          "median_latency_ms": 0.013254999430500902,
+          "p95_latency_ms": 0.017254000522370905,
+          "total_frames": 150
+        }
+      }
+    },
+    "holdout": {
+      "SNMOT-066": {
+        "frames": 150,
+        "gt_count": 0,
+        "detected_count_mode_a": 0,
+        "detected_count_mode_b": 0,
+        "timing_ms": {
+          "mean_latency_ms": 0.014199340075720102,
+          "median_latency_ms": 0.013469998521031812,
+          "p95_latency_ms": 0.018272549823450387,
+          "total_frames": 150
+        }
+      },
+      "SNMOT-067": {
+        "frames": 150,
+        "gt_count": 0,
+        "detected_count_mode_a": 0,
+        "detected_count_mode_b": 0,
+        "timing_ms": {
+          "mean_latency_ms": 0.01290909992045878,
+          "median_latency_ms": 0.011836998965009116,
+          "p95_latency_ms": 0.01856369926827025,
+          "total_frames": 150
+        }
+      },
+      "SNMOT-068": {
+        "frames": 150,
+        "gt_count": 4,
+        "detected_count_mode_a": 6,
+        "detected_count_mode_b": 3,
+        "timing_ms": {
+          "mean_latency_ms": 0.038334666654312365,
+          "median_latency_ms": 0.042464500438654795,
+          "p95_latency_ms": 0.0603541991949896,
+          "total_frames": 150
+        }
+      },
+      "SNMOT-069": {
+        "frames": 750,
+        "gt_count": 2,
+        "detected_count_mode_a": 20,
+        "detected_count_mode_b": 25,
+        "timing_ms": {
+          "mean_latency_ms": 0.029454665399195317,
+          "median_latency_ms": 0.018804999854182824,
+          "p95_latency_ms": 0.056423599016852635,
+          "total_frames": 750
+        }
+      },
+      "SNMOT-070": {
+        "frames": 150,
+        "gt_count": 0,
+        "detected_count_mode_a": 1,
+        "detected_count_mode_b": 1,
+        "timing_ms": {
+          "mean_latency_ms": 0.022377499990398064,
+          "median_latency_ms": 0.016740999853936955,
+          "p95_latency_ms": 0.04264900017005857,
+          "total_frames": 150
+        }
+      },
+      "SNMOT-071": {
+        "frames": 150,
+        "gt_count": 0,
+        "detected_count_mode_a": 0,
+        "detected_count_mode_b": 0,
+        "timing_ms": {
+          "mean_latency_ms": 0.0143219866004074,
+          "median_latency_ms": 0.013595501513918862,
+          "p95_latency_ms": 0.0192152005183743,
+          "total_frames": 150
+        }
+      }
+    }
+  },
+  "latency_compliance": {
+    "mean_pass_detector_latency_ms": 0.025680956427499443,
+    "p95_pass_detector_latency_ms": 0.06929597711859964,
+    "latency_target_ms": 0.3,
+    "compliant": true
+  }
+}
