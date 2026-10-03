@@ -1,0 +1,247 @@
+{
+  "examples": [
+    {
+      "id": "fact_01",
+      "category": "EXACT_FACT",
+      "analysis_id": "SNMOT-068",
+      "query": "Quelle équipe a perdu le ballon à 2.16s ?",
+      "query_scope": "MATCH_COMPARISON",
+      "confidence": 0.572,
+      "answer": "### 📊 Comparaison des Équipes (Agrégats Vidéo)\n**Équipe TEAM_0** :\n- Possession contrôlée : 18.6% (durée: 2.60s, pertes/gains: 3) *(couverture: 100%, conf: 0.54)*\n- Hauteur moyenne du bloc : 65.7m (profondeur: 24.7m, largeur: 19.6m)\n- Pression défensive : indice moyen 0.264 (pic: 0.775, épisodes intenses: 3)\n- Réactivité à la perte (candidat contre-pressing) : indice moyen 0.529 *(diagnostic)*\n\n**Équipe TEAM_1** :\n- Possession contrôlée : 43.7% (durée: 6.12s, pertes/gains: 1) *(couverture: 100%, conf: 0.55)*\n- Hauteur moyenne du bloc : 22.6m (profondeur: 22.7m, largeur: 15.4m)\n- Pression défensive : indice moyen 0.461 (pic: 1.000, épisodes intenses: 3)\n\n\n**Limites méthodologiques :**\n- *Diagnostic candidate semantics; physics-derived GT evaluation*\n- *Downstream of pass detector baseline; precision limited by tracking flicker*",
+      "evidence_citations": [
+        "[event:pass_53_55_TEAM_0_PASS_INTERCEPTED | t=2.08s | conf=0.86 | HIGH]",
+        "[event:press_53_243_TEAM_1 | t=2.08s | conf=0.44 | HIGH]",
+        "[event:poss_change_55_TEAM_0_to_TEAM_1 | t=2.16s | conf=0.39 | LOW]",
+        "[event:trans_55_80_TEAM_0_COUNTERPRESS_CANDIDATE | t=2.16s | conf=0.60 | HIGH]"
+      ],
+      "knowledge_citations": [],
+      "is_abstention": false
+    },
+    {
+      "id": "fact_02",
+      "category": "EXACT_FACT",
+      "analysis_id": "SNMOT-068",
+      "query": "Y a-t-il eu un épisode de pression défensive à 2.08s ?",
+      "query_scope": "MATCH_TIMELINE",
+      "confidence": 0.572,
+      "answer": "### ⏱️ Événements et Preuves Vidéo\n- **2.08s – 2.16s** : TEAM_0 ball transfer completed (2.08–2.16s). Distance: 1.6m, forward displacement: +0.0m [Confidence: 0.86]. [event:pass_53_55_TEAM_0_PASS_INTERCEPTED | t=2.08s | conf=0.86 | HIGH]\n- **2.08s – 9.68s** : TEAM_1 applied continuous defensive pressure on TEAM_0 (2.08–9.68s, dur: 7.60s). Mean PressureIndex: 0.44 (peak: 0.76), min defender proximity: 0.5m. [event:press_53_243_TEAM_1 | t=2.08s | conf=0.44 | HIGH]\n- **2.16s – 2.16s** : TEAM_0 lost possession to TEAM_1 at 2.16s (frame 55). Possession confidence: 0.39 [LOW]. [event:poss_change_55_TEAM_0_to_TEAM_1 | t=2.16s | conf=0.39 | LOW]\n- **2.16s – 3.20s** : Les signaux sont compatibles avec un candidat : TEAM_0 engaged in post-loss pressing against TEAM_1 (2.16–3.20s, Δt=1.04s). Nearest defender closed from 1.9m to 4.0m; PressureIndex changed from 0.08 to 0.26. CounterpressScore: 0.60 [Confidence: 0.60]. [event:trans_55_80_TEAM_0_COUNTERPRESS_CANDIDATE | t=2.16s | conf=0.60 | HIGH]\n\n**Limites méthodologiques :**\n- *Diagnostic candidate semantics; physics-derived GT evaluation*\n- *Downstream of pass detector baseline; precision limited by tracking flicker*",
+      "evidence_citations": [
+        "[event:pass_53_55_TEAM_0_PASS_INTERCEPTED | t=2.08s | conf=0.86 | HIGH]",
+        "[event:press_53_243_TEAM_1 | t=2.08s | conf=0.44 | HIGH]",
+        "[event:poss_change_55_TEAM_0_to_TEAM_1 | t=2.16s | conf=0.39 | LOW]",
+        "[event:trans_55_80_TEAM_0_COUNTERPRESS_CANDIDATE | t=2.16s | conf=0.60 | HIGH]"
+      ],
+      "knowledge_citations": [],
+      "is_abstention": false
+    },
+    {
+      "id": "fact_03",
+      "category": "EXACT_FACT",
+      "analysis_id": "SNMOT-068",
+      "query": "Quelle est la distance du transfert de balle à 2.08s ?",
+      "query_scope": "MATCH_TIMELINE",
+      "confidence": 0.572,
+      "answer": "### ⏱️ Événements et Preuves Vidéo\n- **2.08s – 2.16s** : TEAM_0 ball transfer completed (2.08–2.16s). Distance: 1.6m, forward displacement: +0.0m [Confidence: 0.86]. [event:pass_53_55_TEAM_0_PASS_INTERCEPTED | t=2.08s | conf=0.86 | HIGH]\n- **2.08s – 9.68s** : TEAM_1 applied continuous defensive pressure on TEAM_0 (2.08–9.68s, dur: 7.60s). Mean PressureIndex: 0.44 (peak: 0.76), min defender proximity: 0.5m. [event:press_53_243_TEAM_1 | t=2.08s | conf=0.44 | HIGH]\n- **2.16s – 2.16s** : TEAM_0 lost possession to TEAM_1 at 2.16s (frame 55). Possession confidence: 0.39 [LOW]. [event:poss_change_55_TEAM_0_to_TEAM_1 | t=2.16s | conf=0.39 | LOW]\n- **2.16s – 3.20s** : Les signaux sont compatibles avec un candidat : TEAM_0 engaged in post-loss pressing against TEAM_1 (2.16–3.20s, Δt=1.04s). Nearest defender closed from 1.9m to 4.0m; PressureIndex changed from 0.08 to 0.26. CounterpressScore: 0.60 [Confidence: 0.60]. [event:trans_55_80_TEAM_0_COUNTERPRESS_CANDIDATE | t=2.16s | conf=0.60 | HIGH]\n\n**Limites méthodologiques :**\n- *Diagnostic candidate semantics; physics-derived GT evaluation*\n- *Downstream of pass detector baseline; precision limited by tracking flicker*",
+      "evidence_citations": [
+        "[event:pass_53_55_TEAM_0_PASS_INTERCEPTED | t=2.08s | conf=0.86 | HIGH]",
+        "[event:press_53_243_TEAM_1 | t=2.08s | conf=0.44 | HIGH]",
+        "[event:poss_change_55_TEAM_0_to_TEAM_1 | t=2.16s | conf=0.39 | LOW]",
+        "[event:trans_55_80_TEAM_0_COUNTERPRESS_CANDIDATE | t=2.16s | conf=0.60 | HIGH]"
+      ],
+      "knowledge_citations": [],
+      "is_abstention": false
+    },
+    {
+      "id": "fact_04",
+      "category": "EXACT_FACT",
+      "analysis_id": "SNMOT-069",
+      "query": "Quelle équipe a le ballon à 1.5s ?",
+      "query_scope": "MATCH_COMPARISON",
+      "confidence": 0.775,
+      "answer": "### 📊 Comparaison des Équipes (Agrégats Vidéo)\n**Équipe TEAM_0** :\n- Possession contrôlée : 52.3% (durée: 7.32s, pertes/gains: 4) *(couverture: 100%, conf: 0.65)*\n- Hauteur moyenne du bloc : 54.4m (profondeur: 18.7m, largeur: 19.9m)\n- Pression défensive : indice moyen 0.425 (pic: 0.852, épisodes intenses: 4)\n- Réactivité à la perte (candidat contre-pressing) : indice moyen 0.423 *(diagnostic)*\n\n**Équipe TEAM_1** :\n- Possession contrôlée : 26.0% (durée: 3.64s, pertes/gains: 2) *(couverture: 100%, conf: 0.63)*\n- Hauteur moyenne du bloc : 25.0m (profondeur: 21.9m, largeur: 19.1m)\n- Pression défensive : indice moyen 0.393 (pic: 0.940, épisodes intenses: 2)\n- Réactivité à la perte (candidat contre-pressing) : indice moyen 0.443 *(diagnostic)*\n\n\n**Limites méthodologiques :**\n- *Downstream of pass detector baseline; precision limited by tracking flicker*",
+      "evidence_citations": [
+        "[event:pass_48_49_TEAM_0_PASS_COMPLETED | t=1.88s | conf=0.78 | HIGH]"
+      ],
+      "knowledge_citations": [],
+      "is_abstention": false
+    },
+    {
+      "id": "fact_05",
+      "category": "EXACT_FACT",
+      "analysis_id": "SNMOT-062",
+      "query": "Quel événement défensif se produit à 0.92s ?",
+      "query_scope": "MATCH_TIMELINE",
+      "confidence": 0.347,
+      "answer": "### ⏱️ Événements et Preuves Vidéo\n- **0.92s – 1.20s** : TEAM_1 applied continuous defensive pressure on TEAM_0 (0.92–1.20s, dur: 0.28s). Mean PressureIndex: 0.35 (peak: 0.55), min defender proximity: 0.5m. [event:press_24_31_TEAM_1 | t=0.92s | conf=0.35 | HIGH]",
+      "evidence_citations": [
+        "[event:press_24_31_TEAM_1 | t=0.92s | conf=0.35 | HIGH]"
+      ],
+      "knowledge_citations": [],
+      "is_abstention": false
+    },
+    {
+      "id": "fact_06",
+      "category": "EXACT_FACT",
+      "analysis_id": "SNMOT-068",
+      "query": "Qui exerce la pression défensive à 9.5s ?",
+      "query_scope": "MATCH_TIMELINE",
+      "confidence": 0.449,
+      "answer": "### ⏱️ Événements et Preuves Vidéo\n- **2.08s – 9.68s** : TEAM_1 applied continuous defensive pressure on TEAM_0 (2.08–9.68s, dur: 7.60s). Mean PressureIndex: 0.44 (peak: 0.76), min defender proximity: 0.5m. [event:press_53_243_TEAM_1 | t=2.08s | conf=0.44 | HIGH]\n- **9.88s – 11.44s** : TEAM_1 applied continuous defensive pressure on TEAM_0 (9.88–11.44s, dur: 1.56s). Mean PressureIndex: 0.46 (peak: 0.66), min defender proximity: 1.4m. [event:press_248_287_TEAM_1 | t=9.88s | conf=0.46 | HIGH]",
+      "evidence_citations": [
+        "[event:press_53_243_TEAM_1 | t=2.08s | conf=0.44 | HIGH]",
+        "[event:press_248_287_TEAM_1 | t=9.88s | conf=0.46 | HIGH]"
+      ],
+      "knowledge_citations": [],
+      "is_abstention": false
+    },
+    {
+      "id": "fact_07",
+      "category": "EXACT_FACT",
+      "analysis_id": "SNMOT-070",
+      "query": "Quelle est la hauteur du bloc défensif observée pour l'équipe 0 ?",
+      "query_scope": "MATCH_FACT",
+      "confidence": 0.719,
+      "answer": "### ⏱️ Événements et Preuves Vidéo\n- **7.08s – 7.08s** : TEAM_0 lost possession to TEAM_1 at 7.08s (frame 178). Possession confidence: 0.64 [LOW]. [event:poss_change_178_TEAM_0_to_TEAM_1 | t=7.08s | conf=0.64 | LOW]\n- **7.08s – 8.12s** : Les signaux sont compatibles avec un candidat : TEAM_0 initiated defensive recovery after possession loss (7.08–8.12s). Backline retreated at -4.7m/s; centroid-ball distance shifted by -0.6m. RecoveryScore: 0.64 [Confidence: 0.64]. [event:trans_178_203_TEAM_0_DEFENSIVE_RECOVERY_CANDIDATE | t=7.08s | conf=0.64 | HIGH]\n- **10.96s – 10.96s** : TEAM_0 lost possession to TEAM_1 at 10.96s (frame 275). Possession confidence: 0.83 [MEDIUM]. [event:poss_change_275_TEAM_0_to_TEAM_1 | t=10.96s | conf=0.83 | MEDIUM]\n- **11.28s – 11.68s** : TEAM_0 ball transfer completed (11.28–11.68s). Distance: 3.7m, forward displacement: +0.0m [Confidence: 0.86]. [event:pass_283_293_TEAM_0_PASS_INTERCEPTED | t=11.28s | conf=0.86 | HIGH]\n- **11.68s – 11.68s** : TEAM_0 lost possession to TEAM_1 at 11.68s (frame 293). Possession confidence: 0.76 [MEDIUM]. [event:poss_change_293_TEAM_0_to_TEAM_1 | t=11.68s | conf=0.76 | MEDIUM]\n- **12.16s – 13.96s** : TEAM_0 applied continuous defensive pressure on TEAM_1 (12.16–13.96s, dur: 1.80s). Mean PressureIndex: 0.56 (peak: 0.69), min defender proximity: 1.5m. [event:press_305_350_TEAM_0 | t=12.16s | conf=0.48 | MEDIUM]\n- **13.16s – 13.20s** : TEAM_0 ball transfer completed (13.16–13.20s). Distance: 3.1m, forward displacement: +0.0m [Confidence: 0.78]. [event:pass_330_331_TEAM_0_PASS_COMPLETED | t=13.16s | conf=0.78 | HIGH]\n- **13.48s – 13.52s** : TEAM_0 ball transfer completed (13.48–13.52s). Distance: 3.2m, forward displacement: +0.0m [Confidence: 0.78]. [event:pass_338_339_TEAM_0_PASS_COMPLETED | t=13.48s | conf=0.78 | HIGH]\n\n**Limites méthodologiques :**\n- *Diagnostic candidate semantics; physics-derived GT evaluation*\n- *Downstream of pass detector baseline; precision limited by tracking flicker*",
+      "evidence_citations": [
+        "[event:poss_change_178_TEAM_0_to_TEAM_1 | t=7.08s | conf=0.64 | LOW]",
+        "[event:trans_178_203_TEAM_0_DEFENSIVE_RECOVERY_CANDIDATE | t=7.08s | conf=0.64 | HIGH]",
+        "[event:poss_change_275_TEAM_0_to_TEAM_1 | t=10.96s | conf=0.83 | MEDIUM]",
+        "[event:pass_283_293_TEAM_0_PASS_INTERCEPTED | t=11.28s | conf=0.86 | HIGH]",
+        "[event:poss_change_293_TEAM_0_to_TEAM_1 | t=11.68s | conf=0.76 | MEDIUM]",
+        "[event:press_305_350_TEAM_0 | t=12.16s | conf=0.48 | MEDIUM]",
+        "[event:pass_330_331_TEAM_0_PASS_COMPLETED | t=13.16s | conf=0.78 | HIGH]",
+        "[event:pass_338_339_TEAM_0_PASS_COMPLETED | t=13.48s | conf=0.78 | HIGH]"
+      ],
+      "knowledge_citations": [],
+      "is_abstention": false
+    },
+    {
+      "id": "fact_08",
+      "category": "EXACT_FACT",
+      "analysis_id": "SNMOT-068",
+      "query": "Quel est le porteur de balle initial au début de la séquence ?",
+      "query_scope": "MATCH_FACT",
+      "confidence": 0.506,
+      "answer": "### ⏱️ Événements et Preuves Vidéo\n- **2.08s – 2.16s** : TEAM_0 ball transfer completed (2.08–2.16s). Distance: 1.6m, forward displacement: +0.0m [Confidence: 0.86]. [event:pass_53_55_TEAM_0_PASS_INTERCEPTED | t=2.08s | conf=0.86 | HIGH]\n- **2.08s – 9.68s** : TEAM_1 applied continuous defensive pressure on TEAM_0 (2.08–9.68s, dur: 7.60s). Mean PressureIndex: 0.44 (peak: 0.76), min defender proximity: 0.5m. [event:press_53_243_TEAM_1 | t=2.08s | conf=0.44 | HIGH]\n- **2.16s – 2.16s** : TEAM_0 lost possession to TEAM_1 at 2.16s (frame 55). Possession confidence: 0.39 [LOW]. [event:poss_change_55_TEAM_0_to_TEAM_1 | t=2.16s | conf=0.39 | LOW]\n- **2.16s – 3.20s** : Les signaux sont compatibles avec un candidat : TEAM_0 engaged in post-loss pressing against TEAM_1 (2.16–3.20s, Δt=1.04s). Nearest defender closed from 1.9m to 4.0m; PressureIndex changed from 0.08 to 0.26. CounterpressScore: 0.60 [Confidence: 0.60]. [event:trans_55_80_TEAM_0_COUNTERPRESS_CANDIDATE | t=2.16s | conf=0.60 | HIGH]\n- **7.80s – 8.24s** : TEAM_0 applied continuous defensive pressure on TEAM_1 (7.80–8.24s, dur: 0.44s). Mean PressureIndex: 0.37 (peak: 0.54), min defender proximity: 1.7m. [event:press_196_207_TEAM_0 | t=7.80s | conf=0.37 | HIGH]\n- **9.88s – 11.44s** : TEAM_1 applied continuous defensive pressure on TEAM_0 (9.88–11.44s, dur: 1.56s). Mean PressureIndex: 0.46 (peak: 0.66), min defender proximity: 1.4m. [event:press_248_287_TEAM_1 | t=9.88s | conf=0.46 | HIGH]\n- **10.20s – 10.20s** : TEAM_0 lost possession to TEAM_1 at 10.20s (frame 256). Possession confidence: 0.48 [HIGH]. [event:poss_change_256_TEAM_0_to_TEAM_1 | t=10.20s | conf=0.48 | HIGH]\n- **10.20s – 10.76s** : TEAM_0 applied continuous defensive pressure on TEAM_1 (10.20–10.76s, dur: 0.56s). Mean PressureIndex: 0.45 (peak: 0.64), min defender proximity: 1.4m. [event:press_256_270_TEAM_0 | t=10.20s | conf=0.45 | HIGH]\n\n**Limites méthodologiques :**\n- *Diagnostic candidate semantics; physics-derived GT evaluation*\n- *Downstream of pass detector baseline; precision limited by tracking flicker*",
+      "evidence_citations": [
+        "[event:pass_53_55_TEAM_0_PASS_INTERCEPTED | t=2.08s | conf=0.86 | HIGH]",
+        "[event:press_53_243_TEAM_1 | t=2.08s | conf=0.44 | HIGH]",
+        "[event:poss_change_55_TEAM_0_to_TEAM_1 | t=2.16s | conf=0.39 | LOW]",
+        "[event:trans_55_80_TEAM_0_COUNTERPRESS_CANDIDATE | t=2.16s | conf=0.60 | HIGH]",
+        "[event:press_196_207_TEAM_0 | t=7.80s | conf=0.37 | HIGH]",
+        "[event:press_248_287_TEAM_1 | t=9.88s | conf=0.46 | HIGH]",
+        "[event:poss_change_256_TEAM_0_to_TEAM_1 | t=10.20s | conf=0.48 | HIGH]",
+        "[event:press_256_270_TEAM_0 | t=10.20s | conf=0.45 | HIGH]"
+      ],
+      "knowledge_citations": [],
+      "is_abstention": false
+    },
+    {
+      "id": "fact_09",
+      "category": "EXACT_FACT",
+      "analysis_id": "SNMOT-066",
+      "query": "Une perte de balle a-t-elle été enregistrée pour l'équipe 1 ?",
+      "query_scope": "MATCH_FACT",
+      "confidence": 0.69,
+      "answer": "### ⏱️ Événements et Preuves Vidéo\n- **12.08s – 12.08s** : TEAM_1 lost possession to TEAM_0 at 12.08s (frame 303). Possession confidence: 0.83 [MEDIUM]. [event:poss_change_303_TEAM_1_to_TEAM_0 | t=12.08s | conf=0.83 | MEDIUM]\n- **12.08s – 13.12s** : Les signaux sont compatibles avec un candidat : TEAM_1 initiated defensive recovery after possession loss (12.08–13.12s). Backline retreated at 8.1m/s; centroid-ball distance shifted by +0.3m. RecoveryScore: 0.54 [Confidence: 0.54]. [event:trans_303_328_TEAM_1_DEFENSIVE_RECOVERY_CANDIDATE | t=12.08s | conf=0.54 | HIGH]\n- **12.60s – 13.96s** : TEAM_1 applied continuous defensive pressure on TEAM_0 (12.60–13.96s, dur: 1.36s). Mean PressureIndex: 0.69 (peak: 0.69), min defender proximity: 0.9m. [event:press_316_350_TEAM_1 | t=12.60s | conf=0.69 | HIGH]\n\n**Limites méthodologiques :**\n- *Diagnostic candidate semantics; physics-derived GT evaluation*",
+      "evidence_citations": [
+        "[event:poss_change_303_TEAM_1_to_TEAM_0 | t=12.08s | conf=0.83 | MEDIUM]",
+        "[event:trans_303_328_TEAM_1_DEFENSIVE_RECOVERY_CANDIDATE | t=12.08s | conf=0.54 | HIGH]",
+        "[event:press_316_350_TEAM_1 | t=12.60s | conf=0.69 | HIGH]"
+      ],
+      "knowledge_citations": [],
+      "is_abstention": false
+    },
+    {
+      "id": "fact_10",
+      "category": "EXACT_FACT",
+      "analysis_id": "SNMOT-068",
+      "query": "Quel événement survient exactement à 8.0 secondes ?",
+      "query_scope": "MATCH_TIMELINE",
+      "confidence": 0.408,
+      "answer": "### ⏱️ Événements et Preuves Vidéo\n- **2.08s – 9.68s** : TEAM_1 applied continuous defensive pressure on TEAM_0 (2.08–9.68s, dur: 7.60s). Mean PressureIndex: 0.44 (peak: 0.76), min defender proximity: 0.5m. [event:press_53_243_TEAM_1 | t=2.08s | conf=0.44 | HIGH]\n- **7.80s – 8.24s** : TEAM_0 applied continuous defensive pressure on TEAM_1 (7.80–8.24s, dur: 0.44s). Mean PressureIndex: 0.37 (peak: 0.54), min defender proximity: 1.7m. [event:press_196_207_TEAM_0 | t=7.80s | conf=0.37 | HIGH]",
+      "evidence_citations": [
+        "[event:press_53_243_TEAM_1 | t=2.08s | conf=0.44 | HIGH]",
+        "[event:press_196_207_TEAM_0 | t=7.80s | conf=0.37 | HIGH]"
+      ],
+      "knowledge_citations": [],
+      "is_abstention": false
+    },
+    {
+      "id": "fact_11",
+      "category": "EXACT_FACT",
+      "analysis_id": "SNMOT-071",
+      "query": "Quel est l'indice de pression mesuré à 2.0s ?",
+      "query_scope": "MATCH_TIMELINE",
+      "confidence": 0.0,
+      "answer": "Les données d'analyse vidéo de cette séquence ne permettent pas d'établir d'événement tactique vérifié à t=2.0s.",
+      "evidence_citations": [],
+      "knowledge_citations": [],
+      "is_abstention": true
+    },
+    {
+      "id": "fact_12",
+      "category": "EXACT_FACT",
+      "analysis_id": "SNMOT-065",
+      "query": "L'équipe 0 a-t-elle subi un pressing à 1.2s ?",
+      "query_scope": "MATCH_TIMELINE",
+      "confidence": 0.0,
+      "answer": "Les données d'analyse vidéo de cette séquence ne permettent pas d'établir d'événement tactique vérifié à t=1.2s.",
+      "evidence_citations": [],
+      "knowledge_citations": [],
+      "is_abstention": true
+    },
+    {
+      "id": "time_01",
+      "category": "TIMESTAMP",
+      "analysis_id": "SNMOT-068",
+      "query": "Que se passe-t-il à 2.16 secondes ?",
+      "query_scope": "MATCH_TIMELINE",
+      "confidence": 0.572,
+      "answer": "### ⏱️ Événements et Preuves Vidéo\n- **2.08s – 2.16s** : TEAM_0 ball transfer completed (2.08–2.16s). Distance: 1.6m, forward displacement: +0.0m [Confidence: 0.86]. [event:pass_53_55_TEAM_0_PASS_INTERCEPTED | t=2.08s | conf=0.86 | HIGH]\n- **2.08s – 9.68s** : TEAM_1 applied continuous defensive pressure on TEAM_0 (2.08–9.68s, dur: 7.60s). Mean PressureIndex: 0.44 (peak: 0.76), min defender proximity: 0.5m. [event:press_53_243_TEAM_1 | t=2.08s | conf=0.44 | HIGH]\n- **2.16s – 2.16s** : TEAM_0 lost possession to TEAM_1 at 2.16s (frame 55). Possession confidence: 0.39 [LOW]. [event:poss_change_55_TEAM_0_to_TEAM_1 | t=2.16s | conf=0.39 | LOW]\n- **2.16s – 3.20s** : Les signaux sont compatibles avec un candidat : TEAM_0 engaged in post-loss pressing against TEAM_1 (2.16–3.20s, Δt=1.04s). Nearest defender closed from 1.9m to 4.0m; PressureIndex changed from 0.08 to 0.26. CounterpressScore: 0.60 [Confidence: 0.60]. [event:trans_55_80_TEAM_0_COUNTERPRESS_CANDIDATE | t=2.16s | conf=0.60 | HIGH]\n\n**Limites méthodologiques :**\n- *Diagnostic candidate semantics; physics-derived GT evaluation*\n- *Downstream of pass detector baseline; precision limited by tracking flicker*",
+      "evidence_citations": [
+        "[event:pass_53_55_TEAM_0_PASS_INTERCEPTED | t=2.08s | conf=0.86 | HIGH]",
+        "[event:press_53_243_TEAM_1 | t=2.08s | conf=0.44 | HIGH]",
+        "[event:poss_change_55_TEAM_0_to_TEAM_1 | t=2.16s | conf=0.39 | LOW]",
+        "[event:trans_55_80_TEAM_0_COUNTERPRESS_CANDIDATE | t=2.16s | conf=0.60 | HIGH]"
+      ],
+      "knowledge_citations": [],
+      "is_abstention": false
+    },
+    {
+      "id": "time_02",
+      "category": "TIMESTAMP",
+      "analysis_id": "SNMOT-068",
+      "query": "Quels événements se déroulent entre 2.0s et 4.0s ?",
+      "query_scope": "MATCH_TIMELINE",
+      "confidence": 0.572,
+      "answer": "### ⏱️ Événements et Preuves Vidéo\n- **2.08s – 2.16s** : TEAM_0 ball transfer completed (2.08–2.16s). Distance: 1.6m, forward displacement: +0.0m [Confidence: 0.86]. [event:pass_53_55_TEAM_0_PASS_INTERCEPTED | t=2.08s | conf=0.86 | HIGH]\n- **2.08s – 9.68s** : TEAM_1 applied continuous defensive pressure on TEAM_0 (2.08–9.68s, dur: 7.60s). Mean PressureIndex: 0.44 (peak: 0.76), min defender proximity: 0.5m. [event:press_53_243_TEAM_1 | t=2.08s | conf=0.44 | HIGH]\n- **2.16s – 2.16s** : TEAM_0 lost possession to TEAM_1 at 2.16s (frame 55). Possession confidence: 0.39 [LOW]. [event:poss_change_55_TEAM_0_to_TEAM_1 | t=2.16s | conf=0.39 | LOW]\n- **2.16s – 3.20s** : Les signaux sont compatibles avec un candidat : TEAM_0 engaged in post-loss pressing against TEAM_1 (2.16–3.20s, Δt=1.04s). Nearest defender closed from 1.9m to 4.0m; PressureIndex changed from 0.08 to 0.26. CounterpressScore: 0.60 [Confidence: 0.60]. [event:trans_55_80_TEAM_0_COUNTERPRESS_CANDIDATE | t=2.16s | conf=0.60 | HIGH]\n\n**Limites méthodologiques :**\n- *Diagnostic candidate semantics; physics-derived GT evaluation*\n- *Downstream of pass detector baseline; precision limited by tracking flicker*",
+      "evidence_citations": [
+        "[event:pass_53_55_TEAM_0_PASS_INTERCEPTED | t=2.08s | conf=0.86 | HIGH]",
+        "[event:press_53_243_TEAM_1 | t=2.08s | conf=0.44 | HIGH]",
+        "[event:poss_change_55_TEAM_0_to_TEAM_1 | t=2.16s | conf=0.39 | LOW]",
+        "[event:trans_55_80_TEAM_0_COUNTERPRESS_CANDIDATE | t=2.16s | conf=0.60 | HIGH]"
+      ],
+      "knowledge_citations": [],
+      "is_abstention": false
+    },
+    {
+      "id": "time_03",
+      "category": "TIMESTAMP",
+      "analysis_id": "SNMOT-068",
+      "query": "Que font les équipes à 10.0 secondes ?",
+      "query_scope": "MATCH_TIMELINE",
+      "confidence": 0.457,
+      "answer": "### ⏱️ Événements et Preuves Vidéo\n- **2.08s – 9.68s** : TEAM_1 applied continuous defensive pressure on TEAM_0 (2.08–9.68s, dur: 7.60s). Mean PressureIndex: 0.44 (peak: 0.76), min defender proximity: 0.5m. [event:press_53_243_TEAM_1 | t=2.08s | conf=0.44 | HIGH]\n- **9.88s – 11.44s** : TEAM_1 applied continuous defensive pressure on TEAM_0 (9.88–11.44s, dur: 1.56s). Mean PressureIndex: 0.46 (peak: 0.66), min defender proximity: 1.4m. [event:press_248_287_TEAM_1 | t=9.88s | conf=0.46 | HIGH]\n- **10.20s – 10.20s** : TEAM_0 lost possession to TEAM_1 at 10.20s (frame 256). Possession confidence: 0.48 [HIGH]. [event:poss_change_256_TEAM_0_to_TEAM_1 | t=10.20s | conf=0.48 | HIGH]\n- **10.20s – 10.76s** : TEAM_0 applied continuous defensive pressure on TEAM_1 (10.20–10.76s, dur: 0.56s). Mean PressureIndex: 0.45 (peak: 0.64), min defender proximity: 1.4m. [event:press_256_270_TEAM_0 | t=10.20s | conf=0.45 | HIGH]\n- **10.20s – 11.24s** : Les signaux sont compatibles avec un candidat : TEAM_0 engaged in post-loss pressing against TEAM_1 (10.20–11.24s, Δt=1.04s). Nearest defender closed from 3.1m to 3.2m; PressureIndex changed from 0.21 to 0.29. CounterpressScore: 0.46 [Confidence: 0.45]. [event:trans_256_281_TEAM_0_NEUTRAL_TRANSITION | t=10.20s | conf=0.45 | HIGH]\n\n**Limites méthodologiques :**\n- *Diagnostic candidate semantics; physics-derived GT evaluation*",
+      "evidence_citations": [
+        "[event:press_53_243_TEAM_1 | t=2.08s | conf=0.44 | HIGH]",
+        "[event:press_248_287_TEAM_1 | t=9.88s | conf=0.46 | HIGH]",
+        "[event:poss_change_256_TEAM_0_to_TEAM_1 | t=10.20s | conf=0.48 | HIGH]",
+        "[event:press_256_270_TEAM_0 | t=10.20s | conf=0.45 | HIGH]",
+        "[event:trans_256_281_TEAM_0_NEUTRAL_TRANSITION | t=10.20s | conf=0.45 | HIGH]"
+      ],
+      "knowledge_citations": [],
+      "is_abstention": false
+    }
+  ]
+}

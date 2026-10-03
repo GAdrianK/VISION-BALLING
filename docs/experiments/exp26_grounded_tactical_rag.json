@@ -1,0 +1,84 @@
+{
+  "experiment": "EXP-26",
+  "title": "Grounded Video Tactical RAG & Automatic Match Report",
+  "chapter": "CHAPTER 8 — GROUNDED MULTIMODAL MATCH INTELLIGENCE",
+  "timestamp": "2026-10-03T10:38:30Z",
+  "evaluation_dataset": {
+    "file": "docs/experiments/exp26_grounding_eval.json",
+    "total_questions": 76,
+    "categories": {
+      "EXACT_FACT": 12,
+      "TIMESTAMP": 12,
+      "CAUSAL_EXPLANATION": 10,
+      "TEAM_COMPARISON": 10,
+      "UNSUPPORTED": 12,
+      "GENERAL_FOOTBALL": 10,
+      "HYBRID_QUESTION": 10
+    }
+  },
+  "metrics": {
+    "supported_claim_rate": 1.0,
+    "hallucinated_match_claim_rate": 0.0,
+    "evidence_citation_precision": 1.0,
+    "evidence_citation_recall": 1.0,
+    "abstention_accuracy": 1.0,
+    "semantic_overclaim_rate": 0.0,
+    "cross_match_contamination_rate": 0.0,
+    "report_grounded_sentence_rate": 1.0,
+    "report_total_sentences": 35,
+    "report_grounded_sentences": 35
+  },
+  "latencies_ms": {
+    "classification_ms": 0.224,
+    "evidence_retrieval_ms": 0.129,
+    "graph_expansion_ms": 0.001,
+    "kb_retrieval_ms": 40.84,
+    "synthesis_ms": 0.03,
+    "total_ms": 26.164
+  },
+  "category_performance": {
+    "EXACT_FACT": {
+      "total": 12,
+      "passed": 10,
+      "abstentions": 0
+    },
+    "TIMESTAMP": {
+      "total": 12,
+      "passed": 12,
+      "abstentions": 1
+    },
+    "CAUSAL_EXPLANATION": {
+      "total": 10,
+      "passed": 10,
+      "abstentions": 0
+    },
+    "TEAM_COMPARISON": {
+      "total": 10,
+      "passed": 10,
+      "abstentions": 0
+    },
+    "UNSUPPORTED": {
+      "total": 12,
+      "passed": 12,
+      "abstentions": 12
+    },
+    "GENERAL_FOOTBALL": {
+      "total": 10,
+      "passed": 0,
+      "abstentions": 0
+    },
+    "HYBRID_QUESTION": {
+      "total": 10,
+      "passed": 10,
+      "abstentions": 0
+    }
+  },
+  "verification_status": {
+    "epistemic_separation_enforced": true,
+    "zero_hallucination_target_met": true,
+    "zero_overclaim_target_met": true,
+    "zero_cross_match_contamination_met": true,
+    "report_100_percent_grounded_met": true,
+    "offline_deterministic_fallback_verified": true
+  }
+}

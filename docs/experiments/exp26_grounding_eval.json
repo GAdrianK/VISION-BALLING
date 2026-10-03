@@ -1,0 +1,791 @@
+{
+  "total_cases": 76,
+  "eval_cases": [
+    {
+      "id": "fact_01",
+      "category": "EXACT_FACT",
+      "analysis_id": "SNMOT-068",
+      "query": "Quelle équipe a perdu le ballon à 2.16s ?",
+      "expected_scope": "MATCH_FACT",
+      "should_abstain": false,
+      "expected_event_families": [
+        "POSSESSION_CHANGE"
+      ],
+      "expected_semantic_level": "LEVEL_1_PHYSICAL_FACT",
+      "target_event_id": "poss_change_55_TEAM_0_to_TEAM_1"
+    },
+    {
+      "id": "fact_02",
+      "category": "EXACT_FACT",
+      "analysis_id": "SNMOT-068",
+      "query": "Y a-t-il eu un épisode de pression défensive à 2.08s ?",
+      "expected_scope": "MATCH_FACT",
+      "should_abstain": false,
+      "expected_event_families": [
+        "PRESSURE_EPISODE"
+      ],
+      "expected_semantic_level": "LEVEL_1_PHYSICAL_FACT",
+      "target_event_id": "press_53_243_TEAM_1"
+    },
+    {
+      "id": "fact_03",
+      "category": "EXACT_FACT",
+      "analysis_id": "SNMOT-068",
+      "query": "Quelle est la distance du transfert de balle à 2.08s ?",
+      "expected_scope": "MATCH_FACT",
+      "should_abstain": false,
+      "expected_event_families": [
+        "BALL_TRANSFER"
+      ],
+      "expected_semantic_level": "LEVEL_1_PHYSICAL_FACT",
+      "target_event_id": "pass_53_55_TEAM_0_PASS_INTERCEPTED"
+    },
+    {
+      "id": "fact_04",
+      "category": "EXACT_FACT",
+      "analysis_id": "SNMOT-069",
+      "query": "Quelle équipe a le ballon à 1.5s ?",
+      "expected_scope": "MATCH_FACT",
+      "should_abstain": false,
+      "expected_event_families": [
+        "POSSESSION_CHANGE",
+        "PRESSURE_EPISODE"
+      ],
+      "expected_semantic_level": "LEVEL_1_PHYSICAL_FACT"
+    },
+    {
+      "id": "fact_05",
+      "category": "EXACT_FACT",
+      "analysis_id": "SNMOT-062",
+      "query": "Quel événement défensif se produit à 0.92s ?",
+      "expected_scope": "MATCH_FACT",
+      "should_abstain": false,
+      "expected_event_families": [
+        "PRESSURE_EPISODE"
+      ],
+      "expected_semantic_level": "LEVEL_1_PHYSICAL_FACT",
+      "target_event_id": "press_24_31_TEAM_1"
+    },
+    {
+      "id": "fact_06",
+      "category": "EXACT_FACT",
+      "analysis_id": "SNMOT-068",
+      "query": "Qui exerce la pression défensive à 9.5s ?",
+      "expected_scope": "MATCH_FACT",
+      "should_abstain": false,
+      "expected_event_families": [
+        "PRESSURE_EPISODE"
+      ],
+      "expected_semantic_level": "LEVEL_1_PHYSICAL_FACT"
+    },
+    {
+      "id": "fact_07",
+      "category": "EXACT_FACT",
+      "analysis_id": "SNMOT-070",
+      "query": "Quelle est la hauteur du bloc défensif observée pour l'équipe 0 ?",
+      "expected_scope": "MATCH_FACT",
+      "should_abstain": false,
+      "expected_event_families": [
+        "DEFENSIVE_BLOCK"
+      ],
+      "expected_semantic_level": "LEVEL_2_STRUCTURAL_INFERENCE"
+    },
+    {
+      "id": "fact_08",
+      "category": "EXACT_FACT",
+      "analysis_id": "SNMOT-068",
+      "query": "Quel est le porteur de balle initial au début de la séquence ?",
+      "expected_scope": "MATCH_FACT",
+      "should_abstain": false,
+      "expected_event_families": [
+        "BALL_TRANSFER",
+        "PRESSURE_EPISODE"
+      ],
+      "expected_semantic_level": "LEVEL_1_PHYSICAL_FACT"
+    },
+    {
+      "id": "fact_09",
+      "category": "EXACT_FACT",
+      "analysis_id": "SNMOT-066",
+      "query": "Une perte de balle a-t-elle été enregistrée pour l'équipe 1 ?",
+      "expected_scope": "MATCH_FACT",
+      "should_abstain": false,
+      "expected_event_families": [
+        "POSSESSION_CHANGE"
+      ],
+      "expected_semantic_level": "LEVEL_1_PHYSICAL_FACT"
+    },
+    {
+      "id": "fact_10",
+      "category": "EXACT_FACT",
+      "analysis_id": "SNMOT-068",
+      "query": "Quel événement survient exactement à 8.0 secondes ?",
+      "expected_scope": "MATCH_FACT",
+      "should_abstain": false,
+      "expected_event_families": [
+        "PRESSURE_EPISODE"
+      ],
+      "expected_semantic_level": "LEVEL_1_PHYSICAL_FACT"
+    },
+    {
+      "id": "fact_11",
+      "category": "EXACT_FACT",
+      "analysis_id": "SNMOT-071",
+      "query": "Quel est l'indice de pression mesuré à 2.0s ?",
+      "expected_scope": "MATCH_FACT",
+      "should_abstain": false,
+      "expected_event_families": [
+        "PRESSURE_EPISODE"
+      ],
+      "expected_semantic_level": "LEVEL_1_PHYSICAL_FACT"
+    },
+    {
+      "id": "fact_12",
+      "category": "EXACT_FACT",
+      "analysis_id": "SNMOT-065",
+      "query": "L'équipe 0 a-t-elle subi un pressing à 1.2s ?",
+      "expected_scope": "MATCH_FACT",
+      "should_abstain": false,
+      "expected_event_families": [
+        "PRESSURE_EPISODE"
+      ],
+      "expected_semantic_level": "LEVEL_1_PHYSICAL_FACT"
+    },
+    {
+      "id": "time_01",
+      "category": "TIMESTAMP",
+      "analysis_id": "SNMOT-068",
+      "query": "Que se passe-t-il à 2.16 secondes ?",
+      "expected_scope": "MATCH_TIMELINE",
+      "should_abstain": false,
+      "expected_event_families": [
+        "POSSESSION_CHANGE",
+        "TACTICAL_TRANSITION"
+      ],
+      "target_timestamp": 2.16
+    },
+    {
+      "id": "time_02",
+      "category": "TIMESTAMP",
+      "analysis_id": "SNMOT-068",
+      "query": "Quels événements se déroulent entre 2.0s et 4.0s ?",
+      "expected_scope": "MATCH_TIMELINE",
+      "should_abstain": false,
+      "expected_event_families": [
+        "POSSESSION_CHANGE",
+        "PRESSURE_EPISODE",
+        "TACTICAL_TRANSITION"
+      ],
+      "target_range": [
+        2.0,
+        4.0
+      ]
+    },
+    {
+      "id": "time_03",
+      "category": "TIMESTAMP",
+      "analysis_id": "SNMOT-068",
+      "query": "Que font les équipes à 10.0 secondes ?",
+      "expected_scope": "MATCH_TIMELINE",
+      "should_abstain": false,
+      "expected_event_families": [
+        "PRESSURE_EPISODE",
+        "DEFENSIVE_BLOCK"
+      ],
+      "target_timestamp": 10.0
+    },
+    {
+      "id": "time_04",
+      "category": "TIMESTAMP",
+      "analysis_id": "SNMOT-069",
+      "query": "Quelle est la chronologie des événements à 3.2s ?",
+      "expected_scope": "MATCH_TIMELINE",
+      "should_abstain": false,
+      "expected_event_families": [
+        "PRESSURE_EPISODE",
+        "DEFENSIVE_BLOCK"
+      ],
+      "target_timestamp": 3.2
+    },
+    {
+      "id": "time_05",
+      "category": "TIMESTAMP",
+      "analysis_id": "SNMOT-068",
+      "query": "Que se passe-t-il à 12.4 secondes ?",
+      "expected_scope": "MATCH_TIMELINE",
+      "should_abstain": false,
+      "expected_event_families": [
+        "PRESSURE_EPISODE",
+        "DEFENSIVE_BLOCK"
+      ],
+      "target_timestamp": 12.4
+    },
+    {
+      "id": "time_06",
+      "category": "TIMESTAMP",
+      "analysis_id": "SNMOT-062",
+      "query": "Décris l'action à 1.0s.",
+      "expected_scope": "MATCH_TIMELINE",
+      "should_abstain": false,
+      "expected_event_families": [
+        "PRESSURE_EPISODE"
+      ],
+      "target_timestamp": 1.0
+    },
+    {
+      "id": "time_07",
+      "category": "TIMESTAMP",
+      "analysis_id": "SNMOT-068",
+      "query": "Que se passe-t-il dans les 3 secondes après 2.16s ?",
+      "expected_scope": "MATCH_TIMELINE",
+      "should_abstain": false,
+      "expected_event_families": [
+        "TACTICAL_TRANSITION",
+        "PRESSURE_EPISODE"
+      ],
+      "target_range": [
+        2.16,
+        5.16
+      ]
+    },
+    {
+      "id": "time_08",
+      "category": "TIMESTAMP",
+      "analysis_id": "SNMOT-070",
+      "query": "Que se passe-t-il à 5.0 secondes ?",
+      "expected_scope": "MATCH_TIMELINE",
+      "should_abstain": false,
+      "expected_event_families": [
+        "DEFENSIVE_BLOCK",
+        "PRESSURE_EPISODE"
+      ],
+      "target_timestamp": 5.0
+    },
+    {
+      "id": "time_09",
+      "category": "TIMESTAMP",
+      "analysis_id": "SNMOT-071",
+      "query": "Chronologie des actions entre 1.0s et 3.0s.",
+      "expected_scope": "MATCH_TIMELINE",
+      "should_abstain": false,
+      "expected_event_families": [
+        "PRESSURE_EPISODE"
+      ],
+      "target_range": [
+        1.0,
+        3.0
+      ]
+    },
+    {
+      "id": "time_10",
+      "category": "TIMESTAMP",
+      "analysis_id": "SNMOT-068",
+      "query": "Que se passe-t-il à 50.0 secondes ?",
+      "expected_scope": "MATCH_TIMELINE",
+      "should_abstain": true,
+      "expected_event_families": [],
+      "target_timestamp": 50.0
+    },
+    {
+      "id": "time_11",
+      "category": "TIMESTAMP",
+      "analysis_id": "SNMOT-066",
+      "query": "Que se passe-t-il à 4.5 secondes ?",
+      "expected_scope": "MATCH_TIMELINE",
+      "should_abstain": false,
+      "expected_event_families": [
+        "PRESSURE_EPISODE",
+        "DEFENSIVE_BLOCK"
+      ],
+      "target_timestamp": 4.5
+    },
+    {
+      "id": "time_12",
+      "category": "TIMESTAMP",
+      "analysis_id": "SNMOT-068",
+      "query": "Timeline des événements entre 6.0s et 9.0s.",
+      "expected_scope": "MATCH_TIMELINE",
+      "should_abstain": false,
+      "expected_event_families": [
+        "PRESSURE_EPISODE",
+        "DEFENSIVE_BLOCK"
+      ],
+      "target_range": [
+        6.0,
+        9.0
+      ]
+    },
+    {
+      "id": "cause_01",
+      "category": "CAUSAL_EXPLANATION",
+      "analysis_id": "SNMOT-068",
+      "query": "Pourquoi l'équipe 0 a-t-elle souffert après la perte à 2.16s ?",
+      "expected_scope": "MATCH_EXPLANATION",
+      "should_abstain": false,
+      "requires_graph": true,
+      "requires_qualification": true
+    },
+    {
+      "id": "cause_02",
+      "category": "CAUSAL_EXPLANATION",
+      "analysis_id": "SNMOT-068",
+      "query": "Comment l'équipe 0 a réagi après la perte de balle ?",
+      "expected_scope": "MATCH_EXPLANATION",
+      "should_abstain": false,
+      "requires_graph": true,
+      "requires_qualification": true
+    },
+    {
+      "id": "cause_03",
+      "category": "CAUSAL_EXPLANATION",
+      "analysis_id": "SNMOT-068",
+      "query": "Qu'est-ce qui a causé la perte de possession de l'équipe 0 ?",
+      "expected_scope": "MATCH_EXPLANATION",
+      "should_abstain": false,
+      "requires_graph": true
+    },
+    {
+      "id": "cause_04",
+      "category": "CAUSAL_EXPLANATION",
+      "analysis_id": "SNMOT-068",
+      "query": "Quelle est la conséquence de la pression de l'équipe 1 à 2.08s ?",
+      "expected_scope": "MATCH_EXPLANATION",
+      "should_abstain": false,
+      "requires_graph": true
+    },
+    {
+      "id": "cause_05",
+      "category": "CAUSAL_EXPLANATION",
+      "analysis_id": "SNMOT-069",
+      "query": "Pourquoi le bloc de l'équipe 1 a-t-il reculé ?",
+      "expected_scope": "MATCH_EXPLANATION",
+      "should_abstain": false,
+      "requires_graph": true
+    },
+    {
+      "id": "cause_06",
+      "category": "CAUSAL_EXPLANATION",
+      "analysis_id": "SNMOT-068",
+      "query": "Explique la relation entre la perte de balle et le contre-pressing.",
+      "expected_scope": "MATCH_EXPLANATION",
+      "should_abstain": false,
+      "requires_graph": true,
+      "requires_qualification": true
+    },
+    {
+      "id": "cause_07",
+      "category": "CAUSAL_EXPLANATION",
+      "analysis_id": "SNMOT-070",
+      "query": "Pourquoi la pression a-t-elle augmenté sur le porteur ?",
+      "expected_scope": "MATCH_EXPLANATION",
+      "should_abstain": false,
+      "requires_graph": true
+    },
+    {
+      "id": "cause_08",
+      "category": "CAUSAL_EXPLANATION",
+      "analysis_id": "SNMOT-066",
+      "query": "Comment expliquer la transition offensive adverse suite à la perte ?",
+      "expected_scope": "MATCH_EXPLANATION",
+      "should_abstain": false,
+      "requires_graph": true
+    },
+    {
+      "id": "cause_09",
+      "category": "CAUSAL_EXPLANATION",
+      "analysis_id": "SNMOT-068",
+      "query": "Quelles ont été les conséquences du pressing sur la relance ?",
+      "expected_scope": "MATCH_EXPLANATION",
+      "should_abstain": false,
+      "requires_graph": true
+    },
+    {
+      "id": "cause_10",
+      "category": "CAUSAL_EXPLANATION",
+      "analysis_id": "SNMOT-071",
+      "query": "Pourquoi l'équipe en possession a-t-elle été bloquée ?",
+      "expected_scope": "MATCH_EXPLANATION",
+      "should_abstain": false,
+      "requires_graph": true
+    },
+    {
+      "id": "comp_01",
+      "category": "TEAM_COMPARISON",
+      "analysis_id": "SNMOT-068",
+      "query": "Quelle équipe a pressé le plus dans cette vidéo ?",
+      "expected_scope": "MATCH_COMPARISON",
+      "should_abstain": false,
+      "expected_fields": [
+        "mean_pressure_index",
+        "peak_pressure_index"
+      ]
+    },
+    {
+      "id": "comp_02",
+      "category": "TEAM_COMPARISON",
+      "analysis_id": "SNMOT-068",
+      "query": "Quelle équipe a eu la possession moyenne la plus élevée ?",
+      "expected_scope": "MATCH_COMPARISON",
+      "should_abstain": false,
+      "expected_fields": [
+        "secure_possession_pct"
+      ]
+    },
+    {
+      "id": "comp_03",
+      "category": "TEAM_COMPARISON",
+      "analysis_id": "SNMOT-068",
+      "query": "Comparer la hauteur de bloc de l'équipe 0 et de l'équipe 1.",
+      "expected_scope": "MATCH_COMPARISON",
+      "should_abstain": false,
+      "expected_fields": [
+        "mean_defensive_line_height_m"
+      ]
+    },
+    {
+      "id": "comp_04",
+      "category": "TEAM_COMPARISON",
+      "analysis_id": "SNMOT-068",
+      "query": "Quelle équipe a été la plus compacte en largeur et en profondeur ?",
+      "expected_scope": "MATCH_COMPARISON",
+      "should_abstain": false,
+      "expected_fields": [
+        "mean_team_width_m",
+        "mean_team_depth_m"
+      ]
+    },
+    {
+      "id": "comp_05",
+      "category": "TEAM_COMPARISON",
+      "analysis_id": "SNMOT-069",
+      "query": "Quelle équipe a eu le plus la balle dans cette séquence ?",
+      "expected_scope": "MATCH_COMPARISON",
+      "should_abstain": false,
+      "expected_fields": [
+        "secure_possession_pct"
+      ]
+    },
+    {
+      "id": "comp_06",
+      "category": "TEAM_COMPARISON",
+      "analysis_id": "SNMOT-069",
+      "query": "Différence de bloc entre l'équipe 0 et l'équipe 1 ?",
+      "expected_scope": "MATCH_COMPARISON",
+      "should_abstain": false,
+      "expected_fields": [
+        "mean_defensive_line_height_m"
+      ]
+    },
+    {
+      "id": "comp_07",
+      "category": "TEAM_COMPARISON",
+      "analysis_id": "SNMOT-070",
+      "query": "Quelle équipe a pressé le plus dans cette vidéo ?",
+      "expected_scope": "MATCH_COMPARISON",
+      "should_abstain": false,
+      "expected_fields": [
+        "mean_pressure_index"
+      ]
+    },
+    {
+      "id": "comp_08",
+      "category": "TEAM_COMPARISON",
+      "analysis_id": "SNMOT-068",
+      "query": "Comparer l'indice de récupération après perte des deux équipes.",
+      "expected_scope": "MATCH_COMPARISON",
+      "should_abstain": false,
+      "expected_fields": [
+        "post_loss_counterpress_mean",
+        "defensive_recovery_mean"
+      ]
+    },
+    {
+      "id": "comp_09",
+      "category": "TEAM_COMPARISON",
+      "analysis_id": "SNMOT-071",
+      "query": "Quelle équipe a dominé en compacité défensive ?",
+      "expected_scope": "MATCH_COMPARISON",
+      "should_abstain": false,
+      "expected_fields": [
+        "mean_hull_area_m2"
+      ]
+    },
+    {
+      "id": "comp_10",
+      "category": "TEAM_COMPARISON",
+      "analysis_id": "SNMOT-066",
+      "query": "Quelle équipe a réalisé le plus de passes complétées ?",
+      "expected_scope": "MATCH_COMPARISON",
+      "should_abstain": false,
+      "expected_fields": [
+        "completed_pass_count"
+      ]
+    },
+    {
+      "id": "unsupp_01",
+      "category": "UNSUPPORTED",
+      "analysis_id": "SNMOT-068",
+      "query": "Quel est le score final du match ?",
+      "expected_scope": "UNSUPPORTED",
+      "should_abstain": true
+    },
+    {
+      "id": "unsupp_02",
+      "category": "UNSUPPORTED",
+      "analysis_id": "SNMOT-068",
+      "query": "Qui a marqué les buts dans ce match ?",
+      "expected_scope": "UNSUPPORTED",
+      "should_abstain": true
+    },
+    {
+      "id": "unsupp_03",
+      "category": "UNSUPPORTED",
+      "analysis_id": "SNMOT-068",
+      "query": "Quel est le xG de l'équipe 0 ?",
+      "expected_scope": "UNSUPPORTED",
+      "should_abstain": true
+    },
+    {
+      "id": "unsupp_04",
+      "category": "UNSUPPORTED",
+      "analysis_id": "SNMOT-068",
+      "query": "Combien de expected goals ont été générés ?",
+      "expected_scope": "UNSUPPORTED",
+      "should_abstain": true
+    },
+    {
+      "id": "unsupp_05",
+      "category": "UNSUPPORTED",
+      "analysis_id": "SNMOT-068",
+      "query": "Qui est l'homme du match ?",
+      "expected_scope": "UNSUPPORTED",
+      "should_abstain": true
+    },
+    {
+      "id": "unsupp_06",
+      "category": "UNSUPPORTED",
+      "analysis_id": "SNMOT-068",
+      "query": "Quel joueur a obtenu la meilleure note MVP ?",
+      "expected_scope": "UNSUPPORTED",
+      "should_abstain": true
+    },
+    {
+      "id": "unsupp_07",
+      "category": "UNSUPPORTED",
+      "analysis_id": "SNMOT-068",
+      "query": "Le plan tactique du coach a-t-il été un succès ?",
+      "expected_scope": "UNSUPPORTED",
+      "should_abstain": true
+    },
+    {
+      "id": "unsupp_08",
+      "category": "UNSUPPORTED",
+      "analysis_id": "SNMOT-068",
+      "query": "Est-ce que le plan du coach a bien fonctionné ?",
+      "expected_scope": "UNSUPPORTED",
+      "should_abstain": true
+    },
+    {
+      "id": "unsupp_09",
+      "category": "UNSUPPORTED",
+      "analysis_id": "SNMOT-068",
+      "query": "L'arbitre a-t-il commis une erreur d'arbitrage ?",
+      "expected_scope": "UNSUPPORTED",
+      "should_abstain": true
+    },
+    {
+      "id": "unsupp_10",
+      "category": "UNSUPPORTED",
+      "analysis_id": "SNMOT-069",
+      "query": "Qui a gagné le match ?",
+      "expected_scope": "UNSUPPORTED",
+      "should_abstain": true
+    },
+    {
+      "id": "unsupp_11",
+      "category": "UNSUPPORTED",
+      "analysis_id": "SNMOT-070",
+      "query": "Y a-t-il eu un carton rouge ou un penalty ?",
+      "expected_scope": "UNSUPPORTED",
+      "should_abstain": true
+    },
+    {
+      "id": "unsupp_12",
+      "category": "UNSUPPORTED",
+      "analysis_id": "SNMOT-068",
+      "query": "Quelle est la valeur xG attendue sur ce tir ?",
+      "expected_scope": "UNSUPPORTED",
+      "should_abstain": true
+    },
+    {
+      "id": "gen_01",
+      "category": "GENERAL_FOOTBALL",
+      "analysis_id": "GENERAL",
+      "query": "Qu'est-ce qu'un contre-pressing ?",
+      "expected_scope": "GENERAL_FOOTBALL",
+      "should_abstain": false
+    },
+    {
+      "id": "gen_02",
+      "category": "GENERAL_FOOTBALL",
+      "analysis_id": "GENERAL",
+      "query": "Comment fonctionne un bloc bas ?",
+      "expected_scope": "GENERAL_FOOTBALL",
+      "should_abstain": false
+    },
+    {
+      "id": "gen_03",
+      "category": "GENERAL_FOOTBALL",
+      "analysis_id": "GENERAL",
+      "query": "Quel est le rôle du faux 9 dans une attaque ?",
+      "expected_scope": "GENERAL_FOOTBALL",
+      "should_abstain": false
+    },
+    {
+      "id": "gen_04",
+      "category": "GENERAL_FOOTBALL",
+      "analysis_id": "GENERAL",
+      "query": "Quels sont les principes du gegenpressing de Jürgen Klopp ?",
+      "expected_scope": "GENERAL_FOOTBALL",
+      "should_abstain": false
+    },
+    {
+      "id": "gen_05",
+      "category": "GENERAL_FOOTBALL",
+      "analysis_id": "GENERAL",
+      "query": "Quelle est la différence entre un 4-3-3 et un 4-4-2 ?",
+      "expected_scope": "GENERAL_FOOTBALL",
+      "should_abstain": false
+    },
+    {
+      "id": "gen_06",
+      "category": "GENERAL_FOOTBALL",
+      "analysis_id": "GENERAL",
+      "query": "Comment coulisser efficacement en phase défensive ?",
+      "expected_scope": "GENERAL_FOOTBALL",
+      "should_abstain": false
+    },
+    {
+      "id": "gen_07",
+      "category": "GENERAL_FOOTBALL",
+      "analysis_id": "GENERAL",
+      "query": "Qu'est-ce que la défense préventive (rest defense) ?",
+      "expected_scope": "GENERAL_FOOTBALL",
+      "should_abstain": false
+    },
+    {
+      "id": "gen_08",
+      "category": "GENERAL_FOOTBALL",
+      "analysis_id": "GENERAL",
+      "query": "Comment briser un bloc médian compact ?",
+      "expected_scope": "GENERAL_FOOTBALL",
+      "should_abstain": false
+    },
+    {
+      "id": "gen_09",
+      "category": "GENERAL_FOOTBALL",
+      "analysis_id": "GENERAL",
+      "query": "Quels sont les avantages d'un double pivot au milieu ?",
+      "expected_scope": "GENERAL_FOOTBALL",
+      "should_abstain": false
+    },
+    {
+      "id": "gen_10",
+      "category": "GENERAL_FOOTBALL",
+      "analysis_id": "GENERAL",
+      "query": "Comment organiser une sortie de balle face à un pressing haut ?",
+      "expected_scope": "GENERAL_FOOTBALL",
+      "should_abstain": false
+    },
+    {
+      "id": "hyb_01",
+      "category": "HYBRID_QUESTION",
+      "analysis_id": "SNMOT-068",
+      "query": "L'équipe 0 a perdu la balle à 2.16s : quels principes de contre-pressing s'appliquent ?",
+      "expected_scope": "MATCH_EXPLANATION",
+      "should_abstain": false,
+      "requires_kb": true
+    },
+    {
+      "id": "hyb_02",
+      "category": "HYBRID_QUESTION",
+      "analysis_id": "SNMOT-068",
+      "query": "Le bloc défensif était à 65m : quels sont les risques théoriques d'un bloc haut ?",
+      "expected_scope": "MATCH_EXPLANATION",
+      "should_abstain": false,
+      "requires_kb": true
+    },
+    {
+      "id": "hyb_03",
+      "category": "HYBRID_QUESTION",
+      "analysis_id": "SNMOT-068",
+      "query": "Comment le pressing exercé à 2.08s illustre-t-il le harcèlement à la perte ?",
+      "expected_scope": "MATCH_EXPLANATION",
+      "should_abstain": false,
+      "requires_kb": true
+    },
+    {
+      "id": "hyb_04",
+      "category": "HYBRID_QUESTION",
+      "analysis_id": "SNMOT-069",
+      "query": "L'équipe 1 a reculé : comment restructurer un bloc bas selon la théorie ?",
+      "expected_scope": "MATCH_EXPLANATION",
+      "should_abstain": false,
+      "requires_kb": true
+    },
+    {
+      "id": "hyb_05",
+      "category": "HYBRID_QUESTION",
+      "analysis_id": "SNMOT-068",
+      "query": "Pourquoi la perte à 2.16s a créé un danger au vu des règles de rest defense ?",
+      "expected_scope": "MATCH_EXPLANATION",
+      "should_abstain": false,
+      "requires_kb": true
+    },
+    {
+      "id": "hyb_06",
+      "category": "HYBRID_QUESTION",
+      "analysis_id": "SNMOT-070",
+      "query": "La hauteur de ligne est à 45m : quel rôle pour le gardien-libéro dans cette configuration ?",
+      "expected_scope": "MATCH_EXPLANATION",
+      "should_abstain": false,
+      "requires_kb": true
+    },
+    {
+      "id": "hyb_07",
+      "category": "HYBRID_QUESTION",
+      "analysis_id": "SNMOT-068",
+      "query": "La compacité observée est de 24m : est-ce conforme aux standards théoriques de bloc compact ?",
+      "expected_scope": "MATCH_EXPLANATION",
+      "should_abstain": false,
+      "requires_kb": true
+    },
+    {
+      "id": "hyb_08",
+      "category": "HYBRID_QUESTION",
+      "analysis_id": "SNMOT-066",
+      "query": "Explique la transition adverse après la perte sous l'angle des 5 secondes de réaction.",
+      "expected_scope": "MATCH_EXPLANATION",
+      "should_abstain": false,
+      "requires_kb": true
+    },
+    {
+      "id": "hyb_09",
+      "category": "HYBRID_QUESTION",
+      "analysis_id": "SNMOT-071",
+      "query": "L'intensité de pressing a atteint 0.8 : comment l'adversaire doit-il orienter le jeu sous pression ?",
+      "expected_scope": "MATCH_EXPLANATION",
+      "should_abstain": false,
+      "requires_kb": true
+    },
+    {
+      "id": "hyb_10",
+      "category": "HYBRID_QUESTION",
+      "analysis_id": "SNMOT-068",
+      "query": "Quelle est la formation observée de l'équipe 0 et que préconise la théorie ?",
+      "expected_scope": "MATCH_FACT",
+      "should_abstain": false,
+      "requires_kb": false
+    }
+  ]
+}
