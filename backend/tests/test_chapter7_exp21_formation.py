@@ -264,11 +264,39 @@ def test_coordinate_noise_robustness() -> None:
         assert sig.formation_label == "4-3-3"
 
 
-def test_one_missing_player_partial_evidence() -> None:
-    """Verifies that 9 visible outfield players trigger PARTIAL_EVIDENCE / PARTIAL without hallucinating."""
-    engine = DynamicFormationEngine(FormationConfig(full_evidence_threshold=10))
-    # 9 players observed: [4, 3, 2] instead of 10
-    counts = [4, 3, 2]
+def test_partial_visibility_evidence() -> None:
+    """Verifies that 7-8 visible outfield players trigger PARTIAL_EVIDENCE / PARTIAL without hallucinating."""
+    engine = DynamicFormationEngine()
+    # 8 players observed: [4, 3, 1] (partial evidence tier: 7-8 players)
+    counts = [4, 3, 1]
+    x_pos = [-20.0, -5.0, 12.0]
+    lines = _make_lines(counts, x_pos)
+
+    players = []
+    tid = 0
+    for cnt, x in zip(counts, x_pos):
+        for j in range(cnt):
+            players.append(_make_player(tid, "TEAM_0", x, float(j * 6 - 8)))
+            tid += 1
+
+    assert len(players) == 8
+    tf, of = _make_context(players, lines)
+    res = engine.process_frame(1, 0.04, players, tf, of)
+
+    sig = res.team_0.instantaneous_signature
+    assert sig.visible_outfield_count == 8
+    assert sig.missing_player_count == 2
+    assert sig.visibility_class == VisibilityClass.PARTIAL_EVIDENCE
+    assert sig.formation_state == FormationState.PARTIAL
+    assert sig.formation_label == "PARTIAL"
+    # Structure must still be preserved numerically
+    assert sig.players_per_line == [4, 3, 1]
+
+
+def test_nine_players_full_evidence() -> None:
+    """Verifies that N=9 outfield players satisfies FULL_EVIDENCE threshold (N >= 9)."""
+    engine = DynamicFormationEngine()
+    counts = [4, 3, 2]  # 9 outfield players
     x_pos = [-20.0, -5.0, 12.0]
     lines = _make_lines(counts, x_pos)
 
@@ -286,10 +314,7 @@ def test_one_missing_player_partial_evidence() -> None:
     sig = res.team_0.instantaneous_signature
     assert sig.visible_outfield_count == 9
     assert sig.missing_player_count == 1
-    assert sig.visibility_class == VisibilityClass.PARTIAL_EVIDENCE
-    assert sig.formation_state == FormationState.PARTIAL
-    assert sig.formation_label == "PARTIAL"
-    # Structure must still be preserved numerically
+    assert sig.visibility_class == VisibilityClass.FULL_EVIDENCE
     assert sig.players_per_line == [4, 3, 2]
 
 

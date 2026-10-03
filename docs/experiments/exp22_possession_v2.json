@@ -1,0 +1,896 @@
+{
+  "experiment": "EXP-22",
+  "description": "Ball Control & Possession V2 Challenger Benchmark",
+  "timestamp": "2026-10-03 00:04:14",
+  "platform": "Linux-7.0.0-34-generic-x86_64-with-glibc2.39",
+  "python_version": "3.12.3",
+  "synthetic_scenarios": {
+    "acquisition": {
+      "status": "SECURE",
+      "team": "TEAM_0",
+      "carrier_id": 1,
+      "success": true
+    },
+    "same_team_handoff": {
+      "transit_status": "PROVISIONAL_TRANSIT",
+      "possession_team": "TEAM_0",
+      "success": true
+    },
+    "opponent_takeover": {
+      "final_team": "TEAM_1",
+      "turnovers_emitted": 1,
+      "success": true
+    },
+    "contested_duel": {
+      "control_state": "CONTESTED",
+      "possession_team": "CONTESTED",
+      "success": true
+    },
+    "id_switch_robustness": {
+      "possession_team": "TEAM_0",
+      "turnovers_emitted": 0,
+      "success": true
+    },
+    "aerial_jump_invalidation": {
+      "is_aerial_suspect": true,
+      "success": true
+    }
+  },
+  "performance_summary": {
+    "dev_team_accuracy_v1": 64.22222222222223,
+    "dev_team_accuracy_v2": 63.111111111111114,
+    "dev_macro_f1_v1": 0.38071321144036796,
+    "dev_macro_f1_v2": 0.3546024970325335,
+    "holdout_team_accuracy_v1": 55.733333333333334,
+    "holdout_team_accuracy_v2": 60.13333333333334,
+    "holdout_macro_f1_v1": 0.3579430696012188,
+    "holdout_macro_f1_v2": 0.41600063265022247,
+    "holdout_carrier_accuracy_v1": 33.52924836601307,
+    "holdout_carrier_accuracy_v2": 44.201470588235296,
+    "holdout_carrier_delta_pct": 10.672222222222224,
+    "holdout_team_delta_pct": 4.400000000000006
+  },
+  "downstream_frozen_exp19_transfer": {
+    "mode_a_v1_precision": 0.06666666666666667,
+    "mode_a_v1_recall": 0.03636363636363636,
+    "mode_a_v1_f1": 0.04705882352941177,
+    "mode_b_v2_precision": 0.13333333333333333,
+    "mode_b_v2_recall": 0.03636363636363636,
+    "mode_b_v2_f1": 0.05714285714285715,
+    "mode_c_oracle_precision": 0.04,
+    "mode_c_oracle_recall": 0.01818181818181818,
+    "mode_c_oracle_f1": 0.025000000000000005,
+    "downstream_f1_delta": 0.010084033613445377
+  },
+  "runtime": {
+    "mean_v2_latency_ms": 0.16569621467594214,
+    "target_ms": 0.5,
+    "is_budget_compliant": true
+  },
+  "decision_gate": {
+    "is_holdout_control_improved": true,
+    "is_downstream_pass_improved": true,
+    "verdict": "CASE_A_POSSESSION_V2_ADOPTED"
+  },
+  "dev_sequences": {
+    "v1": {
+      "SNMOT-060": {
+        "frames_compared": 150,
+        "team_possession_frame_accuracy_pct": 71.33333333333334,
+        "valid_prediction_coverage_pct": 98.66666666666667,
+        "macro_f1": 0.24994541484716154,
+        "carrier_accuracy_pct": 67.0,
+        "unambiguous_carrier_frames": 100,
+        "temporal_stability": {
+          "switches_per_minute": 160.0,
+          "false_short_acquisitions": 7,
+          "mean_control_duration_seconds": 0.3525
+        },
+        "event_boundary_metrics": {
+          "boundary_frames_evaluated": 91,
+          "boundary_team_accuracy_pct": 56.043956043956044,
+          "boundary_carrier_accuracy_pct": 58.536585365853654
+        },
+        "per_state_breakdown": {
+          "CONTESTED": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1
+          },
+          "NEUTRAL": {
+            "precision": 0.9333333333333333,
+            "recall": 0.2857142857142857,
+            "f1": 0.43749999999999994,
+            "support": 49
+          },
+          "TEAM_0": {
+            "precision": 0.7045454545454546,
+            "recall": 0.9587628865979382,
+            "f1": 0.8122270742358078,
+            "support": 97
+          },
+          "TEAM_1": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 3
+          },
+          "UNKNOWN": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        }
+      },
+      "SNMOT-063": {
+        "frames_compared": 150,
+        "team_possession_frame_accuracy_pct": 58.666666666666664,
+        "valid_prediction_coverage_pct": 98.66666666666667,
+        "macro_f1": 0.39446640316205533,
+        "carrier_accuracy_pct": 70.70707070707071,
+        "unambiguous_carrier_frames": 99,
+        "temporal_stability": {
+          "switches_per_minute": 150.0,
+          "false_short_acquisitions": 7,
+          "mean_control_duration_seconds": 0.336
+        },
+        "event_boundary_metrics": {
+          "boundary_frames_evaluated": 103,
+          "boundary_team_accuracy_pct": 43.689320388349515,
+          "boundary_carrier_accuracy_pct": 57.14285714285714
+        },
+        "per_state_breakdown": {
+          "CONTESTED": {
+            "precision": 0.4,
+            "recall": 0.11764705882352941,
+            "f1": 0.1818181818181818,
+            "support": 17
+          },
+          "NEUTRAL": {
+            "precision": 0.7222222222222222,
+            "recall": 0.38235294117647056,
+            "f1": 0.4999999999999999,
+            "support": 34
+          },
+          "TEAM_0": {
+            "precision": 0.6086956521739131,
+            "recall": 0.6086956521739131,
+            "f1": 0.6086956521739131,
+            "support": 46
+          },
+          "TEAM_1": {
+            "precision": 0.569620253164557,
+            "recall": 0.8490566037735849,
+            "f1": 0.6818181818181819,
+            "support": 53
+          },
+          "UNKNOWN": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        }
+      },
+      "SNMOT-064": {
+        "frames_compared": 150,
+        "team_possession_frame_accuracy_pct": 62.66666666666667,
+        "valid_prediction_coverage_pct": 100.0,
+        "macro_f1": 0.4977278163118871,
+        "carrier_accuracy_pct": 49.645390070921984,
+        "unambiguous_carrier_frames": 141,
+        "temporal_stability": {
+          "switches_per_minute": 20.0,
+          "false_short_acquisitions": 0,
+          "mean_control_duration_seconds": 2.52
+        },
+        "event_boundary_metrics": {
+          "boundary_frames_evaluated": 19,
+          "boundary_team_accuracy_pct": 100.0,
+          "boundary_carrier_accuracy_pct": 0.0
+        },
+        "per_state_breakdown": {
+          "NEUTRAL": {
+            "precision": 0.13846153846153847,
+            "recall": 1.0,
+            "f1": 0.24324324324324326,
+            "support": 9
+          },
+          "TEAM_1": {
+            "precision": 1.0,
+            "recall": 0.6028368794326241,
+            "f1": 0.752212389380531,
+            "support": 141
+          }
+        }
+      }
+    },
+    "v2": {
+      "SNMOT-060": {
+        "frames_compared": 150,
+        "team_possession_frame_accuracy_pct": 68.66666666666667,
+        "valid_prediction_coverage_pct": 100.0,
+        "macro_f1": 0.2924407840132797,
+        "carrier_accuracy_pct": 90.0,
+        "unambiguous_carrier_frames": 100,
+        "temporal_stability": {
+          "switches_per_minute": 160.0,
+          "false_short_acquisitions": 7,
+          "mean_control_duration_seconds": 0.3525
+        },
+        "event_boundary_metrics": {
+          "boundary_frames_evaluated": 91,
+          "boundary_team_accuracy_pct": 51.64835164835166,
+          "boundary_carrier_accuracy_pct": 82.92682926829268
+        },
+        "per_state_breakdown": {
+          "CONTESTED": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1
+          },
+          "NEUTRAL": {
+            "precision": 0.65,
+            "recall": 0.2653061224489796,
+            "f1": 0.3768115942028986,
+            "support": 49
+          },
+          "TEAM_0": {
+            "precision": 0.6923076923076923,
+            "recall": 0.9278350515463918,
+            "f1": 0.7929515418502203,
+            "support": 97
+          },
+          "TEAM_1": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 3
+          }
+        }
+      },
+      "SNMOT-063": {
+        "frames_compared": 150,
+        "team_possession_frame_accuracy_pct": 64.0,
+        "valid_prediction_coverage_pct": 99.33333333333333,
+        "macro_f1": 0.4096645794247463,
+        "carrier_accuracy_pct": 83.83838383838383,
+        "unambiguous_carrier_frames": 99,
+        "temporal_stability": {
+          "switches_per_minute": 110.0,
+          "false_short_acquisitions": 4,
+          "mean_control_duration_seconds": 0.4581818181818182
+        },
+        "event_boundary_metrics": {
+          "boundary_frames_evaluated": 103,
+          "boundary_team_accuracy_pct": 50.48543689320388,
+          "boundary_carrier_accuracy_pct": 76.19047619047619
+        },
+        "per_state_breakdown": {
+          "CONTESTED": {
+            "precision": 0.4,
+            "recall": 0.11764705882352941,
+            "f1": 0.1818181818181818,
+            "support": 17
+          },
+          "NEUTRAL": {
+            "precision": 0.6,
+            "recall": 0.2647058823529412,
+            "f1": 0.36734693877551017,
+            "support": 34
+          },
+          "TEAM_0": {
+            "precision": 0.7777777777777778,
+            "recall": 0.7608695652173914,
+            "f1": 0.7692307692307693,
+            "support": 46
+          },
+          "TEAM_1": {
+            "precision": 0.5952380952380952,
+            "recall": 0.9433962264150944,
+            "f1": 0.7299270072992702,
+            "support": 53
+          },
+          "UNKNOWN": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        }
+      },
+      "SNMOT-064": {
+        "frames_compared": 150,
+        "team_possession_frame_accuracy_pct": 56.666666666666664,
+        "valid_prediction_coverage_pct": 100.0,
+        "macro_f1": 0.36170212765957444,
+        "carrier_accuracy_pct": 60.28368794326241,
+        "unambiguous_carrier_frames": 141,
+        "temporal_stability": {
+          "switches_per_minute": 10.0,
+          "false_short_acquisitions": 0,
+          "mean_control_duration_seconds": 2.24
+        },
+        "event_boundary_metrics": {
+          "boundary_frames_evaluated": 19,
+          "boundary_team_accuracy_pct": 52.63157894736842,
+          "boundary_carrier_accuracy_pct": 100.0
+        },
+        "per_state_breakdown": {
+          "NEUTRAL": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 9
+          },
+          "TEAM_1": {
+            "precision": 0.9042553191489362,
+            "recall": 0.6028368794326241,
+            "f1": 0.7234042553191489,
+            "support": 141
+          }
+        }
+      }
+    }
+  },
+  "holdout_sequences": {
+    "v1": {
+      "SNMOT-066": {
+        "frames_compared": 150,
+        "team_possession_frame_accuracy_pct": 98.66666666666667,
+        "valid_prediction_coverage_pct": 100.0,
+        "macro_f1": 0.4966442953020134,
+        "carrier_accuracy_pct": 0.0,
+        "unambiguous_carrier_frames": 2,
+        "temporal_stability": {
+          "switches_per_minute": 0.0,
+          "false_short_acquisitions": 0,
+          "mean_control_duration_seconds": 0.0
+        },
+        "event_boundary_metrics": {
+          "boundary_frames_evaluated": 12,
+          "boundary_team_accuracy_pct": 83.33333333333334,
+          "boundary_carrier_accuracy_pct": 0.0
+        },
+        "per_state_breakdown": {
+          "NEUTRAL": {
+            "precision": 0.9866666666666667,
+            "recall": 1.0,
+            "f1": 0.9932885906040269,
+            "support": 148
+          },
+          "TEAM_1": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2
+          }
+        }
+      },
+      "SNMOT-068": {
+        "frames_compared": 150,
+        "team_possession_frame_accuracy_pct": 34.0,
+        "valid_prediction_coverage_pct": 100.0,
+        "macro_f1": 0.16544342507645263,
+        "carrier_accuracy_pct": 46.875,
+        "unambiguous_carrier_frames": 32,
+        "temporal_stability": {
+          "switches_per_minute": 210.0,
+          "false_short_acquisitions": 12,
+          "mean_control_duration_seconds": 0.2571428571428572
+        },
+        "event_boundary_metrics": {
+          "boundary_frames_evaluated": 119,
+          "boundary_team_accuracy_pct": 25.210084033613445,
+          "boundary_carrier_accuracy_pct": 46.875
+        },
+        "per_state_breakdown": {
+          "CONTESTED": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "NEUTRAL": {
+            "precision": 0.9361702127659575,
+            "recall": 0.3728813559322034,
+            "f1": 0.5333333333333334,
+            "support": 118
+          },
+          "TEAM_0": {
+            "precision": 0.07,
+            "recall": 0.7777777777777778,
+            "f1": 0.12844036697247707,
+            "support": 9
+          },
+          "TEAM_1": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 23
+          }
+        }
+      },
+      "SNMOT-069": {
+        "frames_compared": 150,
+        "team_possession_frame_accuracy_pct": 56.00000000000001,
+        "valid_prediction_coverage_pct": 98.66666666666667,
+        "macro_f1": 0.23931623931623933,
+        "carrier_accuracy_pct": 19.333333333333332,
+        "unambiguous_carrier_frames": 150,
+        "temporal_stability": {
+          "switches_per_minute": 120.0,
+          "false_short_acquisitions": 5,
+          "mean_control_duration_seconds": 0.2533333333333333
+        },
+        "event_boundary_metrics": {
+          "boundary_frames_evaluated": 0,
+          "boundary_team_accuracy_pct": 0.0,
+          "boundary_carrier_accuracy_pct": 0.0
+        },
+        "per_state_breakdown": {
+          "NEUTRAL": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "TEAM_0": {
+            "precision": 1.0,
+            "recall": 0.56,
+            "f1": 0.717948717948718,
+            "support": 150
+          },
+          "UNKNOWN": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        }
+      },
+      "SNMOT-070": {
+        "frames_compared": 150,
+        "team_possession_frame_accuracy_pct": 86.0,
+        "valid_prediction_coverage_pct": 100.0,
+        "macro_f1": 0.8498498498498499,
+        "carrier_accuracy_pct": 95.55555555555556,
+        "unambiguous_carrier_frames": 45,
+        "temporal_stability": {
+          "switches_per_minute": 50.0,
+          "false_short_acquisitions": 2,
+          "mean_control_duration_seconds": 0.8959999999999999
+        },
+        "event_boundary_metrics": {
+          "boundary_frames_evaluated": 21,
+          "boundary_team_accuracy_pct": 76.19047619047619,
+          "boundary_carrier_accuracy_pct": 81.81818181818183
+        },
+        "per_state_breakdown": {
+          "NEUTRAL": {
+            "precision": 1.0,
+            "recall": 0.8,
+            "f1": 0.888888888888889,
+            "support": 105
+          },
+          "TEAM_0": {
+            "precision": 0.6818181818181818,
+            "recall": 1.0,
+            "f1": 0.8108108108108109,
+            "support": 45
+          }
+        }
+      },
+      "SNMOT-071": {
+        "frames_compared": 150,
+        "team_possession_frame_accuracy_pct": 4.0,
+        "valid_prediction_coverage_pct": 100.0,
+        "macro_f1": 0.038461538461538464,
+        "carrier_accuracy_pct": 5.88235294117647,
+        "unambiguous_carrier_frames": 102,
+        "temporal_stability": {
+          "switches_per_minute": 10.0,
+          "false_short_acquisitions": 0,
+          "mean_control_duration_seconds": 5.76
+        },
+        "event_boundary_metrics": {
+          "boundary_frames_evaluated": 92,
+          "boundary_team_accuracy_pct": 3.260869565217391,
+          "boundary_carrier_accuracy_pct": 5.555555555555555
+        },
+        "per_state_breakdown": {
+          "NEUTRAL": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "TEAM_0": {
+            "precision": 1.0,
+            "recall": 0.04,
+            "f1": 0.07692307692307693,
+            "support": 150
+          }
+        }
+      }
+    },
+    "v2": {
+      "SNMOT-066": {
+        "frames_compared": 150,
+        "team_possession_frame_accuracy_pct": 98.66666666666667,
+        "valid_prediction_coverage_pct": 100.0,
+        "macro_f1": 0.4966442953020134,
+        "carrier_accuracy_pct": 0.0,
+        "unambiguous_carrier_frames": 2,
+        "temporal_stability": {
+          "switches_per_minute": 0.0,
+          "false_short_acquisitions": 0,
+          "mean_control_duration_seconds": 0.0
+        },
+        "event_boundary_metrics": {
+          "boundary_frames_evaluated": 12,
+          "boundary_team_accuracy_pct": 83.33333333333334,
+          "boundary_carrier_accuracy_pct": 0.0
+        },
+        "per_state_breakdown": {
+          "NEUTRAL": {
+            "precision": 0.9866666666666667,
+            "recall": 1.0,
+            "f1": 0.9932885906040269,
+            "support": 148
+          },
+          "TEAM_1": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2
+          }
+        }
+      },
+      "SNMOT-068": {
+        "frames_compared": 150,
+        "team_possession_frame_accuracy_pct": 56.666666666666664,
+        "valid_prediction_coverage_pct": 100.0,
+        "macro_f1": 0.4575653623272671,
+        "carrier_accuracy_pct": 53.125,
+        "unambiguous_carrier_frames": 32,
+        "temporal_stability": {
+          "switches_per_minute": 140.0,
+          "false_short_acquisitions": 8,
+          "mean_control_duration_seconds": 0.3857142857142857
+        },
+        "event_boundary_metrics": {
+          "boundary_frames_evaluated": 119,
+          "boundary_team_accuracy_pct": 52.10084033613446,
+          "boundary_carrier_accuracy_pct": 53.125
+        },
+        "per_state_breakdown": {
+          "NEUTRAL": {
+            "precision": 0.9014084507042254,
+            "recall": 0.5423728813559322,
+            "f1": 0.6772486772486772,
+            "support": 118
+          },
+          "TEAM_0": {
+            "precision": 0.5,
+            "recall": 0.2222222222222222,
+            "f1": 0.30769230769230765,
+            "support": 9
+          },
+          "TEAM_1": {
+            "precision": 0.25333333333333335,
+            "recall": 0.8260869565217391,
+            "f1": 0.38775510204081637,
+            "support": 23
+          }
+        }
+      },
+      "SNMOT-069": {
+        "frames_compared": 150,
+        "team_possession_frame_accuracy_pct": 55.333333333333336,
+        "valid_prediction_coverage_pct": 99.33333333333333,
+        "macro_f1": 0.23748211731044352,
+        "carrier_accuracy_pct": 62.0,
+        "unambiguous_carrier_frames": 150,
+        "temporal_stability": {
+          "switches_per_minute": 110.0,
+          "false_short_acquisitions": 5,
+          "mean_control_duration_seconds": 0.27636363636363637
+        },
+        "event_boundary_metrics": {
+          "boundary_frames_evaluated": 0,
+          "boundary_team_accuracy_pct": 0.0,
+          "boundary_carrier_accuracy_pct": 0.0
+        },
+        "per_state_breakdown": {
+          "NEUTRAL": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "TEAM_0": {
+            "precision": 1.0,
+            "recall": 0.5533333333333333,
+            "f1": 0.7124463519313305,
+            "support": 150
+          },
+          "UNKNOWN": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        }
+      },
+      "SNMOT-070": {
+        "frames_compared": 150,
+        "team_possession_frame_accuracy_pct": 86.0,
+        "valid_prediction_coverage_pct": 100.0,
+        "macro_f1": 0.8498498498498499,
+        "carrier_accuracy_pct": 100.0,
+        "unambiguous_carrier_frames": 45,
+        "temporal_stability": {
+          "switches_per_minute": 50.0,
+          "false_short_acquisitions": 2,
+          "mean_control_duration_seconds": 0.8959999999999999
+        },
+        "event_boundary_metrics": {
+          "boundary_frames_evaluated": 21,
+          "boundary_team_accuracy_pct": 76.19047619047619,
+          "boundary_carrier_accuracy_pct": 100.0
+        },
+        "per_state_breakdown": {
+          "NEUTRAL": {
+            "precision": 1.0,
+            "recall": 0.8,
+            "f1": 0.888888888888889,
+            "support": 105
+          },
+          "TEAM_0": {
+            "precision": 0.6818181818181818,
+            "recall": 1.0,
+            "f1": 0.8108108108108109,
+            "support": 45
+          }
+        }
+      },
+      "SNMOT-071": {
+        "frames_compared": 150,
+        "team_possession_frame_accuracy_pct": 4.0,
+        "valid_prediction_coverage_pct": 100.0,
+        "macro_f1": 0.038461538461538464,
+        "carrier_accuracy_pct": 5.88235294117647,
+        "unambiguous_carrier_frames": 102,
+        "temporal_stability": {
+          "switches_per_minute": 10.0,
+          "false_short_acquisitions": 0,
+          "mean_control_duration_seconds": 5.76
+        },
+        "event_boundary_metrics": {
+          "boundary_frames_evaluated": 92,
+          "boundary_team_accuracy_pct": 3.260869565217391,
+          "boundary_carrier_accuracy_pct": 5.555555555555555
+        },
+        "per_state_breakdown": {
+          "NEUTRAL": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "TEAM_0": {
+            "precision": 1.0,
+            "recall": 0.04,
+            "f1": 0.07692307692307693,
+            "support": 150
+          }
+        }
+      }
+    },
+    "downstream_v1": {
+      "SNMOT-066": {
+        "pred_events_count": 0,
+        "gt_events_count": 6,
+        "matched_events": 0,
+        "transfer_precision": 0.0,
+        "transfer_recall": 0.0,
+        "transfer_f1": 0.0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 6,
+        "mean_release_frame_error": 0.0,
+        "mean_reception_frame_error": 0.0
+      },
+      "SNMOT-068": {
+        "pred_events_count": 6,
+        "gt_events_count": 12,
+        "matched_events": 2,
+        "transfer_precision": 0.3333333333333333,
+        "transfer_recall": 0.18181818181818182,
+        "transfer_f1": 0.23529411764705885,
+        "tp": 2,
+        "fp": 4,
+        "fn": 9,
+        "mean_release_frame_error": 3.0,
+        "mean_reception_frame_error": 1.0
+      },
+      "SNMOT-069": {
+        "pred_events_count": 3,
+        "gt_events_count": 2,
+        "matched_events": 0,
+        "transfer_precision": 0.0,
+        "transfer_recall": 0.0,
+        "transfer_f1": 0.0,
+        "tp": 0,
+        "fp": 2,
+        "fn": 1,
+        "mean_release_frame_error": 0.0,
+        "mean_reception_frame_error": 0.0
+      },
+      "SNMOT-070": {
+        "pred_events_count": 1,
+        "gt_events_count": 5,
+        "matched_events": 0,
+        "transfer_precision": 0.0,
+        "transfer_recall": 0.0,
+        "transfer_f1": 0.0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 5,
+        "mean_release_frame_error": 0.0,
+        "mean_reception_frame_error": 0.0
+      },
+      "SNMOT-071": {
+        "pred_events_count": 0,
+        "gt_events_count": 2,
+        "matched_events": 0,
+        "transfer_precision": 0.0,
+        "transfer_recall": 0.0,
+        "transfer_f1": 0.0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 2,
+        "mean_release_frame_error": 0.0,
+        "mean_reception_frame_error": 0.0
+      }
+    },
+    "downstream_v2": {
+      "SNMOT-066": {
+        "pred_events_count": 0,
+        "gt_events_count": 6,
+        "matched_events": 0,
+        "transfer_precision": 0.0,
+        "transfer_recall": 0.0,
+        "transfer_f1": 0.0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 6,
+        "mean_release_frame_error": 0.0,
+        "mean_reception_frame_error": 0.0
+      },
+      "SNMOT-068": {
+        "pred_events_count": 4,
+        "gt_events_count": 12,
+        "matched_events": 3,
+        "transfer_precision": 0.6666666666666666,
+        "transfer_recall": 0.18181818181818182,
+        "transfer_f1": 0.28571428571428575,
+        "tp": 2,
+        "fp": 1,
+        "fn": 9,
+        "mean_release_frame_error": 2.6666666666666665,
+        "mean_reception_frame_error": 0.3333333333333333
+      },
+      "SNMOT-069": {
+        "pred_events_count": 4,
+        "gt_events_count": 2,
+        "matched_events": 0,
+        "transfer_precision": 0.0,
+        "transfer_recall": 0.0,
+        "transfer_f1": 0.0,
+        "tp": 0,
+        "fp": 3,
+        "fn": 1,
+        "mean_release_frame_error": 0.0,
+        "mean_reception_frame_error": 0.0
+      },
+      "SNMOT-070": {
+        "pred_events_count": 1,
+        "gt_events_count": 5,
+        "matched_events": 0,
+        "transfer_precision": 0.0,
+        "transfer_recall": 0.0,
+        "transfer_f1": 0.0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 5,
+        "mean_release_frame_error": 0.0,
+        "mean_reception_frame_error": 0.0
+      },
+      "SNMOT-071": {
+        "pred_events_count": 0,
+        "gt_events_count": 2,
+        "matched_events": 0,
+        "transfer_precision": 0.0,
+        "transfer_recall": 0.0,
+        "transfer_f1": 0.0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 2,
+        "mean_release_frame_error": 0.0,
+        "mean_reception_frame_error": 0.0
+      }
+    },
+    "downstream_oracle": {
+      "SNMOT-066": {
+        "pred_events_count": 0,
+        "gt_events_count": 6,
+        "matched_events": 0,
+        "transfer_precision": 0.0,
+        "transfer_recall": 0.0,
+        "transfer_f1": 0.0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 6,
+        "mean_release_frame_error": 0.0,
+        "mean_reception_frame_error": 0.0
+      },
+      "SNMOT-068": {
+        "pred_events_count": 6,
+        "gt_events_count": 12,
+        "matched_events": 2,
+        "transfer_precision": 0.2,
+        "transfer_recall": 0.09090909090909091,
+        "transfer_f1": 0.12500000000000003,
+        "tp": 1,
+        "fp": 4,
+        "fn": 10,
+        "mean_release_frame_error": 1.0,
+        "mean_reception_frame_error": 0.0
+      },
+      "SNMOT-069": {
+        "pred_events_count": 0,
+        "gt_events_count": 2,
+        "matched_events": 0,
+        "transfer_precision": 0.0,
+        "transfer_recall": 0.0,
+        "transfer_f1": 0.0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "mean_release_frame_error": 0.0,
+        "mean_reception_frame_error": 0.0
+      },
+      "SNMOT-070": {
+        "pred_events_count": 0,
+        "gt_events_count": 5,
+        "matched_events": 0,
+        "transfer_precision": 0.0,
+        "transfer_recall": 0.0,
+        "transfer_f1": 0.0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 5,
+        "mean_release_frame_error": 0.0,
+        "mean_reception_frame_error": 0.0
+      },
+      "SNMOT-071": {
+        "pred_events_count": 0,
+        "gt_events_count": 2,
+        "matched_events": 0,
+        "transfer_precision": 0.0,
+        "transfer_recall": 0.0,
+        "transfer_f1": 0.0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 2,
+        "mean_release_frame_error": 0.0,
+        "mean_reception_frame_error": 0.0
+      }
+    }
+  }
+}
