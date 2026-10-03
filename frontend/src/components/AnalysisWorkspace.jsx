@@ -31,7 +31,9 @@ export default function AnalysisWorkspace({
       const next = { ...prev, [id]: token };
       try {
         sessionStorage.setItem("vb_analysis_tokens", JSON.stringify(next));
-      } catch {}
+      } catch {
+        // ignore storage quota errors in private browsing
+      }
       return next;
     });
   };

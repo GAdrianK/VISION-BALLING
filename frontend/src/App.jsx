@@ -5,6 +5,8 @@ import AnalysisWorkspace from "./components/AnalysisWorkspace";
 import DemoPage from "./components/DemoPage";
 import ProjectPage from "./components/ProjectPage";
 import ContactPage from "./components/ContactPage";
+import BetaPage from "./components/BetaPage";
+import PrivacyPage from "./components/PrivacyPage";
 
 export default function App() {
   const [currentPath, setCurrentPath] = useState(() => {
@@ -39,7 +41,12 @@ export default function App() {
 
   // If on root landing page, show full minimal logo page
   if (currentPath === "/") {
-    return <LandingPage onEnter={() => navigate("/analyse")} />;
+    return (
+      <LandingPage
+        onEnter={() => navigate("/analyse")}
+        onBeta={() => navigate("/beta")}
+      />
+    );
   }
 
   return (
@@ -66,11 +73,17 @@ export default function App() {
 
         {currentPath === "/project" && <ProjectPage />}
 
+        {currentPath === "/beta" && <BetaPage onNavigate={navigate} />}
+
+        {currentPath === "/privacy" && <PrivacyPage onNavigate={navigate} />}
+
         {currentPath === "/contact" && <ContactPage />}
 
         {currentPath !== "/analyse" &&
           currentPath !== "/demo" &&
           currentPath !== "/project" &&
+          currentPath !== "/beta" &&
+          currentPath !== "/privacy" &&
           currentPath !== "/contact" && (
             <AnalysisWorkspace
               initialSequenceId={selectedDemoSeq}
@@ -82,9 +95,19 @@ export default function App() {
       {/* Minimal technical footer */}
       <footer className="site-footer">
         <div>
-          <span>VISION-BALLING · v0.9.0-rc1 · INTELLIGENCE TACTIQUE ANCRÉE</span>
+          <span>VISION-BALLING · v0.9.0-rc2 · INTELLIGENCE TACTIQUE ANCRÉE</span>
         </div>
         <div style={{ display: "flex", gap: "20px" }}>
+          <a
+            href="/privacy"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate("/privacy");
+            }}
+            style={{ textDecoration: "underline" }}
+          >
+            CONFIDENTIALITÉ
+          </a>
           <a
             href="https://github.com/GAdrianK/football-intelligence-rag"
             target="_blank"

@@ -1,8 +1,8 @@
 {
   "version": "v0.9.0-rc2",
-  "generated_at": "2026-10-03T19:02:25.655581+00:00",
-  "git_commit": "a6cfb07f1735992a35c15035f225d803d12cb4cd",
-  "git_branch": "chore/security-hardening-rc2",
+  "generated_at": "2026-10-03T20:02:41.270368+00:00",
+  "git_commit": "fd0a49f0f5ae3c749b619cff7126631448b89162",
+  "git_branch": "feat/public-beta-intake",
   "gate_status": "PASSED",
   "checks": [
     {

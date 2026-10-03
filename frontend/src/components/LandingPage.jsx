@@ -1,6 +1,8 @@
 import { useEffect, useState, useCallback } from "react";
+import PropTypes from "prop-types";
+import BetaStamp from "./BetaStamp";
 
-export default function LandingPage({ onEnter }) {
+export default function LandingPage({ onEnter, onBeta }) {
   const [fading, setFading] = useState(false);
 
   const handleEnter = useCallback(() => {
@@ -55,6 +57,23 @@ export default function LandingPage({ onEnter }) {
           height="789"
           loading="eager"
         />
+
+        <div
+          className="landing-beta-stamp-slot"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (onBeta) onBeta();
+          }}
+        >
+          <BetaStamp
+            size="large"
+            showHint={false}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (onBeta) onBeta();
+            }}
+          />
+        </div>
       </div>
 
       <div className="landing-enter-cta">
@@ -63,3 +82,8 @@ export default function LandingPage({ onEnter }) {
     </main>
   );
 }
+
+LandingPage.propTypes = {
+  onEnter: PropTypes.func.isRequired,
+  onBeta: PropTypes.func,
+};

@@ -5,6 +5,7 @@ export default function MinimalHeader({ currentPath = "/analyse", onNavigate }) 
     { label: "ANALYSE", path: "/analyse" },
     { label: "DEMO", path: "/demo" },
     { label: "PROJET", path: "/project" },
+    { label: "BETA", path: "/beta", isBeta: true },
     { label: "CONTACT", path: "/contact" },
   ];
 
@@ -17,7 +18,7 @@ export default function MinimalHeader({ currentPath = "/analyse", onNavigate }) 
             <a
               key={link.path}
               href={link.path}
-              className={`nav-link ${isActive ? "active" : ""}`}
+              className={`nav-link ${isActive ? "active" : ""} ${link.isBeta ? "nav-link-beta" : ""}`}
               aria-current={isActive ? "page" : undefined}
               onClick={(e) => {
                 e.preventDefault();
