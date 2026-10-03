@@ -114,6 +114,48 @@ class GroundedTacticalRAGService:
             )
 
         # ----------------------------------------------------------------------
+        # 2b. General Football Theory Query (Source B Only)
+        # ----------------------------------------------------------------------
+        if query_scope == QueryScope.GENERAL_FOOTBALL:
+            t_kb_start = time.perf_counter()
+            kb_results = (
+                self.rag_engine.search(query_text, top_k=3, query_metadata=classification)
+                if self.rag_engine
+                else []
+            )
+            latencies["kb_retrieval_ms"] = (time.perf_counter() - t_kb_start) * 1000.0
+
+            kb_citations = [f"[tactical_kb:{r.get('source', 'tactical_kb')}]" for r in kb_results]
+
+            # Synthesize general football explanation
+            if kb_results:
+                answer_text = "### 📖 Concepts Tactiques (Base de Connaissances Théoriques)\n\n"
+                answer_text += "\n\n".join(
+                    [f"- {r['text'][:300].strip()}... [tactical_kb:{r.get('source')}]" for r in kb_results]
+                )
+            else:
+                answer_text = (
+                    "Les concepts tactiques demandés sont documentés dans la base théorique générale du football."
+                )
+
+            latencies["total_ms"] = (time.perf_counter() - t_total_start) * 1000.0
+            return GroundedMatchAnswer(
+                answer=answer_text,
+                query=query_text,
+                query_scope=QueryScope.GENERAL_FOOTBALL,
+                analysis_id=analysis_id,
+                confidence=0.9,
+                semantic_level=SemanticLevel.LEVEL_1_PHYSICAL_FACT.value,
+                match_claims=[],
+                evidence_citations=[],
+                knowledge_citations=kb_citations,
+                limitations=[],
+                coverage_note="Requête théorique générale traitée par la Base de Connaissances.",
+                is_abstention=False,
+                details={"latencies": latencies, "kb_chunks_count": len(kb_results)},
+            )
+
+        # ----------------------------------------------------------------------
         # 3. Match Evidence Retrieval (Phase 5, 27, 28)
         # ----------------------------------------------------------------------
         t_ret_start = time.perf_counter()

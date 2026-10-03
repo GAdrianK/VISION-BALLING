@@ -131,25 +131,27 @@
       "id": "fact_11",
       "category": "EXACT_FACT",
       "analysis_id": "SNMOT-071",
-      "query": "Quel est l'indice de pression mesuré à 2.0s ?",
+      "query": "Quel est l'indice de pression mesuré à 10.0s ?",
       "expected_scope": "MATCH_FACT",
       "should_abstain": false,
       "expected_event_families": [
         "PRESSURE_EPISODE"
       ],
-      "expected_semantic_level": "LEVEL_1_PHYSICAL_FACT"
+      "expected_semantic_level": "LEVEL_1_PHYSICAL_FACT",
+      "target_event_id": "press_246_343_TEAM_1"
     },
     {
       "id": "fact_12",
       "category": "EXACT_FACT",
       "analysis_id": "SNMOT-065",
-      "query": "L'équipe 0 a-t-elle subi un pressing à 1.2s ?",
+      "query": "L'équipe 0 a-t-elle subi un pressing à 8.0s ?",
       "expected_scope": "MATCH_FACT",
       "should_abstain": false,
       "expected_event_families": [
         "PRESSURE_EPISODE"
       ],
-      "expected_semantic_level": "LEVEL_1_PHYSICAL_FACT"
+      "expected_semantic_level": "LEVEL_1_PHYSICAL_FACT",
+      "target_event_id": "press_191_350_TEAM_1"
     },
     {
       "id": "time_01",

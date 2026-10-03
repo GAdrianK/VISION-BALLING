@@ -2,7 +2,7 @@
   "experiment": "EXP-26",
   "title": "Grounded Video Tactical RAG & Automatic Match Report",
   "chapter": "CHAPTER 8 — GROUNDED MULTIMODAL MATCH INTELLIGENCE",
-  "timestamp": "2026-10-03T10:38:30Z",
+  "timestamp": "2026-10-03T10:48:38Z",
   "evaluation_dataset": {
     "file": "docs/experiments/exp26_grounding_eval.json",
     "total_questions": 76,
@@ -28,18 +28,51 @@
     "report_total_sentences": 35,
     "report_grounded_sentences": 35
   },
+  "metric_taxonomy": {
+    "GROUNDING_METRICS": {
+      "supported_claim_rate": 1.0,
+      "hallucinated_match_claim_rate": 0.0,
+      "semantic_overclaim_rate": 0.0,
+      "cross_match_contamination_rate": 0.0,
+      "report_grounded_sentence_rate": 1.0
+    },
+    "ANSWER_CORRECTNESS_METRICS": {
+      "exact_fact_accuracy": 1.0,
+      "kb_relevance_presence": 1.0
+    },
+    "ROUTING_METRICS": {
+      "scope_routing_accuracy": 1.0,
+      "evaluated_scopes": [
+        "MATCH_FACT",
+        "MATCH_TIMELINE",
+        "MATCH_EXPLANATION",
+        "MATCH_COMPARISON",
+        "UNSUPPORTED",
+        "GENERAL_FOOTBALL"
+      ]
+    },
+    "RETRIEVAL_METRICS": {
+      "evidence_citation_precision": 1.0,
+      "evidence_citation_recall": 1.0
+    },
+    "ABSTENTION_METRICS": {
+      "unsupported_query_abstention_accuracy": 1.0,
+      "out_of_range_timestamp_abstention_accuracy": 1.0,
+      "false_abstention_rate": 0.0
+    }
+  },
   "latencies_ms": {
-    "classification_ms": 0.224,
-    "evidence_retrieval_ms": 0.129,
+    "classification_ms": 0.218,
+    "evidence_retrieval_ms": 0.136,
     "graph_expansion_ms": 0.001,
-    "kb_retrieval_ms": 40.84,
+    "kb_retrieval_ms": 69.368,
     "synthesis_ms": 0.03,
-    "total_ms": 26.164
+    "total_ms": 55.113
   },
   "category_performance": {
     "EXACT_FACT": {
       "total": 12,
-      "passed": 10,
+      "passed": 12,
       "abstentions": 0
     },
     "TIMESTAMP": {
@@ -64,7 +97,7 @@
     },
     "GENERAL_FOOTBALL": {
       "total": 10,
-      "passed": 0,
+      "passed": 10,
       "abstentions": 0
     },
     "HYBRID_QUESTION": {

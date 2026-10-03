@@ -171,25 +171,36 @@
       "id": "fact_11",
       "category": "EXACT_FACT",
       "analysis_id": "SNMOT-071",
-      "query": "Quel est l'indice de pression mesuré à 2.0s ?",
+      "query": "Quel est l'indice de pression mesuré à 10.0s ?",
       "query_scope": "MATCH_TIMELINE",
-      "confidence": 0.0,
-      "answer": "Les données d'analyse vidéo de cette séquence ne permettent pas d'établir d'événement tactique vérifié à t=2.0s.",
-      "evidence_citations": [],
+      "confidence": 0.713,
+      "answer": "### ⏱️ Événements et Preuves Vidéo\n- **9.80s – 13.68s** : TEAM_1 applied continuous defensive pressure on TEAM_0 (9.80–13.68s, dur: 3.88s). Mean PressureIndex: 0.55 (peak: 0.99), min defender proximity: 0.5m. [event:press_246_343_TEAM_1 | t=9.80s | conf=0.55 | HIGH]\n- **10.00s – 10.12s** : TEAM_0 ball transfer completed (10.00–10.12s). Distance: 4.2m, forward displacement: +0.0m [Confidence: 0.86]. [event:pass_251_254_TEAM_0_PASS_COMPLETED | t=10.00s | conf=0.86 | HIGH]\n- **10.32s – 10.32s** : TEAM_0 lost possession to TEAM_1 at 10.32s (frame 259). Possession confidence: 0.59 [LOW]. [event:poss_change_259_TEAM_0_to_TEAM_1 | t=10.32s | conf=0.59 | LOW]\n- **10.32s – 10.36s** : TEAM_0 ball transfer completed (10.32–10.36s). Distance: 9.1m, forward displacement: +0.0m [Confidence: 0.78]. [event:pass_259_260_TEAM_0_PASS_INTERCEPTED | t=10.32s | conf=0.78 | HIGH]\n- **10.32s – 11.36s** : Les signaux sont compatibles avec un candidat : TEAM_0 initiated defensive recovery after possession loss (10.32–11.36s). Backline retreated at -1.4m/s; centroid-ball distance shifted by +85.1m. RecoveryScore: 0.80 [Confidence: 0.80]. [event:trans_259_284_TEAM_0_DEFENSIVE_RECOVERY_CANDIDATE | t=10.32s | conf=0.80 | HIGH]\n\n**Limites méthodologiques :**\n- *Diagnostic candidate semantics; physics-derived GT evaluation*\n- *Downstream of pass detector baseline; precision limited by tracking flicker*",
+      "evidence_citations": [
+        "[event:press_246_343_TEAM_1 | t=9.80s | conf=0.55 | HIGH]",
+        "[event:pass_251_254_TEAM_0_PASS_COMPLETED | t=10.00s | conf=0.86 | HIGH]",
+        "[event:poss_change_259_TEAM_0_to_TEAM_1 | t=10.32s | conf=0.59 | LOW]",
+        "[event:pass_259_260_TEAM_0_PASS_INTERCEPTED | t=10.32s | conf=0.78 | HIGH]",
+        "[event:trans_259_284_TEAM_0_DEFENSIVE_RECOVERY_CANDIDATE | t=10.32s | conf=0.80 | HIGH]"
+      ],
       "knowledge_citations": [],
-      "is_abstention": true
+      "is_abstention": false
     },
     {
       "id": "fact_12",
       "category": "EXACT_FACT",
       "analysis_id": "SNMOT-065",
-      "query": "L'équipe 0 a-t-elle subi un pressing à 1.2s ?",
+      "query": "L'équipe 0 a-t-elle subi un pressing à 8.0s ?",
       "query_scope": "MATCH_TIMELINE",
-      "confidence": 0.0,
-      "answer": "Les données d'analyse vidéo de cette séquence ne permettent pas d'établir d'événement tactique vérifié à t=1.2s.",
-      "evidence_citations": [],
+      "confidence": 0.674,
+      "answer": "### ⏱️ Événements et Preuves Vidéo\n- **7.60s – 13.96s** : TEAM_1 applied continuous defensive pressure on TEAM_0 (7.60–13.96s, dur: 6.36s). Mean PressureIndex: 0.58 (peak: 0.64), min defender proximity: 0.2m. [event:press_191_350_TEAM_1 | t=7.60s | conf=0.58 | HIGH]\n- **7.72s – 7.72s** : TEAM_0 lost possession to TEAM_1 at 7.72s (frame 194). Possession confidence: 0.97 [HIGH]. [event:poss_change_194_TEAM_0_to_TEAM_1 | t=7.72s | conf=0.97 | HIGH]\n- **7.72s – 8.76s** : Les signaux sont compatibles avec un candidat : TEAM_0 initiated defensive recovery after possession loss (7.72–8.76s). Backline retreated at -10.6m/s; centroid-ball distance shifted by +2.0m. RecoveryScore: 0.70 [Confidence: 0.70]. [event:trans_194_219_TEAM_0_DEFENSIVE_RECOVERY_CANDIDATE | t=7.72s | conf=0.70 | HIGH]\n- **7.72s – 10.16s** : TEAM_0 applied continuous defensive pressure on TEAM_1 (7.72–10.16s, dur: 2.44s). Mean PressureIndex: 0.45 (peak: 0.62), min defender proximity: 0.8m. [event:press_194_255_TEAM_0 | t=7.72s | conf=0.44 | HIGH]\n\n**Limites méthodologiques :**\n- *Diagnostic candidate semantics; physics-derived GT evaluation*",
+      "evidence_citations": [
+        "[event:press_191_350_TEAM_1 | t=7.60s | conf=0.58 | HIGH]",
+        "[event:poss_change_194_TEAM_0_to_TEAM_1 | t=7.72s | conf=0.97 | HIGH]",
+        "[event:trans_194_219_TEAM_0_DEFENSIVE_RECOVERY_CANDIDATE | t=7.72s | conf=0.70 | HIGH]",
+        "[event:press_194_255_TEAM_0 | t=7.72s | conf=0.44 | HIGH]"
+      ],
       "knowledge_citations": [],
-      "is_abstention": true
+      "is_abstention": false
     },
     {
       "id": "time_01",

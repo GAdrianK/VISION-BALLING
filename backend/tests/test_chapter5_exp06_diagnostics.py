@@ -21,8 +21,8 @@ def test_multiple_gt_ball_ids_parsing() -> None:
     gameinfo_path = Path("/media/adriano/Windows/datasets/SoccerNetTracking2023/train/SNMOT-061/gameinfo.ini")
     gt_path = Path("/media/adriano/Windows/datasets/SoccerNetTracking2023/train/SNMOT-061/gt/gt.txt")
 
-    assert gameinfo_path.is_file()
-    assert gt_path.is_file()
+    if not (gameinfo_path.is_file() and gt_path.is_file()):
+        pytest.skip("SoccerNet dataset not mounted.")
 
     cp = configparser.ConfigParser()
     cp.read(gameinfo_path)

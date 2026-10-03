@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - main
+      - "feat/**"
+      - "release/**"
       - chore/repository-consolidation
       - feat/video-reproducibility
 

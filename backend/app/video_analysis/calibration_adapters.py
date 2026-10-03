@@ -69,20 +69,20 @@ class PnLCalibAdapter(BaseCalibrationAdapter):
 
     def __init__(
         self,
-        pnlcalib_root: Union[str, Path] = "/tmp/pnlcalib",
-        weights_kp: Union[str, Path] = "/media/adriano/Windows/runs/calibration/pnlcalib/weights/SV_kp",
-        weights_lines: Union[str, Path] = "/media/adriano/Windows/runs/calibration/pnlcalib/weights/SV_lines",
-        python_bin: Union[str, Path] = "/media/adriano/Windows/venvs/vision-balling-pnlcalib/bin/python",
+        pnlcalib_root: Optional[Union[str, Path]] = None,
+        weights_kp: Optional[Union[str, Path]] = None,
+        weights_lines: Optional[Union[str, Path]] = None,
+        python_bin: Optional[Union[str, Path]] = None,
         kp_threshold: float = 0.1,
         line_threshold: float = 0.1,
         max_reproj_err: float = 50.0,
         pitch_dimensions: Optional[PitchDimensions] = None,
     ) -> None:
         super().__init__(pitch_dimensions=pitch_dimensions)
-        self.pnlcalib_root = Path(pnlcalib_root)
-        self.weights_kp = Path(weights_kp)
-        self.weights_lines = Path(weights_lines)
-        self.python_bin = Path(python_bin)
+        self.pnlcalib_root = Path(pnlcalib_root or os.getenv("PNLCALIB_ROOT", "/tmp/pnlcalib"))
+        self.weights_kp = Path(weights_kp or os.getenv("PNLCALIB_WEIGHTS_KP", "/media/adriano/Windows/runs/calibration/pnlcalib/weights/SV_kp"))
+        self.weights_lines = Path(weights_lines or os.getenv("PNLCALIB_WEIGHTS_LINES", "/media/adriano/Windows/runs/calibration/pnlcalib/weights/SV_lines"))
+        self.python_bin = Path(python_bin or os.getenv("PNLCALIB_PYTHON_BIN", "/media/adriano/Windows/venvs/vision-balling-pnlcalib/bin/python"))
         self.kp_threshold = kp_threshold
         self.line_threshold = line_threshold
         self.max_reproj_err = max_reproj_err
@@ -264,16 +264,16 @@ class TVCalibAdapter(BaseCalibrationAdapter):
 
     def __init__(
         self,
-        tvcalib_root: Union[str, Path] = "/tmp/tvcalib",
-        checkpoint: Union[str, Path] = "/media/adriano/Windows/runs/calibration/tvcalib/weights/train_59.pt",
-        python_bin: Union[str, Path] = "/media/adriano/Windows/venvs/vision-balling-tvcalib/bin/python",
+        tvcalib_root: Optional[Union[str, Path]] = None,
+        checkpoint: Optional[Union[str, Path]] = None,
+        python_bin: Optional[Union[str, Path]] = None,
         optim_steps: int = 500,
         pitch_dimensions: Optional[PitchDimensions] = None,
     ) -> None:
         super().__init__(pitch_dimensions=pitch_dimensions)
-        self.tvcalib_root = Path(tvcalib_root)
-        self.checkpoint = Path(checkpoint)
-        self.python_bin = Path(python_bin)
+        self.tvcalib_root = Path(tvcalib_root or os.getenv("TVCALIB_ROOT", "/tmp/tvcalib"))
+        self.checkpoint = Path(checkpoint or os.getenv("TVCALIB_CHECKPOINT", "/media/adriano/Windows/runs/calibration/tvcalib/weights/train_59.pt"))
+        self.python_bin = Path(python_bin or os.getenv("TVCALIB_PYTHON_BIN", "/media/adriano/Windows/venvs/vision-balling-tvcalib/bin/python"))
         self.optim_steps = optim_steps
 
     def calibrate_image(

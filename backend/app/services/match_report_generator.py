@@ -279,6 +279,8 @@ class MatchReportGenerator:
                 limitations_set.add(lim)
 
         sec8_sentences = [
+            "Ce rapport garantit que 100% des affirmations formulées sont strictement traçables aux évidences structurées du système (EXP-25) et non inventées par le LLM.",
+            "Il ne garantit pas que les estimations amont de vision par ordinateur (détections, trajectoires, homographies) constituent une vérité terrain physique absolue exempte d'erreurs de mesure.",
             "L'analyse est soumise à la troncature du champ de vision propre aux retransmissions télévisées standard.",
             "Les inférences de pressing et de transition restent des proxies physiques sans validation sémantique humaine indépendante.",
             "L'exactitude des chaînes de passes est dépendante du bruit de tracking sur le porteur du ballon.",

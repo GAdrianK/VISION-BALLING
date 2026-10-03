@@ -18,7 +18,7 @@ Validates:
 from __future__ import annotations
 
 import random
-from typing import List, Tuple
+from typing import List, Optional, Sequence, Tuple
 
 import numpy as np
 import pytest

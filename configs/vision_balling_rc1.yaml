@@ -1,0 +1,105 @@
+# VISION-BALLING Canonical Release Configuration
+# Version: 0.9.0-rc1
+# Architecture: Chapter 5 (CV) -> Chapter 6 (Geometry) -> Chapter 7 (Tactics) -> Chapter 8 (Grounded RAG)
+
+version: "0.9.0-rc1"
+app_name: "VISION-BALLING"
+environment: "production_rc1"
+
+pipeline:
+  default_mode: "QUALITY"
+
+  modes:
+    QUALITY:
+      description: "Mode haute fidélité pour analyse tactique approfondie post-match"
+      detector:
+        model: "rfdetr" # Fallback: "yolo11s"
+        input_resolution: 960
+        confidence_threshold: 0.35
+        device: "cuda"
+      tracking:
+        algorithm: "botsort"
+        reid_enabled: true
+        reid_model: "prtreid-soccernet-baseline"
+        reid_gating: "conditional"
+      calibration:
+        adapter: "pnlcalib" # Isolé sous subprocess (GPL-2.0)
+        temporal_smoothing: true
+        smoothing_alpha: 0.85
+      throughput:
+        target_fps: 25.0
+        expected_runtime_fps: 11.4
+        strict_25_fps_guaranteed: false
+
+    LOW_LATENCY:
+      description: "Mode streaming accéléré pour réactivité en direct"
+      detector:
+        model: "yolo11n"
+        input_resolution: 640
+        confidence_threshold: 0.40
+        device: "cuda"
+      tracking:
+        algorithm: "bytetrack"
+        reid_enabled: false
+      calibration:
+        adapter: "tvcalib"
+        temporal_smoothing: true
+        smoothing_alpha: 0.70
+      throughput:
+        target_fps: 25.0
+        expected_runtime_fps: 24.2
+        strict_25_fps_guaranteed: false
+
+tactical_intelligence:
+  pitch_dimensions:
+    length_meters: 105.0
+    width_meters: 68.0
+
+  team_role_attribution:
+    algorithm: "kmeans_lab"
+    color_space: "CIE-Lab"
+    referee_exclusion: true
+
+  possession:
+    algorithm: "v2_adaptive_spatial_temporal_gating"
+    spatial_radius_meters: 1.8
+    hysteresis_frames: 5
+
+  pressure:
+    algorithm: "continuous_vector_index"
+    distance_weight: 0.50
+    closing_speed_weight: 0.30
+    density_weight: 0.20
+    discrete_labels_enabled: false # Réfuté par EXP-23
+
+  formations:
+    algorithm: "continuous_lines_and_centroids"
+    nominal_categorical_labels_enabled: false # Réfuté par EXP-21 (Troncation FOV)
+    min_visible_players_for_line: 3
+
+  event_fusion:
+    confidence_decay_per_hop: 0.90
+    max_causal_window_seconds: 4.0
+    output_contract:
+      - "TacticalEvidenceEvent"
+      - "MatchTacticalTimeline"
+      - "team_summary.json"
+      - "event_graph.json"
+
+grounded_rag:
+  truth_interface: "authoritative_structured_match_evidence"
+  general_knowledge_base: "Source_B_Tactical_Concepts"
+  retrieval:
+    hybrid_production:
+      dense_store: "qdrant"
+      dense_collection: "football_tactics"
+      sparse_retriever: "bm25"
+      reranker: "flashrank"
+      parent_doc_store: "sqlite"
+    offline_fallback:
+      retriever: "tfidf_local"
+  guardrails:
+    strict_grounding: true
+    citation_required: true
+    abstain_on_unsupported_facts: true
+    zero_hallucination_match_facts: true

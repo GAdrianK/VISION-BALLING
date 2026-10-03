@@ -246,6 +246,26 @@ class QueryClassifier:
         if not has_video_indicators:
             return QueryScope.GENERAL_FOOTBALL
 
+        # Vérification si la question est purement conceptuelle/théorique malgré le contexte vidéo
+        general_theory_keywords = [
+            "c'est quoi", "qu'est-ce que", "qu'est-ce qu'", "définition", "explique ce qu'est",
+            "comment fonctionne", "rôle du", "principes du", "différence entre", "avantages du",
+            "avantages", "comment ", "quels sont", "quelles sont", "quel est le rôle",
+            "définir", "organisation de", "principes de"
+        ]
+        has_match_anchors = (
+            temporal_info["timestamp"] is not None
+            or temporal_info["time_range"] is not None
+            or temporal_info["frame"] is not None
+            or team_target is not None
+            or any(kw in msg_lower for kw in [
+                "cette vidéo", "ce match", "dans ce match", "dans la vidéo", "l'action",
+                "la perte à", "le pressing à", "souffert après", "ont réagi"
+            ])
+        )
+        if any(kw in msg_lower for kw in general_theory_keywords) and not has_match_anchors:
+            return QueryScope.GENERAL_FOOTBALL
+
         # A. MATCH_COMPARISON : comparaisons inter-équipes ou agrégats globaux
         comp_keywords = [
             "qui a pressé le plus", "plus pressé", "pressé le plus", "plus compact",

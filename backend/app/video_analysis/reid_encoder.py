@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import os
 from pathlib import Path
 from typing import Any, Callable
 
@@ -11,7 +12,9 @@ import torch.nn.functional as F
 
 EXPECTED_PRTREID_MD5 = "9633825232bc89f23a94522c5561650e"
 EXPECTED_PRTREID_SHA256 = "1304562c4c930a4a54bbf2d44e221eb911fe31408f6875c5058b2d6ed621cf3b"
-DEFAULT_REID_CKPT_PATH = Path("/media/adriano/Windows/runs/reid/prtreid-soccernet-baseline.pth.tar")
+DEFAULT_REID_CKPT_PATH = Path(
+    os.getenv("REID_CKPT_PATH", "/media/adriano/Windows/runs/reid/prtreid-soccernet-baseline.pth.tar")
+)
 
 # Sports-specific appearance embedding specification
 EMBEDDING_DIM: int = 256
