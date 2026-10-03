@@ -48,6 +48,25 @@ export default function LandingPage({ onEnter, onBeta }) {
       tabIndex={0}
       aria-label="Entrer dans l'application VISION-BALLING"
     >
+      {/* 1. Large Upper-Left Red BETA Rubber Stamp (Art Direction Anchor) */}
+      <div
+        className="landing-beta-hero-slot"
+        onClick={(e) => {
+          e.stopPropagation();
+          if (onBeta) onBeta();
+        }}
+      >
+        <BetaStamp
+          size="hero"
+          variant="classic"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (onBeta) onBeta();
+          }}
+        />
+      </div>
+
+      {/* 2. Dominant Central / Lower-Centered VISION-BALLING Logo */}
       <div className="landing-logo-container">
         <img
           src="/brand/vision-balling-logo.png"
@@ -57,23 +76,6 @@ export default function LandingPage({ onEnter, onBeta }) {
           height="789"
           loading="eager"
         />
-
-        <div
-          className="landing-beta-stamp-slot"
-          onClick={(e) => {
-            e.stopPropagation();
-            if (onBeta) onBeta();
-          }}
-        >
-          <BetaStamp
-            size="large"
-            showHint={false}
-            onClick={(e) => {
-              e.stopPropagation();
-              if (onBeta) onBeta();
-            }}
-          />
-        </div>
       </div>
 
       <div className="landing-enter-cta">

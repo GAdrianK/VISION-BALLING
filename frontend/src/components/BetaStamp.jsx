@@ -2,6 +2,7 @@ import PropTypes from "prop-types";
 
 export default function BetaStamp({
   size = "large",
+  variant = "classic",
   className = "",
   onClick = null,
   showHint = false,
@@ -15,9 +16,16 @@ export default function BetaStamp({
     }
   };
 
+  const sizeClass =
+    size === "hero"
+      ? "beta-stamp-hero"
+      : size === "small"
+      ? "beta-stamp-small"
+      : "beta-stamp-large";
+
   return (
     <div
-      className={`beta-stamp-wrapper ${size === "small" ? "beta-stamp-small" : "beta-stamp-large"} ${
+      className={`beta-stamp-wrapper ${sizeClass} ${
         isInteractive ? "beta-stamp-interactive" : ""
       } ${className}`}
       onClick={onClick}
@@ -34,7 +42,7 @@ export default function BetaStamp({
           className="beta-stamp-svg"
           aria-hidden="true"
         >
-          {/* Subtle distressed / textured filter */}
+          {/* Subtle distressed / textured filter for real ink rubber-stamp feel */}
           <defs>
             <filter id="stamp-ink-distress" x="-5%" y="-5%" width="110%" height="110%">
               <feTurbulence
@@ -53,42 +61,61 @@ export default function BetaStamp({
             </filter>
           </defs>
 
-          {/* Outer thick border with authentic stamp imperfection */}
-          <rect
-            x="2"
-            y="2"
-            width="132"
-            height="42"
-            rx="2"
-            stroke="currentColor"
-            strokeWidth="2.75"
-            filter="url(#stamp-ink-distress)"
-          />
+          {variant === "broken" ? (
+            /* Variant B — Subtle broken lines suggesting the stamp plate */
+            <g stroke="currentColor" strokeWidth="2" opacity="0.88">
+              {/* Corner ticks */}
+              <path d="M 3 14 L 3 3 L 18 3" />
+              <path d="M 118 3 L 133 3 L 133 14" />
+              <path d="M 3 32 L 3 43 L 18 43" />
+              <path d="M 118 43 L 133 43 L 133 32" />
+              {/* Minimal center indicators */}
+              <line x1="62" y1="3" x2="74" y2="3" strokeDasharray="3 3" />
+              <line x1="62" y1="43" x2="74" y2="43" strokeDasharray="3 3" />
+            </g>
+          ) : (
+            /* Variant A — Classic rectangular double border rubber stamp */
+            <>
+              {/* Outer thick border with authentic stamp imperfection */}
+              <rect
+                x="2"
+                y="2"
+                width="132"
+                height="42"
+                rx="2"
+                stroke="currentColor"
+                strokeWidth="2.75"
+                filter="url(#stamp-ink-distress)"
+              />
 
-          {/* Inner thin border with slight print gaps */}
-          <rect
-            x="6"
-            y="6"
-            width="124"
-            height="34"
-            rx="1"
-            stroke="currentColor"
-            strokeWidth="1"
-            strokeDasharray="40 2 24 1.5 50 2"
-            opacity="0.9"
-          />
+              {/* Inner thin border with slight print gaps */}
+              <rect
+                x="6"
+                y="6"
+                width="124"
+                height="34"
+                rx="1"
+                stroke="currentColor"
+                strokeWidth="1"
+                strokeDasharray="40 2 24 1.5 50 2"
+                opacity="0.9"
+              />
+            </>
+          )}
 
-          {/* Stamp Typography */}
+          {/* Stamp Typography: uppercase condensed/mono bold */}
           <text
             x="50%"
             y="54%"
             textAnchor="middle"
             dominantBaseline="middle"
             fill="currentColor"
-            fontFamily="var(--font-mono), monospace"
-            fontWeight="900"
+            style={{
+              fontFamily: "var(--font-mono), 'JetBrains Mono', 'Fira Code', monospace",
+              fontWeight: 900,
+            }}
             fontSize="23"
-            letterSpacing="0.2em"
+            letterSpacing="0.22em"
           >
             BETA
           </text>
@@ -101,7 +128,8 @@ export default function BetaStamp({
 }
 
 BetaStamp.propTypes = {
-  size: PropTypes.oneOf(["small", "large"]),
+  size: PropTypes.oneOf(["small", "large", "hero"]),
+  variant: PropTypes.oneOf(["classic", "broken"]),
   className: PropTypes.string,
   onClick: PropTypes.func,
   showHint: PropTypes.bool,

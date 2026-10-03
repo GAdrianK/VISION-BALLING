@@ -207,13 +207,26 @@ h1, h2, h3, h4, h5, h6 {
   cursor: pointer;
   user-select: none;
   padding: 24px;
+  overflow: hidden;
 }
 
+/* 1. Large Upper-Left Red BETA Rubber Stamp Slot (Art Direction Anchor) */
+.landing-beta-hero-slot {
+  position: absolute;
+  top: clamp(40px, 15vh, 160px);
+  left: clamp(28px, 13vw, 220px);
+  z-index: 10;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* 2. Dominant Central / Lower-Centered VISION-BALLING Logo */
 .landing-logo-container {
   width: 100%;
   max-width: 520px;
   text-align: center;
   position: relative;
+  transform: translateY(28px);
   transition: transform var(--transition-fast), opacity var(--transition-fast);
 }
 
@@ -662,22 +675,45 @@ h1, h2, h3, h4, h5, h6 {
   user-select: none;
   mix-blend-mode: multiply;
   opacity: 0.94;
+  transition: transform 220ms ease, opacity 220ms ease;
+}
+
+.beta-stamp-small {
   transform: rotate(-8.5deg);
-  transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+
+.beta-stamp-large {
+  transform: rotate(-8.5deg);
+}
+
+.beta-stamp-hero {
+  transform: rotate(-17deg);
 }
 
 .beta-stamp-interactive {
   cursor: pointer;
 }
 
-.beta-stamp-interactive:hover {
+.beta-stamp-small.beta-stamp-interactive:hover,
+.beta-stamp-large.beta-stamp-interactive:hover {
   transform: rotate(-8.5deg) scale(1.03);
+  opacity: 1;
+}
+
+.beta-stamp-hero.beta-stamp-interactive:hover {
+  transform: rotate(-17.8deg) scale(1.015);
   opacity: 1;
 }
 
 .beta-stamp-interactive:focus-visible {
   outline: 2px solid var(--beta-red);
   outline-offset: 4px;
+}
+
+.beta-stamp-hero .beta-stamp-svg {
+  width: clamp(240px, 20vw, 310px);
+  height: auto;
+  display: block;
 }
 
 .beta-stamp-large .beta-stamp-svg {
@@ -692,6 +728,11 @@ h1, h2, h3, h4, h5, h6 {
   display: block;
 }
 
+.beta-stamp-svg text {
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+  font-weight: 900;
+}
+
 .beta-stamp-subhint {
   font-family: var(--font-mono);
   font-size: 9px;
@@ -703,25 +744,48 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: 4px;
 }
 
-/* Landing Slot */
-.landing-beta-stamp-slot {
-  position: absolute;
-  right: 0px;
-  bottom: 58px;
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+/* Responsive Landing Composition: Desktop -> Tablet -> Mobile */
+@media (max-width: 960px) {
+  .landing-logo-container {
+    max-width: 390px;
+    transform: translateY(22px);
+  }
+
+  .landing-beta-hero-slot {
+    top: clamp(36px, 12vh, 110px);
+    left: clamp(24px, 9vw, 110px);
+  }
+
+  .beta-stamp-hero .beta-stamp-svg {
+    width: clamp(180px, 23vw, 225px);
+  }
 }
 
 @media (max-width: 600px) {
-  .landing-beta-stamp-slot {
-    right: -2px;
-    bottom: 38px;
+  .landing-shell {
+    padding: 20px 16px;
   }
-  .beta-stamp-large .beta-stamp-svg {
-    width: 86px;
-    height: 29px;
+
+  .landing-logo-container {
+    max-width: 280px;
+    transform: translateY(20px);
+  }
+
+  .landing-beta-hero-slot {
+    top: clamp(28px, 7vh, 55px);
+    left: clamp(16px, 5vw, 32px);
+  }
+
+  .beta-stamp-hero {
+    transform: rotate(-15.5deg);
+  }
+
+  .beta-stamp-hero.beta-stamp-interactive:hover {
+    transform: rotate(-16.5deg) scale(1.015);
+  }
+
+  .beta-stamp-hero .beta-stamp-svg {
+    width: clamp(135px, 38vw, 165px);
   }
 }
 
