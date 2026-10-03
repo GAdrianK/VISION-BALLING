@@ -14,6 +14,33 @@ class VideoValidationError(ValueError):
     pass
 
 
+def validate_video_magic_bytes(path: Path) -> None:
+    """Verifies that the file header matches valid video container magic bytes."""
+    if not path.is_file():
+        raise VideoValidationError("Le fichier vidéo est introuvable.")
+    with open(path, "rb") as f:
+        header = f.read(32)
+    if len(header) < 8:
+        raise VideoValidationError("En-tête de fichier vidéo tronqué ou invalide.")
+
+    # MP4 / MOV / ISO base media file format (box signature at bytes 4..8)
+    if len(header) >= 8 and header[4:8] in (
+        b"ftyp", b"moov", b"mdat", b"wide", b"skip", b"free", b"pnot", b"pict"
+    ):
+        return
+    # MKV / WebM (EBML ID)
+    if header.startswith(b"\x1a\x45\xdf\xa3"):
+        return
+    # AVI (RIFF .... AVI )
+    if header.startswith(b"RIFF") and len(header) >= 12 and header[8:12] == b"AVI ":
+        return
+
+    raise VideoValidationError(
+        "Signature de conteneur vidéo non reconnue (magic bytes invalides). "
+        "Seuls les conteneurs MP4, MOV, MKV, WebM et AVI standards sont acceptés."
+    )
+
+
 class VideoValidator:
     def __init__(
         self,
@@ -46,6 +73,7 @@ class VideoValidator:
             raise VideoValidationError(
                 "La vidéo dépasse la taille maximale configurée."
             )
+        validate_video_magic_bytes(path)
         free_bytes = shutil.disk_usage(path.parent).free
         if free_bytes < self.minimum_free_bytes:
             raise VideoValidationError(

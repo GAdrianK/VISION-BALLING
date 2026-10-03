@@ -34,3 +34,43 @@ def test_invalid_video_settings_are_rejected(field: str, value: float):
         Settings(**{field: value})
 
     assert field in str(error.value)
+
+
+def test_production_security_validation():
+    # Production with wildcard origins must fail
+    with pytest.raises(ValidationError) as exc:
+        Settings(APP_ENV="production", ALLOWED_ORIGINS="*")
+    assert "ALLOWED_ORIGINS cannot be '*'" in str(exc.value)
+
+    # Production with empty origins must fail
+    with pytest.raises(ValidationError) as exc:
+        Settings(APP_ENV="production", ALLOWED_ORIGINS="")
+    assert "ALLOWED_ORIGINS" in str(exc.value)
+
+    # Invalid APP_ENV must fail
+    with pytest.raises(ValidationError) as exc:
+        Settings(APP_ENV="staging_insecure")
+    assert "APP_ENV must be one of" in str(exc.value)
+
+    # Production with explicit origin succeeds
+    prod_settings = Settings(
+        APP_ENV="production",
+        ALLOWED_ORIGINS="https://app.vision-balling.com, https://admin.vision-balling.com",
+    )
+    assert prod_settings.cors_allowed_origins == [
+        "https://app.vision-balling.com",
+        "https://admin.vision-balling.com",
+    ]
+    assert prod_settings.is_docs_enabled is False
+
+
+def test_docs_toggle_behavior():
+    dev_settings = Settings(APP_ENV="development")
+    assert dev_settings.is_docs_enabled is True
+
+    prod_settings = Settings(
+        APP_ENV="production",
+        ALLOWED_ORIGINS="https://app.vision-balling.com",
+        ENABLE_DOCS=True,
+    )
+    assert prod_settings.is_docs_enabled is True

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import hmac
 from pathlib import Path
 
 from fastapi import (
@@ -8,7 +10,9 @@ from fastapi import (
     Depends,
     File,
     Form,
+    Header,
     HTTPException,
+    Query,
     UploadFile,
 )
 from fastapi.responses import FileResponse
@@ -28,17 +32,89 @@ from app.video_analysis.validation import VideoValidationError
 
 router = APIRouter(prefix="/api/video-analysis", tags=["video-analysis"])
 
-
-@router.get("/diagnostics/backend")
-def video_backend_diagnostics() -> dict:
-    return diagnose_video_backend().__dict__
-
-
 _service = VideoAnalysisService(settings)
 
 
 def get_video_analysis_service() -> VideoAnalysisService:
     return _service
+
+
+DEMO_ANALYSIS_IDS = {
+    "SNMOT-068",
+    "SNMOT-069",
+    "DEMO_SNMOT068",
+    "DEMO_SNMOT069",
+    "DEMO-068",
+    "DEMO-069",
+    "GOLDEN-01-BROADCAST",
+}
+
+
+def is_demo_analysis(analysis_id: str) -> bool:
+    """Checks whether an analysis ID refers to an immutable public demo sequence."""
+    return analysis_id.strip().upper() in DEMO_ANALYSIS_IDS
+
+
+def verify_analysis_access(
+    analysis_id: str,
+    authorization: str | None = Header(default=None),
+    x_analysis_token: str | None = Header(default=None),
+    token: str | None = Query(default=None),
+    service: VideoAnalysisService = Depends(get_video_analysis_service),
+) -> AnalysisJob | None:
+    """Enforces capability-based authorization for video analyses.
+
+    Public demo sequences are accessible without credentials.
+    Real uploaded analyses require the matching bearer token or header.
+    """
+    if is_demo_analysis(analysis_id):
+        return None
+
+    try:
+        job = service.storage.load_job(analysis_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail="Analyse introuvable.") from exc
+
+    if job is None:
+        raise HTTPException(status_code=404, detail="Analyse introuvable.")
+
+    if not settings.REQUIRE_ANALYSIS_TOKEN:
+        return job
+
+    if job.access_token_hash:
+        provided = None
+        if authorization and authorization.lower().startswith("bearer "):
+            provided = authorization[7:].strip()
+        elif x_analysis_token:
+            provided = x_analysis_token.strip()
+        elif token:
+            provided = token.strip()
+
+        if not provided:
+            raise HTTPException(
+                status_code=401,
+                detail="Accès refusé : token d'autorisation requis pour cette analyse.",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
+        candidate_hash = hashlib.sha256(provided.encode("utf-8")).hexdigest()
+        if not hmac.compare_digest(candidate_hash, job.access_token_hash):
+            raise HTTPException(
+                status_code=403,
+                detail="Accès interdit : token d'autorisation invalide pour cette analyse.",
+            )
+
+    return job
+
+
+@router.get("/diagnostics/backend")
+def video_backend_diagnostics() -> dict:
+    if settings.APP_ENV == "production":
+        raise HTTPException(
+            status_code=404,
+            detail="Diagnostics internes désactivés en environnement de production.",
+        )
+    return diagnose_video_backend().__dict__
 
 
 @router.post("", response_model=AnalysisCreated, status_code=202)
@@ -77,7 +153,10 @@ async def create_analysis(
 def get_analysis(
     analysis_id: str,
     service: VideoAnalysisService = Depends(get_video_analysis_service),
+    _access: AnalysisJob | None = Depends(verify_analysis_access),
 ) -> AnalysisJob:
+    if _access is not None:
+        return _access
     try:
         job = service.storage.load_job(analysis_id)
     except ValueError as exc:
@@ -91,6 +170,7 @@ def get_analysis(
 def get_detections(
     analysis_id: str,
     service: VideoAnalysisService = Depends(get_video_analysis_service),
+    _access: AnalysisJob | None = Depends(verify_analysis_access),
 ) -> AnalysisResult:
     try:
         result = service.storage.load_result(analysis_id)
@@ -107,8 +187,9 @@ def get_detections(
 def list_artifacts(
     analysis_id: str,
     service: VideoAnalysisService = Depends(get_video_analysis_service),
+    _access: AnalysisJob | None = Depends(verify_analysis_access),
 ) -> ArtifactList:
-    job = get_analysis(analysis_id, service)
+    job = _access or get_analysis(analysis_id, service, _access)
     mapping = {
         "annotated_video": ("video/mp4", job.artifacts.annotated_video),
         "detections_json": ("application/json", job.artifacts.detections_json),
@@ -129,6 +210,7 @@ def download_artifact(
     analysis_id: str,
     artifact_name: str,
     service: VideoAnalysisService = Depends(get_video_analysis_service),
+    _access: AnalysisJob | None = Depends(verify_analysis_access),
 ) -> FileResponse:
     filenames = {
         "annotated_video": ("annotated.mp4", "video/mp4"),
@@ -139,7 +221,10 @@ def download_artifact(
         raise HTTPException(status_code=404, detail="Artefact inconnu.")
     filename, media_type = filenames[artifact_name]
     try:
-        path = service.storage.analysis_dir(analysis_id) / filename
+        session_dir = service.storage.analysis_dir(analysis_id)
+        path = (session_dir / filename).resolve()
+        if not str(path).startswith(str(session_dir.resolve())):
+            raise HTTPException(status_code=403, detail="Accès interdit.")
     except ValueError as exc:
         raise HTTPException(status_code=404, detail="Artefact introuvable.") from exc
     if not path.is_file():
@@ -187,6 +272,7 @@ def query_video_analysis(
     analysis_id: str,
     payload: VideoAnalysisQueryRequest,
     rag_service: GroundedTacticalRAGService = Depends(get_grounded_rag_service),
+    _access: AnalysisJob | None = Depends(verify_analysis_access),
 ) -> GroundedMatchAnswer:
     """Interroge les évidences tactiques validées de la vidéo analysée avec ancrage strict."""
     try:
@@ -201,19 +287,29 @@ def query_video_analysis(
 
 
 def _resolve_evidence_dir(analysis_id: str, service: VideoAnalysisService) -> Path:
+    if is_demo_analysis(analysis_id):
+        return Path("docs/experiments/exp25_outputs")
+
     try:
         session_dir = service.storage.analysis_dir(analysis_id)
         if (session_dir / "tactical_events.json").is_file():
             return session_dir
     except Exception:
         pass
-    return Path("docs/experiments/exp25_outputs")
+
+    # FAIL CLOSED: Never fallback to demo data for a real uploaded analysis!
+    raise HTTPException(
+        status_code=404,
+        detail=f"Les preuves tactiques ne sont pas disponibles pour l'analyse '{analysis_id}'. "
+               f"Le traitement est peut-être encore en cours ou a échoué.",
+    )
 
 
 @router.get("/{analysis_id}/timeline")
 def get_video_analysis_timeline(
     analysis_id: str,
     service: VideoAnalysisService = Depends(get_video_analysis_service),
+    _access: AnalysisJob | None = Depends(verify_analysis_access),
 ) -> list:
     """Renvoie la chronologie ordonnée des événements tactiques de la vidéo."""
     ev_dir = _resolve_evidence_dir(analysis_id, service)
@@ -227,6 +323,7 @@ def get_video_analysis_timeline(
 def get_video_analysis_events(
     analysis_id: str,
     service: VideoAnalysisService = Depends(get_video_analysis_service),
+    _access: AnalysisJob | None = Depends(verify_analysis_access),
 ) -> list:
     """Renvoie l'index complet des événements probants de la vidéo."""
     ev_dir = _resolve_evidence_dir(analysis_id, service)
@@ -240,6 +337,7 @@ def get_video_analysis_events(
 def get_video_analysis_summary(
     analysis_id: str,
     service: VideoAnalysisService = Depends(get_video_analysis_service),
+    _access: AnalysisJob | None = Depends(verify_analysis_access),
 ) -> dict:
     """Renvoie les agrégats tactiques et bandes de fiabilité par équipe."""
     ev_dir = _resolve_evidence_dir(analysis_id, service)
@@ -254,6 +352,7 @@ def get_video_analysis_summary(
 def generate_video_analysis_report(
     analysis_id: str,
     service: VideoAnalysisService = Depends(get_video_analysis_service),
+    _access: AnalysisJob | None = Depends(verify_analysis_access),
 ) -> MatchReportResponse:
     """Génère le rapport d'intelligence tactique 100% ancré pour la vidéo."""
     try:
@@ -262,3 +361,4 @@ def generate_video_analysis_report(
         return generator.generate_report(analysis_id)
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Erreur de génération du rapport : {exc}") from exc
+

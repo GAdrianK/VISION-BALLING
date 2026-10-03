@@ -34,7 +34,7 @@ def verify_checkpoint_hash(
         raise FileNotFoundError(f"ReID checkpoint not found: {path}")
 
     sha256_hasher = hashlib.sha256()
-    md5_hasher = hashlib.md5()
+    md5_hasher = hashlib.md5(usedforsecurity=False)
     with open(path, "rb") as f:
         while chunk := f.read(1024 * 1024):
             sha256_hasher.update(chunk)

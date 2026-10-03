@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { marked } from "marked";
+import DOMPurify from "dompurify";
 import TacticalTimeline from "./TacticalTimeline";
 import EvidenceCards from "./EvidenceCards";
 import GroundedAIPanel from "./GroundedAIPanel";
@@ -16,6 +17,24 @@ export default function AnalysisWorkspace({
   const [pipelineMode, setPipelineMode] = useState("QUALITY");
   const [activeTab, setActiveTab] = useState("events"); // "events" | "report" | "qa"
   const [lookupJobId, setLookupJobId] = useState("");
+  const [sessionTokens, setSessionTokens] = useState(() => {
+    try {
+      return JSON.parse(sessionStorage.getItem("vb_analysis_tokens") || "{}");
+    } catch {
+      return {};
+    }
+  });
+
+  const saveToken = (id, token) => {
+    if (!id || !token) return;
+    setSessionTokens((prev) => {
+      const next = { ...prev, [id]: token };
+      try {
+        sessionStorage.setItem("vb_analysis_tokens", JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  };
 
   // Job status state machine: null | "PROCESSING" | "FAILED" | "COMPLETED"
   const [jobState, setJobState] = useState(null);
@@ -77,9 +96,18 @@ export default function AnalysisWorkspace({
     }
   };
 
-  const loadJobById = async (analysisId) => {
-    const cleanId = (analysisId || lookupJobId).trim();
-    if (!cleanId) return;
+  const loadJobById = async (analysisId, explicitToken) => {
+    const rawInput = (analysisId || lookupJobId).trim();
+    if (!rawInput) return;
+
+    let cleanId = rawInput;
+    let token = explicitToken || sessionTokens[rawInput];
+    if (rawInput.includes(":")) {
+      const parts = rawInput.split(":");
+      cleanId = parts[0].trim();
+      token = parts[1].trim();
+      saveToken(cleanId, token);
+    }
 
     if (pollTimerRef.current) clearInterval(pollTimerRef.current);
     setJobState("PROCESSING");
@@ -87,14 +115,19 @@ export default function AnalysisWorkspace({
     setJobError(null);
     setActiveAnalysis(null);
 
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
     try {
-      const res = await fetch(`${API_BASE}/api/video-analysis/${cleanId}`);
+      const res = await fetch(`${API_BASE}/api/video-analysis/${cleanId}`, { headers });
       if (!res.ok) {
         setJobState("FAILED");
         setJobError({
           analysisId: cleanId,
-          code: "not_found",
-          message: `Session d'analyse '${cleanId}' introuvable sur le serveur.`,
+          code: res.status === 401 ? "unauthorized" : "not_found",
+          message:
+            res.status === 401
+              ? `Accès non autorisé à l'analyse '${cleanId}'. Un token d'accès valide est requis.`
+              : `Session d'analyse '${cleanId}' introuvable sur le serveur.`,
         });
         return;
       }
@@ -111,12 +144,12 @@ export default function AnalysisWorkspace({
       }
 
       if (job.status === "completed") {
-        await loadRealAnalysisData(job);
+        await loadRealAnalysisData(job, token);
         return;
       }
 
       // If pending or processing, start polling
-      startPollingJob(cleanId);
+      startPollingJob(cleanId, token);
     } catch (err) {
       setJobState("FAILED");
       setJobError({
@@ -127,13 +160,15 @@ export default function AnalysisWorkspace({
     }
   };
 
-  const loadRealAnalysisData = async (job) => {
+  const loadRealAnalysisData = async (job, explicitToken) => {
     const analysisId = job.analysis_id;
+    const token = explicitToken || sessionTokens[analysisId];
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
     try {
       const [summaryRes, eventsRes, reportRes] = await Promise.all([
-        fetch(`${API_BASE}/api/video-analysis/${analysisId}/summary`),
-        fetch(`${API_BASE}/api/video-analysis/${analysisId}/events`),
-        fetch(`${API_BASE}/api/video-analysis/${analysisId}/report`, { method: "POST" }),
+        fetch(`${API_BASE}/api/video-analysis/${analysisId}/summary`, { headers }),
+        fetch(`${API_BASE}/api/video-analysis/${analysisId}/events`, { headers }),
+        fetch(`${API_BASE}/api/video-analysis/${analysisId}/report`, { method: "POST", headers }),
       ]);
 
       const summaryData = summaryRes.ok ? await summaryRes.json() : {};
@@ -151,7 +186,7 @@ export default function AnalysisWorkspace({
         mode: job.pipeline?.mode || job.mode || pipelineMode,
         throughputFps: (job.pipeline?.mode || job.mode) === "QUALITY" ? 11.4 : 24.2,
         strict25Fps: false,
-        videoUrl: `${API_BASE}/api/video-analysis/${analysisId}/artifacts/annotated_video`,
+        videoUrl: `${API_BASE}/api/video-analysis/${analysisId}/artifacts/annotated_video${token ? `?token=${encodeURIComponent(token)}` : ""}`,
         summary: activeSummary,
         events: eventsData,
         report: reportData.markdown_report,
@@ -177,12 +212,14 @@ export default function AnalysisWorkspace({
     }
   };
 
-  const startPollingJob = (analysisId) => {
+  const startPollingJob = (analysisId, explicitToken) => {
+    const token = explicitToken || sessionTokens[analysisId];
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
     if (pollTimerRef.current) clearInterval(pollTimerRef.current);
 
     pollTimerRef.current = setInterval(async () => {
       try {
-        const res = await fetch(`${API_BASE}/api/video-analysis/${analysisId}`);
+        const res = await fetch(`${API_BASE}/api/video-analysis/${analysisId}`, { headers });
         if (!res.ok) return;
 
         const job = await res.json();
@@ -205,7 +242,7 @@ export default function AnalysisWorkspace({
 
         if (job.status === "completed") {
           clearInterval(pollTimerRef.current);
-          await loadRealAnalysisData(job);
+          await loadRealAnalysisData(job, token);
         }
       } catch (err) {
         console.error("Erreur de suivi du job:", err);
@@ -243,6 +280,9 @@ export default function AnalysisWorkspace({
       }
 
       const job = await res.json();
+      if (job.access_token) {
+        saveToken(job.analysis_id, job.access_token);
+      }
       setJobProgress({
         percent: 15,
         step: "Job enregistré. Lancement du pipeline vidéo réel...",
@@ -250,7 +290,7 @@ export default function AnalysisWorkspace({
       });
 
       // Poll until finished
-      startPollingJob(job.analysis_id);
+      startPollingJob(job.analysis_id, job.access_token);
     } catch (err) {
       setJobState("FAILED");
       setJobError({
@@ -670,7 +710,9 @@ export default function AnalysisWorkspace({
                 <div
                   className="report-content"
                   dangerouslySetInnerHTML={{
-                    __html: marked.parse(activeAnalysis.report || "Aucun rapport généré."),
+                    __html: DOMPurify.sanitize(
+                      marked.parse(activeAnalysis.report || "Aucun rapport généré.")
+                    ),
                   }}
                 />
               </div>

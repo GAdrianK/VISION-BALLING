@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import os
 from pathlib import Path
 
-from pydantic import Field
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Chemin vers la racine du dossier backend
@@ -9,6 +11,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 class Settings(BaseSettings):
+    APP_ENV: str = Field(default="development")
+    PUBLIC_UPLOAD_ENABLED: bool = Field(default=False)
+    REQUIRE_ANALYSIS_TOKEN: bool = Field(default=True)
+    ENABLE_LEGACY_SQL_API: bool = Field(default=False)
+    ENABLE_DOCS: bool | None = Field(default=None)
+    MAX_CONCURRENT_ANALYSES: int = Field(default=1, ge=1)
+
     OPENAI_API_KEY: str = "mock-local-only"
     GEMINI_API_KEY: str = ""
     GOOGLE_API_KEY: str = ""
@@ -30,6 +39,21 @@ class Settings(BaseSettings):
 
     ALLOWED_ORIGINS: str = "*"
 
+    @property
+    def cors_allowed_origins(self) -> list[str]:
+        raw = self.ALLOWED_ORIGINS.strip()
+        if not raw:
+            return []
+        if raw == "*":
+            return ["*"]
+        return [o.strip() for o in raw.split(",") if o.strip()]
+
+    @property
+    def is_docs_enabled(self) -> bool:
+        if self.ENABLE_DOCS is not None:
+            return self.ENABLE_DOCS
+        return self.APP_ENV != "production"
+
     RAW_DATA_DIR: str = ""
     PROCESSED_DATA_DIR: str = ""
     QDRANT_URL: str = ":memory:"
@@ -46,7 +70,7 @@ class Settings(BaseSettings):
     VIDEO_FRAME_SAMPLE_RATE: int = Field(default=1, ge=1)
     VIDEO_MODE: str = "QUALITY"
     VIDEO_DETECTOR: str = "rfdetr"
-    VIDEO_MODEL_PATH: str = "/media/adriano/Windows/runs/detect/exp04_rfdetr_small_h250_960/checkpoint_best_total.pth"
+    VIDEO_MODEL_PATH: str = ""
     VIDEO_MODEL_PROFILE: str = "football"
     VIDEO_CONFIDENCE_THRESHOLD: float = 0.35
     VIDEO_PERSON_CONFIDENCE_THRESHOLD: float = 0.35
@@ -101,6 +125,36 @@ class Settings(BaseSettings):
 
     def get_video_result_dir(self) -> str:
         return self.VIDEO_RESULT_DIR or str(BASE_DIR / "data" / "video_results")
+
+    def get_rfdetr_checkpoint_path(self) -> Path:
+        if self.VIDEO_MODEL_PATH and self.VIDEO_MODEL_PATH.strip():
+            return Path(self.VIDEO_MODEL_PATH.strip())
+        env_ckpt = os.getenv("RFDETR_CHECKPOINT_PATH", "").strip()
+        if env_ckpt:
+            return Path(env_ckpt)
+        if self.APP_ENV != "production":
+            dev_candidate = Path(
+                "/media/adriano/Windows/runs/detect/exp04_rfdetr_small_h250_960/checkpoint_best_total.pth"
+            )
+            if dev_candidate.is_file():
+                return dev_candidate
+        return Path("/opt/models/rfdetr/checkpoint_best_total.pth")
+
+    @model_validator(mode="after")
+    def validate_production_security(self) -> Settings:
+        env = (self.APP_ENV or "").strip().lower()
+        if env not in ("development", "test", "production"):
+            raise ValueError(
+                f"APP_ENV must be one of: 'development', 'test', 'production', got '{self.APP_ENV}'"
+            )
+        if env == "production":
+            allowed = self.ALLOWED_ORIGINS.strip()
+            if allowed == "*" or not allowed:
+                raise ValueError(
+                    "Production security violation: ALLOWED_ORIGINS cannot be '*' or empty in production mode. "
+                    "Specify explicit allowed origin(s), e.g. 'https://app.vision-balling.com'."
+                )
+        return self
 
     # Recherche le fichier .env dans le dossier racine du backend
     model_config = SettingsConfigDict(

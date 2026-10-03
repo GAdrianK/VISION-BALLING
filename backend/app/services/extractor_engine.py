@@ -25,7 +25,7 @@ class FootballScraperEngine:
         try:
             # 1. Récupération du contenu HTML (URL ou fichier local)
             if url.startswith("http://") or url.startswith("https://"):
-                response = requests.get(url, headers=self.headers)
+                response = requests.get(url, headers=self.headers, timeout=10)
                 if response.status_code != 200:
                     raise Exception(f"Impossible d'accéder à la page : Code {response.status_code}")
                 html_content = response.text

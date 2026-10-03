@@ -1,0 +1,42 @@
+{
+  "version": "v0.9.0-rc2",
+  "generated_at": "2026-10-03T19:02:25.655581+00:00",
+  "git_commit": "a6cfb07f1735992a35c15035f225d803d12cb4cd",
+  "git_branch": "chore/security-hardening-rc2",
+  "gate_status": "PASSED",
+  "checks": [
+    {
+      "check": "secret_scan",
+      "passed": true,
+      "gitleaks_found": "exit_1",
+      "trufflehog_found": "exit_1",
+      "details": "gitleaks: code 1; trufflehog: code 1; git secret grep clean"
+    },
+    {
+      "check": "static_analysis_bandit",
+      "passed": true,
+      "details": "0 High severity issues"
+    },
+    {
+      "check": "pip_audit",
+      "passed": true,
+      "details": "No known Python vulnerabilities found"
+    },
+    {
+      "check": "frontend_audit_production",
+      "passed": true,
+      "details": "0 vulnerabilities in production frontend dependencies"
+    },
+    {
+      "check": "security_test_suite",
+      "passed": true,
+      "details": "All security and config unit tests passed"
+    },
+    {
+      "check": "commercial_license_review_gate",
+      "passed": true,
+      "commercial_deployment_license_review_required": true,
+      "details": "Documented in SECURITY.md and docs/experiments/golden_dataset_provenance.md"
+    }
+  ]
+}

@@ -3,7 +3,9 @@ from __future__ import annotations
 import hashlib
 import logging
 import re
+import secrets
 import shutil
+import threading
 from pathlib import Path
 from uuid import uuid4
 
@@ -87,10 +89,24 @@ class VideoAnalysisService:
             min_height=settings.VIDEO_MIN_HEIGHT,
             minimum_free_bytes=settings.VIDEO_MIN_FREE_DISK_MB * 1024 * 1024,
         )
+        self._active_analyses: set[str] = set()
+        self._active_lock = threading.Lock()
 
     async def create(
         self, upload: UploadFile, match_id: str | None = None, mode: str = "QUALITY"
     ) -> AnalysisCreated:
+        if self.settings.APP_ENV == "production" and not self.settings.PUBLIC_UPLOAD_ENABLED:
+            raise VideoValidationError(
+                "Public video uploads are disabled on this production deployment."
+            )
+
+        with self._active_lock:
+            if len(self._active_analyses) >= self.settings.MAX_CONCURRENT_ANALYSES:
+                raise VideoValidationError(
+                    f"Le serveur traite actuellement le nombre maximal d'analyses simultanées "
+                    f"({self.settings.MAX_CONCURRENT_ANALYSES}). Veuillez patienter avant de soumettre une nouvelle vidéo."
+                )
+
         mode_upper = mode.strip().upper()
         if mode_upper not in ("QUALITY", "LOW_LATENCY"):
             raise VideoValidationError(
@@ -128,14 +144,21 @@ class VideoAnalysisService:
         pipeline_metadata = self._build_pipeline_metadata(sha256, mode=mode_upper)
         analysis_key = pipeline_metadata.analysis_key
         assert analysis_key is not None
+
+        raw_token = secrets.token_urlsafe(32)
+        token_hash = hashlib.sha256(raw_token.encode("utf-8")).hexdigest()
+
         completed = self.storage.find_completed_by_analysis_key(analysis_key)
         if completed:
             temporary.unlink(missing_ok=True)
+            completed.access_token_hash = token_hash
+            self.storage.save_job(completed)
             return AnalysisCreated(
                 analysis_id=completed.analysis_id,
                 match_id=completed.match_id,
                 status=completed.status,
                 reused=True,
+                access_token=raw_token,
             )
 
         analysis_id = f"analysis_{uuid4().hex}"
@@ -150,6 +173,7 @@ class VideoAnalysisService:
             source_sha256=sha256,
             analysis_key=analysis_key,
             pipeline=pipeline_metadata,
+            access_token_hash=token_hash,
         )
         self.storage.create_job(job)
         source = directory / f"source.{extension}"
@@ -165,9 +189,19 @@ class VideoAnalysisService:
             analysis_id=analysis_id,
             match_id=resolved_match_id,
             status=job.status,
+            access_token=raw_token,
         )
 
     def process(self, analysis_id: str) -> None:
+        with self._active_lock:
+            self._active_analyses.add(analysis_id)
+        try:
+            self._process_internal(analysis_id)
+        finally:
+            with self._active_lock:
+                self._active_analyses.discard(analysis_id)
+
+    def _process_internal(self, analysis_id: str) -> None:
         job = self.storage.load_job(analysis_id)
         if job is None or job.status == JobStatus.COMPLETED:
             return

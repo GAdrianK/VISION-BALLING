@@ -19,8 +19,18 @@ ENV/
 .venv-reid/
 
 # Configuration & Secrets
-backend/.env
-*.env
+**/.env*
+!**/.env.example
+credentials*
+secrets*
+*.pem
+*.key
+*.pfx
+*.p12
+*.cert
+*.crt
+id_rsa*
+*.id_rsa*
 
 # OS
 .DS_Store
@@ -87,3 +97,9 @@ frontend-vanilla/
 # Misc
 *.egg-info/
 dist-info/
+.coverage
+htmlcov/
+coverage/
+*.tar.gz
+*.zip
+*.7z

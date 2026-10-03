@@ -169,6 +169,7 @@ class AnalysisJob(BaseModel):
     artifacts: ArtifactSet = Field(default_factory=ArtifactSet)
     warnings: list[str] = Field(default_factory=list)
     result_available: bool = False
+    access_token_hash: str | None = None
 
 
 class AnalysisCreated(BaseModel):
@@ -176,6 +177,7 @@ class AnalysisCreated(BaseModel):
     match_id: str
     status: JobStatus
     reused: bool = False
+    access_token: str | None = None
 
 
 class ArtifactInfo(BaseModel):

@@ -16,13 +16,18 @@ logger = logging.getLogger("football.canonical_modes")
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 CONFIG_YAML_PATH = PROJECT_ROOT / "configs" / "vision_balling_rc1.yaml"
 
-LOCKED_RFDETR_CHECKPOINT_PATH = Path(
-    "/media/adriano/Windows/runs/detect/exp04_rfdetr_small_h250_960/checkpoint_best_total.pth"
-)
 LOCKED_RFDETR_SHA256 = (
     "c1a1d88b74edc5ddefa7da4581e2848c4c58c3938d88ad4a1b615f071752ffff"
 )
 LOCKED_YOLO_CHECKPOINT_PATH = PROJECT_ROOT / "yolo11n.pt"
+
+
+def resolve_rfdetr_checkpoint_path() -> Path:
+    """Resolves the canonical RF-DETR checkpoint path via settings/environment."""
+    return settings.get_rfdetr_checkpoint_path()
+
+
+LOCKED_RFDETR_CHECKPOINT_PATH = resolve_rfdetr_checkpoint_path()
 
 _sha_cache: dict[str, str] = {}
 
@@ -91,12 +96,11 @@ def check_environment_preflight(mode: str) -> None:
             ) from exc
 
         # Check checkpoint path
-        ckpt = Path(settings.VIDEO_MODEL_PATH) if settings.VIDEO_MODEL_PATH else LOCKED_RFDETR_CHECKPOINT_PATH
-        if not ckpt.is_file():
-            ckpt = LOCKED_RFDETR_CHECKPOINT_PATH
+        ckpt = resolve_rfdetr_checkpoint_path()
         if not ckpt.is_file():
             raise RuntimeError(
-                f"QUALITY mode unavailable: RF-DETR checkpoint not configured or missing at {ckpt}."
+                f"QUALITY mode unavailable: RF-DETR checkpoint not configured or missing at {ckpt}. "
+                "Configure VIDEO_MODEL_PATH or RFDETR_CHECKPOINT_PATH to the valid checkpoint_best_total.pth."
             )
 
         # Check SHA-256 integrity
@@ -128,9 +132,7 @@ def resolve_detector_for_mode(mode: str, device: str = "cuda") -> Any:
 
     mode_upper = mode.strip().upper()
     if mode_upper == "QUALITY":
-        ckpt = Path(settings.VIDEO_MODEL_PATH)
-        if not ckpt.is_file():
-            ckpt = LOCKED_RFDETR_CHECKPOINT_PATH
+        ckpt = resolve_rfdetr_checkpoint_path()
         return RFDETRDetector(
             model_path=str(ckpt),
             device=device,

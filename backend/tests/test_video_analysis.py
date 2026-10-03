@@ -375,26 +375,38 @@ def test_create_and_get_endpoints(sample_video: Path, video_settings: Settings):
                     data={"match_id": "match_integration"},
                 )
             assert response.status_code == 202
-            analysis_id = response.json()["analysis_id"]
-            status = api.get(f"/api/video-analysis/{analysis_id}")
+            data = response.json()
+            analysis_id = data["analysis_id"]
+            access_token = data.get("access_token")
+            auth_headers = {"Authorization": f"Bearer {access_token}"} if access_token else {}
+
+            # Access without token should be denied (401)
+            unauth = api.get(f"/api/video-analysis/{analysis_id}")
+            assert unauth.status_code == 401
+
+            # Access with token should succeed (200)
+            status = api.get(f"/api/video-analysis/{analysis_id}", headers=auth_headers)
             assert status.status_code == 200
             assert status.json()["status"] == "completed"
-            detections = api.get(f"/api/video-analysis/{analysis_id}/detections")
+            detections = api.get(f"/api/video-analysis/{analysis_id}/detections", headers=auth_headers)
             assert detections.status_code == 200
             assert detections.json()["detections"]
-            artifacts = api.get(f"/api/video-analysis/{analysis_id}/artifacts")
+            artifacts = api.get(f"/api/video-analysis/{analysis_id}/artifacts", headers=auth_headers)
             assert artifacts.status_code == 200
             assert len(artifacts.json()["artifacts"]) >= 2
             annotated = api.get(
-                f"/api/video-analysis/{analysis_id}/artifacts/annotated_video"
+                f"/api/video-analysis/{analysis_id}/artifacts/annotated_video",
+                headers=auth_headers,
             )
             assert annotated.status_code == 200
             assert annotated.headers["content-type"].startswith("video/mp4")
             assert annotated.headers["content-disposition"].startswith("inline;")
             assert annotated.headers["accept-ranges"] == "bytes"
+            range_headers = {"Range": "bytes=0-9"}
+            range_headers.update(auth_headers)
             partial = api.get(
                 f"/api/video-analysis/{analysis_id}/artifacts/annotated_video",
-                headers={"Range": "bytes=0-9"},
+                headers=range_headers,
             )
             assert partial.status_code == 206
             assert partial.headers["accept-ranges"] == "bytes"

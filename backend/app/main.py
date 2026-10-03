@@ -20,21 +20,39 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s %(name)s %(message)s",
 )
 
+from app.core.config import settings
+
 app = FastAPI(
     title="Football IQ - Professional Tactical Engine",
-    description="API de scouting européen propulsée par Qwen 2.5 & SQLite"
+    description="API de scouting européen propulsée par Qwen 2.5 & SQLite",
+    docs_url="/docs" if settings.is_docs_enabled else None,
+    redoc_url="/redoc" if settings.is_docs_enabled else None,
+    openapi_url="/openapi.json" if settings.is_docs_enabled else None,
 )
 
+cors_origins = settings.cors_allowed_origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
+    allow_origins=cors_origins,
+    allow_credentials=True if cors_origins != ["*"] else False,
+    allow_methods=["GET", "POST", "OPTIONS", "DELETE", "PUT"] if settings.APP_ENV == "production" else ["*"],
     allow_headers=["*"],
 )
 
+
+@app.middleware("http")
+async def add_security_headers(request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    if settings.APP_ENV == "production":
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        response.headers["Content-Security-Policy"] = "default-src 'self'; frame-ancestors 'none';"
+    return response
+
 from app.services.rag_engine import RAGEngine
-from app.core.config import settings
 
 # Initialisation globale du moteur RAG
 rag_engine = RAGEngine(
@@ -166,6 +184,11 @@ def fetch_top_players_from_db(season: str, use_ldc: bool = False):
 
 @app.post("/api/analyze")
 async def analyze_tactical_trends(request: AnalysisRequest):
+    if settings.APP_ENV == "production" and not settings.ENABLE_LEGACY_SQL_API:
+        raise HTTPException(
+            status_code=403,
+            detail="Legacy natural-language SQL analysis endpoint is disabled in production.",
+        )
     try:
         # Détection du mode Recherche de Similarité (Algorithme ADN)
         prompt_lower = request.prompt.lower()
@@ -181,7 +204,7 @@ async def analyze_tactical_trends(request: AnalysisRequest):
             
             canonical_target_name = None
             if candidate_words:
-                conn = sqlite3.connect(DB_PATH)
+                conn = sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True)
                 cursor = conn.cursor()
                 
                 # Étape 1 : Essayer de trouver un joueur qui correspond à TOUS les mots candidats
@@ -192,7 +215,7 @@ async def analyze_tactical_trends(request: AnalysisRequest):
                     params.append(f"%{w}%")
                 
                 cursor.execute(
-                    f"SELECT DISTINCT player_name FROM player_match_stats WHERE {' AND '.join(query_parts)} LIMIT 1",
+                    f"SELECT DISTINCT player_name FROM player_match_stats WHERE {' AND '.join(query_parts)} LIMIT 1",  # nosec B608
                     params
                 )
                 row = cursor.fetchone()
@@ -477,13 +500,31 @@ async def analyze_tactical_trends(request: AnalysisRequest):
                 sql_query = sql_text.strip()
 
             if sql_query:
-                sql_query = sql_query.rstrip(';')
-                print(f"🔍 Executing generated SQL: {sql_query}")
+                clean_query = sql_query.rstrip(";").strip()
+                if not re.match(r"^SELECT\s", clean_query, re.IGNORECASE):
+                    raise HTTPException(
+                        status_code=400,
+                        detail="Forbidden query: only SELECT queries are permitted.",
+                    )
+                dangerous_patterns = [
+                    r"\bDROP\b", r"\bDELETE\b", r"\bUPDATE\b", r"\bINSERT\b",
+                    r"\bALTER\b", r"\bCREATE\b", r"\bATTACH\b", r"\bDETACH\b",
+                    r"\bPRAGMA\b", r"\bVACUUM\b", r"\bTRUNCATE\b", r"--", r"/\*", r";"
+                ]
+                upper_query = clean_query.upper()
+                for pat in dangerous_patterns:
+                    if re.search(pat, upper_query):
+                        raise HTTPException(
+                            status_code=400,
+                            detail="Forbidden SQL syntax or keyword detected.",
+                        )
+
+                print(f"🔍 Executing validated SQL: {clean_query}")
                 try:
-                    conn = sqlite3.connect(DB_PATH)
+                    conn = sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True)
                     conn.row_factory = sqlite3.Row
                     cursor = conn.cursor()
-                    cursor.execute(sql_query)
+                    cursor.execute(clean_query)
                     rows = cursor.fetchall()
                     conn.close()
 
