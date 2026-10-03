@@ -1,5 +1,7 @@
 # 🎬 Script de Démo — Football IQ Assistant MVP (5 minutes)
 
+> **Statut : historique / non normatif.** Ce scénario décrit une version antérieure. Pour l'état actuel, consulter [`../README.md`](../README.md) et [`project_status.md`](project_status.md).
+
 Ce script décrit un scénario de démonstration complet du MVP, étape par étape.
 
 ---

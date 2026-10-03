@@ -1,0 +1,40 @@
+{
+  "status": "COMPLETED",
+  "checkpoint": "/media/adriano/Windows/runs/reid/prtreid-soccernet-baseline.pth.tar",
+  "checkpoint_sha256": "1304562c4c930a4a54bbf2d44e221eb911fe31408f6875c5058b2d6ed621cf3b",
+  "checkpoint_md5": "9633825232bc89f23a94522c5561650e",
+  "architecture": "bpbreid (HRNet-32 backbone, 256-D global embedding)",
+  "dev_sequences": [
+    "SNMOT-060",
+    "SNMOT-061",
+    "SNMOT-062"
+  ],
+  "total_crops_evaluated": 11637,
+  "crops_per_second": 195.02,
+  "same_id_similarity": {
+    "count": 1088011,
+    "mean": 0.916385293006897,
+    "median": 0.929563581943512,
+    "std": 0.053889352828264236,
+    "min": 0.4025433659553528,
+    "max": 0.9974322319030762,
+    "p10": 0.8534663915634155,
+    "p50": 0.929563581943512,
+    "p90": 0.9657744765281677
+  },
+  "diff_id_similarity": {
+    "count": 1078859,
+    "mean": 0.6563236117362976,
+    "median": 0.666527509689331,
+    "std": 0.13760046660900116,
+    "min": 0.1299571990966797,
+    "max": 0.9783185720443726,
+    "p10": 0.465732204914093,
+    "p50": 0.666527509689331,
+    "p90": 0.8286077857017518
+  },
+  "separation_margin": 0.2601,
+  "rank1_accuracy": 0.9726,
+  "mean_average_precision_map": 0.8582,
+  "num_queries_evaluated": 73
+}

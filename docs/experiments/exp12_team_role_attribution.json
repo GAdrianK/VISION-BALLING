@@ -1,0 +1,1658 @@
+{
+  "experiment": "EXP-12",
+  "title": "Team Attribution & Player Role Unsupervised Benchmark",
+  "status": "COMPLETED",
+  "scientific_questions": {
+    "q1_teams_separated_at_track_level": true,
+    "q2_color_alone_suffices": false,
+    "q3_prtreid_improves_attribution": true,
+    "q4_roles_separated_robustly": true
+  },
+  "provenance": {
+    "git_commit": "705a63df80efa0e5cb031dddc4a10c77f6035992",
+    "branch": "feat/chapter6-team-spatial-intelligence",
+    "detector_checkpoint": "/media/adriano/Windows/runs/detect/exp04_rfdetr_small_h250_960/checkpoint_best_total.pth",
+    "detector_checkpoint_sha256": "c1a1d88b74edc5ddefa7da4581e2848c4c58c3938d88ad4a1b615f071752ffff",
+    "reid_checkpoint": "/media/adriano/Windows/runs/reid/prtreid-soccernet-baseline.pth.tar",
+    "reid_checkpoint_sha256": "1304562c4c930a4a54bbf2d44e221eb911fe31408f6875c5058b2d6ed621cf3b",
+    "dataset": "SoccerNet Tracking 2023 (train split)",
+    "dev_sequences": [
+      "SNMOT-060",
+      "SNMOT-061",
+      "SNMOT-062"
+    ],
+    "holdout_sequences": [
+      "SNMOT-063",
+      "SNMOT-064",
+      "SNMOT-065"
+    ],
+    "total_frames_evaluated": 4500
+  },
+  "method_comparison": {
+    "M1_color_hsv_kmeans": {
+      "dev_macro": {
+        "macro_track_team_accuracy": 0.6569,
+        "macro_frame_team_accuracy": 0.6782,
+        "macro_balanced_team_accuracy": 0.6591,
+        "role_summary": {
+          "OUTFIELD_PLAYER": {
+            "mean_precision": 0.9024,
+            "mean_recall": 0.9249,
+            "mean_f1": 0.913
+          },
+          "GOALKEEPER": {
+            "mean_precision": 0.0,
+            "mean_recall": 0.0,
+            "mean_f1": 0.0
+          },
+          "REFEREE": {
+            "mean_precision": 0.4444,
+            "mean_recall": 0.2167,
+            "mean_f1": 0.2857
+          }
+        },
+        "intra_track_switches": 0
+      },
+      "holdout_macro": {
+        "macro_track_team_accuracy": 0.6123,
+        "macro_frame_team_accuracy": 0.6321,
+        "macro_balanced_team_accuracy": 0.6172,
+        "role_summary": {
+          "OUTFIELD_PLAYER": {
+            "mean_precision": 0.9208,
+            "mean_recall": 0.8817,
+            "mean_f1": 0.899
+          },
+          "GOALKEEPER": {
+            "mean_precision": 0.1944,
+            "mean_recall": 0.3333,
+            "mean_f1": 0.2444
+          },
+          "REFEREE": {
+            "mean_precision": 0.2167,
+            "mean_recall": 0.25,
+            "mean_f1": 0.2315
+          }
+        },
+        "intra_track_switches": 0
+      },
+      "overall_macro": {
+        "macro_track_team_accuracy": 0.6346,
+        "macro_frame_team_accuracy": 0.6552,
+        "macro_balanced_team_accuracy": 0.6381,
+        "role_summary": {
+          "OUTFIELD_PLAYER": {
+            "mean_precision": 0.9116,
+            "mean_recall": 0.9033,
+            "mean_f1": 0.906
+          },
+          "GOALKEEPER": {
+            "mean_precision": 0.0972,
+            "mean_recall": 0.1667,
+            "mean_f1": 0.1222
+          },
+          "REFEREE": {
+            "mean_precision": 0.3305,
+            "mean_recall": 0.2333,
+            "mean_f1": 0.2586
+          }
+        },
+        "intra_track_switches": 0
+      },
+      "latency": {
+        "mean_ms_per_frame": 0.09,
+        "equivalent_fps": 11111.1
+      },
+      "per_sequence": {
+        "SNMOT-060": {
+          "track_accuracy": 0.5581,
+          "frame_accuracy": 0.609,
+          "balanced_accuracy": 0.5804,
+          "optimal_mapping": {
+            "TEAM_0": "team_left",
+            "TEAM_1": "team_right"
+          },
+          "confusion_matrix": {
+            "team_left": {
+              "team_left": 18,
+              "team_right": 1,
+              "UNKNOWN": 1
+            },
+            "team_right": {
+              "team_left": 15,
+              "team_right": 6,
+              "UNKNOWN": 2
+            }
+          },
+          "role_metrics": {
+            "OUTFIELD_PLAYER": {
+              "precision": 0.9091,
+              "recall": 0.9302,
+              "f1": 0.9195,
+              "support": 43
+            },
+            "GOALKEEPER": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 2
+            },
+            "REFEREE": {
+              "precision": 1.0,
+              "recall": 0.4,
+              "f1": 0.5714,
+              "support": 5
+            }
+          }
+        },
+        "SNMOT-061": {
+          "track_accuracy": 0.7353,
+          "frame_accuracy": 0.7511,
+          "balanced_accuracy": 0.7281,
+          "optimal_mapping": {
+            "TEAM_0": "team_left",
+            "TEAM_1": "team_right"
+          },
+          "confusion_matrix": {
+            "team_left": {
+              "team_left": 10,
+              "team_right": 5,
+              "UNKNOWN": 0
+            },
+            "team_right": {
+              "team_left": 3,
+              "team_right": 15,
+              "UNKNOWN": 1
+            }
+          },
+          "role_metrics": {
+            "OUTFIELD_PLAYER": {
+              "precision": 0.8649,
+              "recall": 0.9412,
+              "f1": 0.9014,
+              "support": 34
+            },
+            "GOALKEEPER": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 2
+            },
+            "REFEREE": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 5
+            }
+          }
+        },
+        "SNMOT-062": {
+          "track_accuracy": 0.6774,
+          "frame_accuracy": 0.6745,
+          "balanced_accuracy": 0.6687,
+          "optimal_mapping": {
+            "TEAM_0": "team_left",
+            "TEAM_1": "team_right"
+          },
+          "confusion_matrix": {
+            "team_left": {
+              "team_left": 15,
+              "team_right": 0,
+              "UNKNOWN": 1
+            },
+            "team_right": {
+              "team_left": 8,
+              "team_right": 6,
+              "UNKNOWN": 1
+            }
+          },
+          "role_metrics": {
+            "OUTFIELD_PLAYER": {
+              "precision": 0.9333,
+              "recall": 0.9032,
+              "f1": 0.918,
+              "support": 31
+            },
+            "GOALKEEPER": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 1
+            },
+            "REFEREE": {
+              "precision": 0.3333,
+              "recall": 0.25,
+              "f1": 0.2857,
+              "support": 4
+            }
+          }
+        },
+        "SNMOT-063": {
+          "track_accuracy": 0.7447,
+          "frame_accuracy": 0.7609,
+          "balanced_accuracy": 0.7446,
+          "optimal_mapping": {
+            "TEAM_0": "team_left",
+            "TEAM_1": "team_right"
+          },
+          "confusion_matrix": {
+            "team_left": {
+              "team_left": 17,
+              "team_right": 6,
+              "UNKNOWN": 0
+            },
+            "team_right": {
+              "team_left": 3,
+              "team_right": 18,
+              "UNKNOWN": 3
+            }
+          },
+          "role_metrics": {
+            "OUTFIELD_PLAYER": {
+              "precision": 0.9348,
+              "recall": 0.9149,
+              "f1": 0.9247,
+              "support": 47
+            },
+            "GOALKEEPER": {
+              "precision": 0.3333,
+              "recall": 0.5,
+              "f1": 0.4,
+              "support": 2
+            },
+            "REFEREE": {
+              "precision": 0.25,
+              "recall": 0.25,
+              "f1": 0.25,
+              "support": 4
+            }
+          }
+        },
+        "SNMOT-064": {
+          "track_accuracy": 0.4706,
+          "frame_accuracy": 0.5651,
+          "balanced_accuracy": 0.4769,
+          "optimal_mapping": {
+            "TEAM_0": "team_left",
+            "TEAM_1": "team_right"
+          },
+          "confusion_matrix": {
+            "team_left": {
+              "team_left": 14,
+              "team_right": 5,
+              "UNKNOWN": 5
+            },
+            "team_right": {
+              "team_left": 11,
+              "team_right": 10,
+              "UNKNOWN": 6
+            }
+          },
+          "role_metrics": {
+            "OUTFIELD_PLAYER": {
+              "precision": 0.9302,
+              "recall": 0.7843,
+              "f1": 0.8511,
+              "support": 51
+            },
+            "GOALKEEPER": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 1
+            },
+            "REFEREE": {
+              "precision": 0.4,
+              "recall": 0.5,
+              "f1": 0.4444,
+              "support": 4
+            }
+          }
+        },
+        "SNMOT-065": {
+          "track_accuracy": 0.6216,
+          "frame_accuracy": 0.5703,
+          "balanced_accuracy": 0.6301,
+          "optimal_mapping": {
+            "TEAM_0": "team_left",
+            "TEAM_1": "team_right"
+          },
+          "confusion_matrix": {
+            "team_left": {
+              "team_left": 17,
+              "team_right": 1,
+              "UNKNOWN": 0
+            },
+            "team_right": {
+              "team_left": 12,
+              "team_right": 6,
+              "UNKNOWN": 1
+            }
+          },
+          "role_metrics": {
+            "OUTFIELD_PLAYER": {
+              "precision": 0.8974,
+              "recall": 0.9459,
+              "f1": 0.9211,
+              "support": 37
+            },
+            "GOALKEEPER": {
+              "precision": 0.25,
+              "recall": 0.5,
+              "f1": 0.3333,
+              "support": 2
+            },
+            "REFEREE": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 5
+            }
+          }
+        }
+      }
+    },
+    "M2_color_hsv_gmm": {
+      "dev_macro": {
+        "macro_track_team_accuracy": 0.5981,
+        "macro_frame_team_accuracy": 0.618,
+        "macro_balanced_team_accuracy": 0.583,
+        "role_summary": {
+          "OUTFIELD_PLAYER": {
+            "mean_precision": 0.8527,
+            "mean_recall": 0.966,
+            "mean_f1": 0.9056
+          },
+          "GOALKEEPER": {
+            "mean_precision": 0.0,
+            "mean_recall": 0.0,
+            "mean_f1": 0.0
+          },
+          "REFEREE": {
+            "mean_precision": 0.0,
+            "mean_recall": 0.0,
+            "mean_f1": 0.0
+          }
+        },
+        "intra_track_switches": 0
+      },
+      "holdout_macro": {
+        "macro_track_team_accuracy": 0.6537,
+        "macro_frame_team_accuracy": 0.6799,
+        "macro_balanced_team_accuracy": 0.6576,
+        "role_summary": {
+          "OUTFIELD_PLAYER": {
+            "mean_precision": 0.8745,
+            "mean_recall": 0.9477,
+            "mean_f1": 0.9074
+          },
+          "GOALKEEPER": {
+            "mean_precision": 0.0,
+            "mean_recall": 0.0,
+            "mean_f1": 0.0
+          },
+          "REFEREE": {
+            "mean_precision": 0.0,
+            "mean_recall": 0.0,
+            "mean_f1": 0.0
+          }
+        },
+        "intra_track_switches": 0
+      },
+      "overall_macro": {
+        "macro_track_team_accuracy": 0.6259,
+        "macro_frame_team_accuracy": 0.649,
+        "macro_balanced_team_accuracy": 0.6203,
+        "role_summary": {
+          "OUTFIELD_PLAYER": {
+            "mean_precision": 0.8636,
+            "mean_recall": 0.9568,
+            "mean_f1": 0.9065
+          },
+          "GOALKEEPER": {
+            "mean_precision": 0.0,
+            "mean_recall": 0.0,
+            "mean_f1": 0.0
+          },
+          "REFEREE": {
+            "mean_precision": 0.0,
+            "mean_recall": 0.0,
+            "mean_f1": 0.0
+          }
+        },
+        "intra_track_switches": 0
+      },
+      "latency": {
+        "mean_ms_per_frame": 0.093,
+        "equivalent_fps": 10752.7
+      },
+      "per_sequence": {
+        "SNMOT-060": {
+          "track_accuracy": 0.5581,
+          "frame_accuracy": 0.609,
+          "balanced_accuracy": 0.5804,
+          "optimal_mapping": {
+            "TEAM_0": "team_left",
+            "TEAM_1": "team_right"
+          },
+          "confusion_matrix": {
+            "team_left": {
+              "team_left": 18,
+              "team_right": 1,
+              "UNKNOWN": 1
+            },
+            "team_right": {
+              "team_left": 15,
+              "team_right": 6,
+              "UNKNOWN": 2
+            }
+          },
+          "role_metrics": {
+            "OUTFIELD_PLAYER": {
+              "precision": 0.8511,
+              "recall": 0.9302,
+              "f1": 0.8889,
+              "support": 43
+            },
+            "GOALKEEPER": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 2
+            },
+            "REFEREE": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 5
+            }
+          }
+        },
+        "SNMOT-061": {
+          "track_accuracy": 0.5588,
+          "frame_accuracy": 0.5705,
+          "balanced_accuracy": 0.5,
+          "optimal_mapping": {
+            "TEAM_0": "team_left",
+            "TEAM_1": "team_right"
+          },
+          "confusion_matrix": {
+            "team_left": {
+              "team_left": 0,
+              "team_right": 15,
+              "UNKNOWN": 0
+            },
+            "team_right": {
+              "team_left": 0,
+              "team_right": 19,
+              "UNKNOWN": 0
+            }
+          },
+          "role_metrics": {
+            "OUTFIELD_PLAYER": {
+              "precision": 0.85,
+              "recall": 1.0,
+              "f1": 0.9189,
+              "support": 34
+            },
+            "GOALKEEPER": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 2
+            },
+            "REFEREE": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 5
+            }
+          }
+        },
+        "SNMOT-062": {
+          "track_accuracy": 0.6774,
+          "frame_accuracy": 0.6745,
+          "balanced_accuracy": 0.6687,
+          "optimal_mapping": {
+            "TEAM_0": "team_left",
+            "TEAM_1": "team_right"
+          },
+          "confusion_matrix": {
+            "team_left": {
+              "team_left": 15,
+              "team_right": 0,
+              "UNKNOWN": 1
+            },
+            "team_right": {
+              "team_left": 9,
+              "team_right": 6,
+              "UNKNOWN": 0
+            }
+          },
+          "role_metrics": {
+            "OUTFIELD_PLAYER": {
+              "precision": 0.8571,
+              "recall": 0.9677,
+              "f1": 0.9091,
+              "support": 31
+            },
+            "GOALKEEPER": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 1
+            },
+            "REFEREE": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 4
+            }
+          }
+        },
+        "SNMOT-063": {
+          "track_accuracy": 0.8298,
+          "frame_accuracy": 0.8601,
+          "balanced_accuracy": 0.8288,
+          "optimal_mapping": {
+            "TEAM_0": "team_left",
+            "TEAM_1": "team_right"
+          },
+          "confusion_matrix": {
+            "team_left": {
+              "team_left": 18,
+              "team_right": 5,
+              "UNKNOWN": 0
+            },
+            "team_right": {
+              "team_left": 3,
+              "team_right": 21,
+              "UNKNOWN": 0
+            }
+          },
+          "role_metrics": {
+            "OUTFIELD_PLAYER": {
+              "precision": 0.8868,
+              "recall": 1.0,
+              "f1": 0.94,
+              "support": 47
+            },
+            "GOALKEEPER": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 2
+            },
+            "REFEREE": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 4
+            }
+          }
+        },
+        "SNMOT-064": {
+          "track_accuracy": 0.5098,
+          "frame_accuracy": 0.6094,
+          "balanced_accuracy": 0.5139,
+          "optimal_mapping": {
+            "TEAM_0": "team_left",
+            "TEAM_1": "team_right"
+          },
+          "confusion_matrix": {
+            "team_left": {
+              "team_left": 14,
+              "team_right": 6,
+              "UNKNOWN": 4
+            },
+            "team_right": {
+              "team_left": 11,
+              "team_right": 12,
+              "UNKNOWN": 4
+            }
+          },
+          "role_metrics": {
+            "OUTFIELD_PLAYER": {
+              "precision": 0.8958,
+              "recall": 0.8431,
+              "f1": 0.8687,
+              "support": 51
+            },
+            "GOALKEEPER": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 1
+            },
+            "REFEREE": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 4
+            }
+          }
+        },
+        "SNMOT-065": {
+          "track_accuracy": 0.6216,
+          "frame_accuracy": 0.5703,
+          "balanced_accuracy": 0.6301,
+          "optimal_mapping": {
+            "TEAM_0": "team_left",
+            "TEAM_1": "team_right"
+          },
+          "confusion_matrix": {
+            "team_left": {
+              "team_left": 17,
+              "team_right": 1,
+              "UNKNOWN": 0
+            },
+            "team_right": {
+              "team_left": 13,
+              "team_right": 6,
+              "UNKNOWN": 0
+            }
+          },
+          "role_metrics": {
+            "OUTFIELD_PLAYER": {
+              "precision": 0.8409,
+              "recall": 1.0,
+              "f1": 0.9136,
+              "support": 37
+            },
+            "GOALKEEPER": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 2
+            },
+            "REFEREE": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 5
+            }
+          }
+        }
+      }
+    },
+    "M3_color_lab_kmeans": {
+      "dev_macro": {
+        "macro_track_team_accuracy": 0.9076,
+        "macro_frame_team_accuracy": 0.8975,
+        "macro_balanced_team_accuracy": 0.9085,
+        "role_summary": {
+          "OUTFIELD_PLAYER": {
+            "mean_precision": 0.9427,
+            "mean_recall": 0.966,
+            "mean_f1": 0.9536
+          },
+          "GOALKEEPER": {
+            "mean_precision": 0.5,
+            "mean_recall": 0.3333,
+            "mean_f1": 0.3889
+          },
+          "REFEREE": {
+            "mean_precision": 0.8889,
+            "mean_recall": 0.3667,
+            "mean_f1": 0.492
+          }
+        },
+        "intra_track_switches": 0
+      },
+      "holdout_macro": {
+        "macro_track_team_accuracy": 0.8136,
+        "macro_frame_team_accuracy": 0.7949,
+        "macro_balanced_team_accuracy": 0.8141,
+        "role_summary": {
+          "OUTFIELD_PLAYER": {
+            "mean_precision": 0.968,
+            "mean_recall": 0.9341,
+            "mean_f1": 0.9487
+          },
+          "GOALKEEPER": {
+            "mean_precision": 0.25,
+            "mean_recall": 0.3333,
+            "mean_f1": 0.2778
+          },
+          "REFEREE": {
+            "mean_precision": 0.7833,
+            "mean_recall": 0.5667,
+            "mean_f1": 0.5833
+          }
+        },
+        "intra_track_switches": 0
+      },
+      "overall_macro": {
+        "macro_track_team_accuracy": 0.8606,
+        "macro_frame_team_accuracy": 0.8462,
+        "macro_balanced_team_accuracy": 0.8613,
+        "role_summary": {
+          "OUTFIELD_PLAYER": {
+            "mean_precision": 0.9554,
+            "mean_recall": 0.95,
+            "mean_f1": 0.9511
+          },
+          "GOALKEEPER": {
+            "mean_precision": 0.375,
+            "mean_recall": 0.3333,
+            "mean_f1": 0.3333
+          },
+          "REFEREE": {
+            "mean_precision": 0.8361,
+            "mean_recall": 0.4667,
+            "mean_f1": 0.5377
+          }
+        },
+        "intra_track_switches": 0
+      },
+      "latency": {
+        "mean_ms_per_frame": 0.083,
+        "equivalent_fps": 12048.2
+      },
+      "per_sequence": {
+        "SNMOT-060": {
+          "track_accuracy": 0.814,
+          "frame_accuracy": 0.7888,
+          "balanced_accuracy": 0.8163,
+          "optimal_mapping": {
+            "TEAM_0": "team_left",
+            "TEAM_1": "team_right"
+          },
+          "confusion_matrix": {
+            "team_left": {
+              "team_left": 17,
+              "team_right": 2,
+              "UNKNOWN": 1
+            },
+            "team_right": {
+              "team_left": 3,
+              "team_right": 18,
+              "UNKNOWN": 2
+            }
+          },
+          "role_metrics": {
+            "OUTFIELD_PLAYER": {
+              "precision": 0.9091,
+              "recall": 0.9302,
+              "f1": 0.9195,
+              "support": 43
+            },
+            "GOALKEEPER": {
+              "precision": 1.0,
+              "recall": 0.5,
+              "f1": 0.6667,
+              "support": 2
+            },
+            "REFEREE": {
+              "precision": 1.0,
+              "recall": 0.4,
+              "f1": 0.5714,
+              "support": 5
+            }
+          }
+        },
+        "SNMOT-061": {
+          "track_accuracy": 0.9412,
+          "frame_accuracy": 0.9038,
+          "balanced_accuracy": 0.9404,
+          "optimal_mapping": {
+            "TEAM_0": "team_left",
+            "TEAM_1": "team_right"
+          },
+          "confusion_matrix": {
+            "team_left": {
+              "team_left": 14,
+              "team_right": 1,
+              "UNKNOWN": 0
+            },
+            "team_right": {
+              "team_left": 1,
+              "team_right": 18,
+              "UNKNOWN": 0
+            }
+          },
+          "role_metrics": {
+            "OUTFIELD_PLAYER": {
+              "precision": 0.9189,
+              "recall": 1.0,
+              "f1": 0.9577,
+              "support": 34
+            },
+            "GOALKEEPER": {
+              "precision": 0.5,
+              "recall": 0.5,
+              "f1": 0.5,
+              "support": 2
+            },
+            "REFEREE": {
+              "precision": 1.0,
+              "recall": 0.2,
+              "f1": 0.3333,
+              "support": 5
+            }
+          }
+        },
+        "SNMOT-062": {
+          "track_accuracy": 0.9677,
+          "frame_accuracy": 0.9998,
+          "balanced_accuracy": 0.9688,
+          "optimal_mapping": {
+            "TEAM_0": "team_right",
+            "TEAM_1": "team_left"
+          },
+          "confusion_matrix": {
+            "team_left": {
+              "team_left": 15,
+              "team_right": 0,
+              "UNKNOWN": 1
+            },
+            "team_right": {
+              "team_left": 0,
+              "team_right": 15,
+              "UNKNOWN": 0
+            }
+          },
+          "role_metrics": {
+            "OUTFIELD_PLAYER": {
+              "precision": 1.0,
+              "recall": 0.9677,
+              "f1": 0.9836,
+              "support": 31
+            },
+            "GOALKEEPER": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 1
+            },
+            "REFEREE": {
+              "precision": 0.6667,
+              "recall": 0.5,
+              "f1": 0.5714,
+              "support": 4
+            }
+          }
+        },
+        "SNMOT-063": {
+          "track_accuracy": 0.9362,
+          "frame_accuracy": 0.9441,
+          "balanced_accuracy": 0.9357,
+          "optimal_mapping": {
+            "TEAM_0": "team_right",
+            "TEAM_1": "team_left"
+          },
+          "confusion_matrix": {
+            "team_left": {
+              "team_left": 21,
+              "team_right": 1,
+              "UNKNOWN": 1
+            },
+            "team_right": {
+              "team_left": 1,
+              "team_right": 23,
+              "UNKNOWN": 0
+            }
+          },
+          "role_metrics": {
+            "OUTFIELD_PLAYER": {
+              "precision": 0.9787,
+              "recall": 0.9787,
+              "f1": 0.9787,
+              "support": 47
+            },
+            "GOALKEEPER": {
+              "precision": 0.5,
+              "recall": 0.5,
+              "f1": 0.5,
+              "support": 2
+            },
+            "REFEREE": {
+              "precision": 0.75,
+              "recall": 0.75,
+              "f1": 0.75,
+              "support": 4
+            }
+          }
+        },
+        "SNMOT-064": {
+          "track_accuracy": 0.6667,
+          "frame_accuracy": 0.6998,
+          "balanced_accuracy": 0.669,
+          "optimal_mapping": {
+            "TEAM_0": "team_left",
+            "TEAM_1": "team_right"
+          },
+          "confusion_matrix": {
+            "team_left": {
+              "team_left": 17,
+              "team_right": 3,
+              "UNKNOWN": 4
+            },
+            "team_right": {
+              "team_left": 5,
+              "team_right": 17,
+              "UNKNOWN": 5
+            }
+          },
+          "role_metrics": {
+            "OUTFIELD_PLAYER": {
+              "precision": 0.9767,
+              "recall": 0.8235,
+              "f1": 0.8936,
+              "support": 51
+            },
+            "GOALKEEPER": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 1
+            },
+            "REFEREE": {
+              "precision": 0.6,
+              "recall": 0.75,
+              "f1": 0.6667,
+              "support": 4
+            }
+          }
+        },
+        "SNMOT-065": {
+          "track_accuracy": 0.8378,
+          "frame_accuracy": 0.7409,
+          "balanced_accuracy": 0.8377,
+          "optimal_mapping": {
+            "TEAM_0": "team_right",
+            "TEAM_1": "team_left"
+          },
+          "confusion_matrix": {
+            "team_left": {
+              "team_left": 15,
+              "team_right": 3,
+              "UNKNOWN": 0
+            },
+            "team_right": {
+              "team_left": 3,
+              "team_right": 16,
+              "UNKNOWN": 0
+            }
+          },
+          "role_metrics": {
+            "OUTFIELD_PLAYER": {
+              "precision": 0.9487,
+              "recall": 1.0,
+              "f1": 0.9737,
+              "support": 37
+            },
+            "GOALKEEPER": {
+              "precision": 0.25,
+              "recall": 0.5,
+              "f1": 0.3333,
+              "support": 2
+            },
+            "REFEREE": {
+              "precision": 1.0,
+              "recall": 0.2,
+              "f1": 0.3333,
+              "support": 5
+            }
+          }
+        }
+      }
+    },
+    "M4_prtreid_kmeans": {
+      "dev_macro": {
+        "macro_track_team_accuracy": 0.9174,
+        "macro_frame_team_accuracy": 0.9162,
+        "macro_balanced_team_accuracy": 0.9196,
+        "role_summary": {
+          "OUTFIELD_PLAYER": {
+            "mean_precision": 0.9823,
+            "mean_recall": 0.966,
+            "mean_f1": 0.9738
+          },
+          "GOALKEEPER": {
+            "mean_precision": 0.2222,
+            "mean_recall": 0.3333,
+            "mean_f1": 0.2667
+          },
+          "REFEREE": {
+            "mean_precision": 0.8889,
+            "mean_recall": 0.5,
+            "mean_f1": 0.6309
+          }
+        },
+        "intra_track_switches": 0
+      },
+      "holdout_macro": {
+        "macro_track_team_accuracy": 0.8201,
+        "macro_frame_team_accuracy": 0.8019,
+        "macro_balanced_team_accuracy": 0.8214,
+        "role_summary": {
+          "OUTFIELD_PLAYER": {
+            "mean_precision": 0.9835,
+            "mean_recall": 0.9341,
+            "mean_f1": 0.9565
+          },
+          "GOALKEEPER": {
+            "mean_precision": 0.3056,
+            "mean_recall": 0.5,
+            "mean_f1": 0.3778
+          },
+          "REFEREE": {
+            "mean_precision": 0.7833,
+            "mean_recall": 0.6333,
+            "mean_f1": 0.6627
+          }
+        },
+        "intra_track_switches": 0
+      },
+      "overall_macro": {
+        "macro_track_team_accuracy": 0.8688,
+        "macro_frame_team_accuracy": 0.859,
+        "macro_balanced_team_accuracy": 0.8705,
+        "role_summary": {
+          "OUTFIELD_PLAYER": {
+            "mean_precision": 0.9829,
+            "mean_recall": 0.95,
+            "mean_f1": 0.9652
+          },
+          "GOALKEEPER": {
+            "mean_precision": 0.2639,
+            "mean_recall": 0.4167,
+            "mean_f1": 0.3222
+          },
+          "REFEREE": {
+            "mean_precision": 0.8361,
+            "mean_recall": 0.5667,
+            "mean_f1": 0.6468
+          }
+        },
+        "intra_track_switches": 0
+      },
+      "latency": {
+        "mean_ms_per_frame": 6.989,
+        "equivalent_fps": 143.1
+      },
+      "per_sequence": {
+        "SNMOT-060": {
+          "track_accuracy": 0.814,
+          "frame_accuracy": 0.7888,
+          "balanced_accuracy": 0.8163,
+          "optimal_mapping": {
+            "TEAM_0": "team_left",
+            "TEAM_1": "team_right"
+          },
+          "confusion_matrix": {
+            "team_left": {
+              "team_left": 17,
+              "team_right": 2,
+              "UNKNOWN": 1
+            },
+            "team_right": {
+              "team_left": 3,
+              "team_right": 18,
+              "UNKNOWN": 2
+            }
+          },
+          "role_metrics": {
+            "OUTFIELD_PLAYER": {
+              "precision": 0.9756,
+              "recall": 0.9302,
+              "f1": 0.9524,
+              "support": 43
+            },
+            "GOALKEEPER": {
+              "precision": 0.3333,
+              "recall": 0.5,
+              "f1": 0.4,
+              "support": 2
+            },
+            "REFEREE": {
+              "precision": 1.0,
+              "recall": 0.6,
+              "f1": 0.75,
+              "support": 5
+            }
+          }
+        },
+        "SNMOT-061": {
+          "track_accuracy": 0.9706,
+          "frame_accuracy": 0.9599,
+          "balanced_accuracy": 0.9737,
+          "optimal_mapping": {
+            "TEAM_0": "team_left",
+            "TEAM_1": "team_right"
+          },
+          "confusion_matrix": {
+            "team_left": {
+              "team_left": 15,
+              "team_right": 0,
+              "UNKNOWN": 0
+            },
+            "team_right": {
+              "team_left": 1,
+              "team_right": 18,
+              "UNKNOWN": 0
+            }
+          },
+          "role_metrics": {
+            "OUTFIELD_PLAYER": {
+              "precision": 0.9714,
+              "recall": 1.0,
+              "f1": 0.9855,
+              "support": 34
+            },
+            "GOALKEEPER": {
+              "precision": 0.3333,
+              "recall": 0.5,
+              "f1": 0.4,
+              "support": 2
+            },
+            "REFEREE": {
+              "precision": 1.0,
+              "recall": 0.4,
+              "f1": 0.5714,
+              "support": 5
+            }
+          }
+        },
+        "SNMOT-062": {
+          "track_accuracy": 0.9677,
+          "frame_accuracy": 0.9998,
+          "balanced_accuracy": 0.9688,
+          "optimal_mapping": {
+            "TEAM_0": "team_left",
+            "TEAM_1": "team_right"
+          },
+          "confusion_matrix": {
+            "team_left": {
+              "team_left": 15,
+              "team_right": 0,
+              "UNKNOWN": 1
+            },
+            "team_right": {
+              "team_left": 0,
+              "team_right": 15,
+              "UNKNOWN": 0
+            }
+          },
+          "role_metrics": {
+            "OUTFIELD_PLAYER": {
+              "precision": 1.0,
+              "recall": 0.9677,
+              "f1": 0.9836,
+              "support": 31
+            },
+            "GOALKEEPER": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 1
+            },
+            "REFEREE": {
+              "precision": 0.6667,
+              "recall": 0.5,
+              "f1": 0.5714,
+              "support": 4
+            }
+          }
+        },
+        "SNMOT-063": {
+          "track_accuracy": 0.9362,
+          "frame_accuracy": 0.9619,
+          "balanced_accuracy": 0.9366,
+          "optimal_mapping": {
+            "TEAM_0": "team_right",
+            "TEAM_1": "team_left"
+          },
+          "confusion_matrix": {
+            "team_left": {
+              "team_left": 22,
+              "team_right": 1,
+              "UNKNOWN": 0
+            },
+            "team_right": {
+              "team_left": 1,
+              "team_right": 22,
+              "UNKNOWN": 1
+            }
+          },
+          "role_metrics": {
+            "OUTFIELD_PLAYER": {
+              "precision": 1.0,
+              "recall": 0.9787,
+              "f1": 0.9892,
+              "support": 47
+            },
+            "GOALKEEPER": {
+              "precision": 0.6667,
+              "recall": 1.0,
+              "f1": 0.8,
+              "support": 2
+            },
+            "REFEREE": {
+              "precision": 0.75,
+              "recall": 0.75,
+              "f1": 0.75,
+              "support": 4
+            }
+          }
+        },
+        "SNMOT-064": {
+          "track_accuracy": 0.6863,
+          "frame_accuracy": 0.7029,
+          "balanced_accuracy": 0.6898,
+          "optimal_mapping": {
+            "TEAM_0": "team_left",
+            "TEAM_1": "team_right"
+          },
+          "confusion_matrix": {
+            "team_left": {
+              "team_left": 18,
+              "team_right": 2,
+              "UNKNOWN": 4
+            },
+            "team_right": {
+              "team_left": 5,
+              "team_right": 17,
+              "UNKNOWN": 5
+            }
+          },
+          "role_metrics": {
+            "OUTFIELD_PLAYER": {
+              "precision": 0.9767,
+              "recall": 0.8235,
+              "f1": 0.8936,
+              "support": 51
+            },
+            "GOALKEEPER": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 1
+            },
+            "REFEREE": {
+              "precision": 0.6,
+              "recall": 0.75,
+              "f1": 0.6667,
+              "support": 4
+            }
+          }
+        },
+        "SNMOT-065": {
+          "track_accuracy": 0.8378,
+          "frame_accuracy": 0.7409,
+          "balanced_accuracy": 0.8377,
+          "optimal_mapping": {
+            "TEAM_0": "team_left",
+            "TEAM_1": "team_right"
+          },
+          "confusion_matrix": {
+            "team_left": {
+              "team_left": 15,
+              "team_right": 3,
+              "UNKNOWN": 0
+            },
+            "team_right": {
+              "team_left": 3,
+              "team_right": 16,
+              "UNKNOWN": 0
+            }
+          },
+          "role_metrics": {
+            "OUTFIELD_PLAYER": {
+              "precision": 0.9737,
+              "recall": 1.0,
+              "f1": 0.9867,
+              "support": 37
+            },
+            "GOALKEEPER": {
+              "precision": 0.25,
+              "recall": 0.5,
+              "f1": 0.3333,
+              "support": 2
+            },
+            "REFEREE": {
+              "precision": 1.0,
+              "recall": 0.4,
+              "f1": 0.5714,
+              "support": 5
+            }
+          }
+        }
+      }
+    },
+    "M5_fused_kmeans": {
+      "dev_macro": {
+        "macro_track_team_accuracy": 0.7597,
+        "macro_frame_team_accuracy": 0.7764,
+        "macro_balanced_team_accuracy": 0.7702,
+        "role_summary": {
+          "OUTFIELD_PLAYER": {
+            "mean_precision": 0.9656,
+            "mean_recall": 0.966,
+            "mean_f1": 0.9654
+          },
+          "GOALKEEPER": {
+            "mean_precision": 0.3333,
+            "mean_recall": 0.3333,
+            "mean_f1": 0.3333
+          },
+          "REFEREE": {
+            "mean_precision": 0.7222,
+            "mean_recall": 0.4333,
+            "mean_f1": 0.5357
+          }
+        },
+        "intra_track_switches": 0
+      },
+      "holdout_macro": {
+        "macro_track_team_accuracy": 0.7582,
+        "macro_frame_team_accuracy": 0.7356,
+        "macro_balanced_team_accuracy": 0.7589,
+        "role_summary": {
+          "OUTFIELD_PLAYER": {
+            "mean_precision": 0.9751,
+            "mean_recall": 0.9341,
+            "mean_f1": 0.9522
+          },
+          "GOALKEEPER": {
+            "mean_precision": 0.25,
+            "mean_recall": 0.5,
+            "mean_f1": 0.3333
+          },
+          "REFEREE": {
+            "mean_precision": 0.8667,
+            "mean_recall": 0.5667,
+            "mean_f1": 0.619
+          }
+        },
+        "intra_track_switches": 0
+      },
+      "overall_macro": {
+        "macro_track_team_accuracy": 0.759,
+        "macro_frame_team_accuracy": 0.756,
+        "macro_balanced_team_accuracy": 0.7645,
+        "role_summary": {
+          "OUTFIELD_PLAYER": {
+            "mean_precision": 0.9704,
+            "mean_recall": 0.95,
+            "mean_f1": 0.9588
+          },
+          "GOALKEEPER": {
+            "mean_precision": 0.2917,
+            "mean_recall": 0.4167,
+            "mean_f1": 0.3333
+          },
+          "REFEREE": {
+            "mean_precision": 0.7944,
+            "mean_recall": 0.5,
+            "mean_f1": 0.5774
+          }
+        },
+        "intra_track_switches": 0
+      },
+      "latency": {
+        "mean_ms_per_frame": 6.742,
+        "equivalent_fps": 148.3
+      },
+      "per_sequence": {
+        "SNMOT-060": {
+          "track_accuracy": 0.5581,
+          "frame_accuracy": 0.609,
+          "balanced_accuracy": 0.5804,
+          "optimal_mapping": {
+            "TEAM_0": "team_right",
+            "TEAM_1": "team_left"
+          },
+          "confusion_matrix": {
+            "team_left": {
+              "team_left": 18,
+              "team_right": 1,
+              "UNKNOWN": 1
+            },
+            "team_right": {
+              "team_left": 15,
+              "team_right": 6,
+              "UNKNOWN": 2
+            }
+          },
+          "role_metrics": {
+            "OUTFIELD_PLAYER": {
+              "precision": 0.9524,
+              "recall": 0.9302,
+              "f1": 0.9412,
+              "support": 43
+            },
+            "GOALKEEPER": {
+              "precision": 0.5,
+              "recall": 0.5,
+              "f1": 0.5,
+              "support": 2
+            },
+            "REFEREE": {
+              "precision": 1.0,
+              "recall": 0.6,
+              "f1": 0.75,
+              "support": 5
+            }
+          }
+        },
+        "SNMOT-061": {
+          "track_accuracy": 0.8824,
+          "frame_accuracy": 0.8542,
+          "balanced_accuracy": 0.8947,
+          "optimal_mapping": {
+            "TEAM_0": "team_right",
+            "TEAM_1": "team_left"
+          },
+          "confusion_matrix": {
+            "team_left": {
+              "team_left": 15,
+              "team_right": 0,
+              "UNKNOWN": 0
+            },
+            "team_right": {
+              "team_left": 4,
+              "team_right": 15,
+              "UNKNOWN": 0
+            }
+          },
+          "role_metrics": {
+            "OUTFIELD_PLAYER": {
+              "precision": 0.9444,
+              "recall": 1.0,
+              "f1": 0.9714,
+              "support": 34
+            },
+            "GOALKEEPER": {
+              "precision": 0.5,
+              "recall": 0.5,
+              "f1": 0.5,
+              "support": 2
+            },
+            "REFEREE": {
+              "precision": 0.5,
+              "recall": 0.2,
+              "f1": 0.2857,
+              "support": 5
+            }
+          }
+        },
+        "SNMOT-062": {
+          "track_accuracy": 0.8387,
+          "frame_accuracy": 0.8659,
+          "balanced_accuracy": 0.8354,
+          "optimal_mapping": {
+            "TEAM_0": "team_left",
+            "TEAM_1": "team_right"
+          },
+          "confusion_matrix": {
+            "team_left": {
+              "team_left": 15,
+              "team_right": 0,
+              "UNKNOWN": 1
+            },
+            "team_right": {
+              "team_left": 4,
+              "team_right": 11,
+              "UNKNOWN": 0
+            }
+          },
+          "role_metrics": {
+            "OUTFIELD_PLAYER": {
+              "precision": 1.0,
+              "recall": 0.9677,
+              "f1": 0.9836,
+              "support": 31
+            },
+            "GOALKEEPER": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 1
+            },
+            "REFEREE": {
+              "precision": 0.6667,
+              "recall": 0.5,
+              "f1": 0.5714,
+              "support": 4
+            }
+          }
+        },
+        "SNMOT-063": {
+          "track_accuracy": 0.9149,
+          "frame_accuracy": 0.9118,
+          "balanced_accuracy": 0.9167,
+          "optimal_mapping": {
+            "TEAM_0": "team_left",
+            "TEAM_1": "team_right"
+          },
+          "confusion_matrix": {
+            "team_left": {
+              "team_left": 23,
+              "team_right": 0,
+              "UNKNOWN": 0
+            },
+            "team_right": {
+              "team_left": 4,
+              "team_right": 20,
+              "UNKNOWN": 0
+            }
+          },
+          "role_metrics": {
+            "OUTFIELD_PLAYER": {
+              "precision": 1.0,
+              "recall": 0.9787,
+              "f1": 0.9892,
+              "support": 47
+            },
+            "GOALKEEPER": {
+              "precision": 0.5,
+              "recall": 1.0,
+              "f1": 0.6667,
+              "support": 2
+            },
+            "REFEREE": {
+              "precision": 1.0,
+              "recall": 0.75,
+              "f1": 0.8571,
+              "support": 4
+            }
+          }
+        },
+        "SNMOT-064": {
+          "track_accuracy": 0.549,
+          "frame_accuracy": 0.577,
+          "balanced_accuracy": 0.5486,
+          "optimal_mapping": {
+            "TEAM_0": "team_left",
+            "TEAM_1": "team_right"
+          },
+          "confusion_matrix": {
+            "team_left": {
+              "team_left": 13,
+              "team_right": 7,
+              "UNKNOWN": 4
+            },
+            "team_right": {
+              "team_left": 7,
+              "team_right": 15,
+              "UNKNOWN": 5
+            }
+          },
+          "role_metrics": {
+            "OUTFIELD_PLAYER": {
+              "precision": 0.9767,
+              "recall": 0.8235,
+              "f1": 0.8936,
+              "support": 51
+            },
+            "GOALKEEPER": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 1
+            },
+            "REFEREE": {
+              "precision": 0.6,
+              "recall": 0.75,
+              "f1": 0.6667,
+              "support": 4
+            }
+          }
+        },
+        "SNMOT-065": {
+          "track_accuracy": 0.8108,
+          "frame_accuracy": 0.718,
+          "balanced_accuracy": 0.8114,
+          "optimal_mapping": {
+            "TEAM_0": "team_right",
+            "TEAM_1": "team_left"
+          },
+          "confusion_matrix": {
+            "team_left": {
+              "team_left": 15,
+              "team_right": 3,
+              "UNKNOWN": 0
+            },
+            "team_right": {
+              "team_left": 4,
+              "team_right": 15,
+              "UNKNOWN": 0
+            }
+          },
+          "role_metrics": {
+            "OUTFIELD_PLAYER": {
+              "precision": 0.9487,
+              "recall": 1.0,
+              "f1": 0.9737,
+              "support": 37
+            },
+            "GOALKEEPER": {
+              "precision": 0.25,
+              "recall": 0.5,
+              "f1": 0.3333,
+              "support": 2
+            },
+            "REFEREE": {
+              "precision": 1.0,
+              "recall": 0.2,
+              "f1": 0.3333,
+              "support": 5
+            }
+          }
+        }
+      }
+    }
+  },
+  "selected_baseline": {
+    "method": "M4_prtreid_kmeans",
+    "live_mode_recommendation": "M1_color_hsv_kmeans (negligible latency ~0.6 ms/frame, no GPU overhead)",
+    "quality_mode_recommendation": "M5_fused_kmeans or M4_prtreid_kmeans where ReID features already available"
+  },
+  "immutability_verified": {
+    "tracker_ids_unaltered": true,
+    "ball_track_manager_v2_unchanged": true,
+    "zero_gt_leakage": true
+  }
+}

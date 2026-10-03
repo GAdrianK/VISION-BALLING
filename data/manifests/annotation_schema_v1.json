@@ -1,0 +1,114 @@
+{
+  "schema_version": "1.0.0",
+  "created_at": "2026-09-03T00:00:00Z",
+  "dataset_role": "golden_eval",
+  "coordinate_system": {
+    "origin": "top_left",
+    "box_format": ["x_min", "y_min", "width", "height"],
+    "reference_resolution": "original_golden_resolution",
+    "constraints": ["finite_coordinates", "positive_width", "positive_height", "fully_clamped_to_image"]
+  },
+  "object_labels": [
+    {
+      "name": "player",
+      "geometry": "rectangle",
+      "evaluation_tasks": ["detection", "tracking", "team"],
+      "team_values": ["team_a", "team_b", "unknown"]
+    },
+    {
+      "name": "goalkeeper",
+      "geometry": "rectangle",
+      "evaluation_tasks": ["detection", "tracking", "team"],
+      "team_values": ["team_a", "team_b", "unknown"]
+    },
+    {
+      "name": "referee",
+      "geometry": "rectangle",
+      "evaluation_tasks": ["detection", "tracking"],
+      "team_values": ["official"]
+    },
+    {
+      "name": "ball",
+      "geometry": "rectangle",
+      "evaluation_tasks": ["detection", "tracking"],
+      "team_values": ["not_applicable"]
+    },
+    {
+      "name": "ignore_person",
+      "geometry": "rectangle",
+      "evaluation_tasks": [],
+      "team_values": ["not_applicable"]
+    },
+    {
+      "name": "ignore_region",
+      "geometry": "polygon",
+      "evaluation_tasks": [],
+      "team_values": ["not_applicable"]
+    }
+  ],
+  "native_cvat_properties": {
+    "occluded": "boolean",
+    "outside": "tracking-only boolean"
+  },
+  "attributes": {
+    "team": {
+      "type": "enum",
+      "values": ["team_a", "team_b", "unknown", "official", "not_applicable"]
+    },
+    "truncated": {"type": "boolean", "default": false},
+    "uncertain": {"type": "boolean", "default": false},
+    "qa_notes": {"type": "text", "required": false}
+  },
+  "tracking": {
+    "sequence_local_ids": true,
+    "required_labels": ["player", "goalkeeper", "referee", "ball"],
+    "excluded_from_primary_evaluation": ["ignore_person", "ignore_region"],
+    "preserve_id_after_brief_occlusion_only_when_identity_is_certain": true
+  },
+  "events": {
+    "geometry": "frame_tag",
+    "values": ["pass", "shot", "ball_out", "restart"],
+    "attributes": {
+      "event_type": ["pass", "shot", "ball_out", "restart"],
+      "team": ["team_a", "team_b", "unknown"],
+      "actor_track_id": "nullable_integer",
+      "target_track_id": "nullable_integer",
+      "notes": "nullable_text",
+      "uncertain": "boolean"
+    }
+  },
+  "calibration": {
+    "pitch_line": {
+      "geometry": "polyline",
+      "line_type": ["touchline", "goal_line", "halfway_line", "penalty_area", "goal_area", "center_circle", "penalty_arc", "other_marking"]
+    },
+    "pitch_keypoint": {
+      "geometry": "points",
+      "keypoint_type": ["line_intersection", "corner", "center_spot", "penalty_spot", "other_known_landmark"]
+    },
+    "metric_coordinates_policy": "Record metric pitch coordinates only when real pitch dimensions are documented; never assume 105 m x 68 m."
+  },
+  "team_observations": {
+    "GOLDEN-01-BROADCAST": {
+      "team_a": "yellow shirts, blue shorts",
+      "team_b": "dark navy kit",
+      "policy": "Use unknown whenever kit or role is ambiguous."
+    },
+    "GOLDEN-02-TACTICAL-WIDE": {
+      "team_a": "red/pink kit candidate",
+      "team_b": "light/dark contrasting kit candidate",
+      "policy": "Small panoramic players require human confirmation; use unknown until confirmed."
+    },
+    "GOLDEN-03-DIFFICULT": {
+      "team_a": "yellow shirt candidate",
+      "team_b": "light/dark contrasting kit candidate",
+      "policy": "Glare, distance and crowd transitions require human confirmation; use unknown when uncertain."
+    }
+  },
+  "prohibited_inference": [
+    "Do not hallucinate hidden objects.",
+    "Do not interpolate ball detection ground truth when the ball is not visible.",
+    "Do not assign home or away automatically.",
+    "Do not box an entire crowd person by person; use ignore_region when exhaustive annotation is unreasonable."
+  ]
+}

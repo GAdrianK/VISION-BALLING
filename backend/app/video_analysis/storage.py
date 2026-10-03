@@ -55,7 +55,9 @@ class ResultStorage:
             return None
         return AnalysisResult.model_validate_json(path.read_text(encoding="utf-8"))
 
-    def find_completed_by_sha(self, sha256: str) -> AnalysisJob | None:
+    def find_completed_by_analysis_key(
+        self, analysis_key: str
+    ) -> AnalysisJob | None:
         for job_path in self.root.glob("analysis_*/job.json"):
             try:
                 job = AnalysisJob.model_validate_json(
@@ -63,7 +65,10 @@ class ResultStorage:
                 )
             except (OSError, ValueError):
                 continue
-            if job.source_sha256 == sha256 and job.status == JobStatus.COMPLETED:
+            if (
+                job.analysis_key == analysis_key
+                and job.status == JobStatus.COMPLETED
+            ):
                 return job
         return None
 

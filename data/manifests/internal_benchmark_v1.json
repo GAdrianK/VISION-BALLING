@@ -1,0 +1,137 @@
+{
+  "benchmark_version": "1.0.0",
+  "created_at": "2026-09-03T00:00:00Z",
+  "structure_status": "STRUCTURE_PASS",
+  "annotation_status": "ANNOTATIONS_PENDING",
+  "dataset_role": "golden_eval",
+  "description": "Single entry point for the private VISION-BALLING internal regression benchmark and its future CVAT annotation package.",
+  "reference_checksum_policy": "SHA-256 of UTF-8 file bytes after canonical CRLF/CR to LF newline normalization.",
+  "golden_manifest": {
+    "path": "data/manifests/golden_videos_v1.json",
+    "version": "1.1.0",
+    "sha256": "3ea335505526946266e16c8a95e875832fe861d7f15c163af26a2b0d26bf70de"
+  },
+  "golden_assets": [
+    {
+      "golden_id": "GOLDEN-01-BROADCAST",
+      "sha256": "9bfa4242b1512799c45d802f650cc76bf519b248c54254a7fecdd236f21bd39b",
+      "frame_count": 6000,
+      "fps": 25.0,
+      "width": 3840,
+      "height": 2160,
+      "dataset_role": "golden_eval"
+    },
+    {
+      "golden_id": "GOLDEN-02-TACTICAL-WIDE",
+      "sha256": "1cec8e8b8ac0ceff71352821cba1dbf4d83da4a834f82209fba323285ae1731e",
+      "frame_count": 6000,
+      "fps": 25.0,
+      "width": 4096,
+      "height": 1080,
+      "dataset_role": "golden_eval"
+    },
+    {
+      "golden_id": "GOLDEN-03-DIFFICULT",
+      "sha256": "804876b65364612e56ee9ca078023e9ce5c473cea9887b67d44fac5f07ad14e9",
+      "frame_count": 1405,
+      "fps": 29.0,
+      "width": 1280,
+      "height": 720,
+      "dataset_role": "golden_eval"
+    }
+  ],
+  "sampling": {
+    "method": "deterministic_zero_based_stride_plus_visually_selected_tracking_windows",
+    "sparse": {
+      "GOLDEN-01-BROADCAST": {"stride": 25, "count": 240},
+      "GOLDEN-02-TACTICAL-WIDE": {"stride": 25, "count": 240},
+      "GOLDEN-03-DIFFICULT": {"stride": 8, "count": 176}
+    },
+    "sparse_total": 656,
+    "tracking_frames_before_deduplication": 316,
+    "sparse_tracking_overlap": 18,
+    "total_unique": 950
+  },
+  "frame_inventory": {
+    "path": "data/manifests/golden_frames_v1.csv",
+    "version": "1.0.0",
+    "sha256": "e77b8a942233da3a4e61ab142c91c470f337c6ce57d8f4ed2f9b8f08ad3193b9",
+    "row_count": 950,
+    "annotation_status": "PENDING"
+  },
+  "tracking_sequences": {
+    "path": "data/manifests/tracking_sequences_v1.json",
+    "version": "1.0.0",
+    "sha256": "bd6fd659961b0e3c394135ba8036c36893b6a04186e3b2a6a85b340e81b29d42",
+    "sequence_count": 6
+  },
+  "calibration_frames": {
+    "path": "data/manifests/calibration_frames_v1.json",
+    "version": "1.0.0",
+    "sha256": "d669bf9c0c112e0e62b997df3d94e185ace35c5192916bdb57c5db182cfd408b",
+    "frame_count": 30
+  },
+  "annotation_schema": {
+    "path": "data/manifests/annotation_schema_v1.json",
+    "version": "1.0.0",
+    "sha256": "2eb56397f1eb31636d011ef751721c2bf75c2eb9962aacf0aeb2c55edf91d325"
+  },
+  "split_policy": {
+    "path": "docs/datasets/internal_validation_split_policy_v1.md",
+    "version": "1.0.0",
+    "sha256": "bb786ef857fc3c5d100f02f1344728ba6f44956e92c4579abcee75b16af26916"
+  },
+  "qa_policy": {
+    "path": "docs/datasets/golden_annotation_guidelines_v1.md",
+    "version": "1.0.0",
+    "sha256": "2f67f0e53a61203810e1adb6c218b63b089423f18e54b83eed6dece47b75cad8"
+  },
+  "partitions": {
+    "golden_eval": {
+      "golden_ids": ["GOLDEN-01-BROADCAST", "GOLDEN-02-TACTICAL-WIDE", "GOLDEN-03-DIFFICULT"],
+      "frame_count": 950,
+      "evaluation_only": true
+    }
+  },
+  "annotation_media": {
+    "private_path": "data/golden/annotation_media",
+    "format": "png",
+    "lossless": true,
+    "original_resolution": true,
+    "mapping": "data/golden/annotation_media/frame_mapping.csv",
+    "identity_policy": "golden_sha256_plus_zero_based_frame_index"
+  },
+  "cvat_tasks": [
+    {"task_id": "CVAT-G01-DETECTION", "group": "sparse_detection", "frame_references": 240},
+    {"task_id": "CVAT-G02-DETECTION", "group": "sparse_detection", "frame_references": 240},
+    {"task_id": "CVAT-G03-DETECTION", "group": "sparse_detection", "frame_references": 176},
+    {"task_id": "CVAT-TRACK-G01-01", "group": "tracking", "frame_references": 50},
+    {"task_id": "CVAT-TRACK-G01-02", "group": "tracking", "frame_references": 50},
+    {"task_id": "CVAT-TRACK-G02-01", "group": "tracking", "frame_references": 50},
+    {"task_id": "CVAT-TRACK-G02-02", "group": "tracking", "frame_references": 50},
+    {"task_id": "CVAT-TRACK-G03-01", "group": "tracking", "frame_references": 58},
+    {"task_id": "CVAT-TRACK-G03-02", "group": "tracking", "frame_references": 58},
+    {"task_id": "CVAT-G01-CALIBRATION", "group": "calibration", "frame_references": 10},
+    {"task_id": "CVAT-G02-CALIBRATION", "group": "calibration", "frame_references": 10},
+    {"task_id": "CVAT-G03-CALIBRATION", "group": "calibration", "frame_references": 10}
+  ],
+  "human_source_of_truth": {
+    "format": "CVAT native export",
+    "must_preserve": ["boxes", "labels", "attributes", "tracks", "points", "polylines", "frame_tags"]
+  },
+  "future_derived_exports": {
+    "detection": "COCO",
+    "tracking": "MOTChallenge or versioned internal benchmark format",
+    "calibration_and_events": "versioned internal JSON",
+    "conversion_policy": "deterministic"
+  },
+  "annotation_package": {
+    "private_path": "data/golden/annotations",
+    "status": "PENDING",
+    "version": null,
+    "sha256": null,
+    "required_for_final_freeze": ["CVAT native export", "QA log", "package version", "package SHA-256"]
+  },
+  "metric_reporting": ["per_golden", "per_camera_type", "macro_average"],
+  "benchmark_limit": "Internal regression benchmark only; not an independent blind scientific test or evidence of universal generalization."
+}

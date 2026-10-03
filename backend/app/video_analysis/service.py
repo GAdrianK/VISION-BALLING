@@ -10,16 +10,31 @@ from uuid import uuid4
 from fastapi import UploadFile
 
 from app.core.config import Settings
+from app.video_analysis.backends import diagnose_video_backend
 from app.video_analysis.detectors import ObjectDetector, create_detector
 from app.video_analysis.pipeline import VideoPipeline
+from app.video_analysis.reproducibility import (
+    build_analysis_key,
+    build_canonical_config,
+    resolve_git_sha,
+    resolve_model_identity,
+    resolve_tracker_identity,
+)
 from app.video_analysis.schemas import (
     AnalysisCreated,
     AnalysisJob,
     JobError,
     JobStatus,
+    PIPELINE_VERSION,
+    PipelineMetadata,
 )
 from app.video_analysis.storage import ResultStorage
-from app.video_analysis.trackers import Tracker, create_tracker
+from app.video_analysis.trackers import (
+    BallTracker,
+    Tracker,
+    create_tracker,
+    resolve_ball_tracker_timing,
+)
 from app.video_analysis.validation import VideoValidationError, VideoValidator
 
 logger = logging.getLogger("football.video_analysis")
@@ -39,9 +54,11 @@ class VideoAnalysisService:
         self.upload_root.mkdir(parents=True, exist_ok=True)
         self.result_root.mkdir(parents=True, exist_ok=True)
         self.storage = storage or ResultStorage(self.result_root)
+        self._model_checksum_cache: dict[tuple[str, int, int], str] = {}
         self.detector = detector or create_detector(
             settings.VIDEO_DETECTOR,
             model_path=settings.VIDEO_MODEL_PATH,
+            model_profile=settings.VIDEO_MODEL_PROFILE,
             device=settings.VIDEO_DEVICE,
             confidence_threshold=settings.VIDEO_CONFIDENCE_THRESHOLD,
             person_threshold=settings.VIDEO_PERSON_CONFIDENCE_THRESHOLD,
@@ -54,6 +71,7 @@ class VideoAnalysisService:
                 settings.VIDEO_TRACKING_ENABLED, settings.VIDEO_TRACKER
             )
         )
+        self._tracker_metadata = tracker.metadata() if tracker is not None else None
         self.validator = VideoValidator(
             allowed_extensions=set(settings.video_extensions),
             max_size_bytes=settings.VIDEO_MAX_SIZE_MB * 1024 * 1024,
@@ -94,7 +112,10 @@ class VideoAnalysisService:
             await upload.close()
 
         sha256 = digest.hexdigest()
-        completed = self.storage.find_completed_by_sha(sha256)
+        pipeline_metadata = self._build_pipeline_metadata(sha256)
+        analysis_key = pipeline_metadata.analysis_key
+        assert analysis_key is not None
+        completed = self.storage.find_completed_by_analysis_key(analysis_key)
         if completed:
             temporary.unlink(missing_ok=True)
             return AnalysisCreated(
@@ -111,6 +132,8 @@ class VideoAnalysisService:
             analysis_id=analysis_id,
             match_id=resolved_match_id,
             source_sha256=sha256,
+            analysis_key=analysis_key,
+            pipeline=pipeline_metadata,
         )
         self.storage.create_job(job)
         source = directory / f"source.{extension}"
@@ -141,11 +164,28 @@ class VideoAnalysisService:
             self._update(job, JobStatus.VALIDATING, 5, "validating_video")
             logger.info("video_validation_started analysis_id=%s", analysis_id)
             metadata = self.validator.validate(source, original_filename)
+            ball_tracker_timing = resolve_ball_tracker_timing(
+                max_missing_seconds=self.settings.VIDEO_BALL_TRACK_MAX_MISSING_SECONDS,
+                trajectory_seconds=self.settings.VIDEO_BALL_TRAJECTORY_SECONDS,
+                source_fps=metadata.fps,
+            )
             self._update(job, JobStatus.PROCESSING, 20, "loading_detector")
             pipeline = VideoPipeline(
                 detector=self.detector,
                 tracker=self.tracker_factory(),
-                frame_interval=self.settings.video_frame_sample_rate,
+                ball_tracker=BallTracker(
+                    max_missing_frames=(
+                        ball_tracker_timing.max_missing_frames_effective
+                    ),
+                    max_distance_ratio=(
+                        self.settings.VIDEO_BALL_TRACK_MAX_DISTANCE_RATIO
+                    ),
+                    trajectory_length=(
+                        ball_tracker_timing.trajectory_frames_effective
+                    ),
+                ),
+                ball_tracker_timing=ball_tracker_timing,
+                frame_sample_rate=self.settings.VIDEO_FRAME_SAMPLE_RATE,
                 keep_extracted_frames=self.settings.VIDEO_KEEP_TEMPORARY_FILES,
                 preserve_audio=self.settings.VIDEO_PRESERVE_AUDIO,
                 max_processing_seconds=self.settings.VIDEO_MAX_PROCESSING_SECONDS,
@@ -161,6 +201,10 @@ class VideoAnalysisService:
                 output_dir=directory,
                 metadata=metadata,
                 progress=progress,
+                pipeline_metadata=(
+                    job.pipeline
+                    or self._build_pipeline_metadata(job.source_sha256 or "unknown")
+                ),
             )
             self.storage.save_result(result)
             job.status = JobStatus.COMPLETED
@@ -169,8 +213,10 @@ class VideoAnalysisService:
             job.artifacts = result.artifacts
             job.warnings = result.warnings
             job.result_available = True
+            job.pipeline = result.pipeline
+            job.analysis_key = result.pipeline.analysis_key
             self.storage.save_job(job)
-            if not self.settings.VIDEO_KEEP_TEMPORARY_FILES:
+            if not self.settings.VIDEO_RETAIN_SOURCE:
                 source.unlink(missing_ok=True)
             logger.info("video_job_completed analysis_id=%s", analysis_id)
         except VideoValidationError as exc:
@@ -197,6 +243,57 @@ class VideoAnalysisService:
             job.analysis_id,
             code,
             message,
+        )
+
+    def _build_pipeline_metadata(self, source_sha256: str) -> PipelineMetadata:
+        detector_metadata = self.detector.metadata()
+        model = resolve_model_identity(
+            self.settings,
+            detector_metadata,
+            backend_root=Path(__file__).resolve().parents[2],
+            checksum_cache=self._model_checksum_cache,
+        )
+        tracker_name, tracker_version = resolve_tracker_identity(
+            self.settings, self._tracker_metadata
+        )
+        backend = diagnose_video_backend()
+        canonical_config = build_canonical_config(
+            self.settings,
+            model,
+            tracker_name=tracker_name,
+            tracker_version=tracker_version,
+            video_backend=backend.video_backend,
+            ffmpeg_version=backend.ffmpeg_version,
+        )
+        analysis_key = build_analysis_key(
+            source_sha256,
+            model.model_checksum,
+            canonical_config,
+        )
+        return PipelineMetadata(
+            version=PIPELINE_VERSION,
+            pipeline_version=PIPELINE_VERSION,
+            detector=model.model_id,
+            detector_name=model.detector_name,
+            detector_version=model.detector_version,
+            frame_sample_rate=self.settings.VIDEO_FRAME_SAMPLE_RATE,
+            device=str(detector_metadata.get("device") or self.settings.VIDEO_DEVICE),
+            tracker_name=tracker_name,
+            tracker_version=tracker_version,
+            tracking_enabled=tracker_name != "none",
+            ffmpeg_version=backend.ffmpeg_version,
+            video_backend=backend.video_backend,
+            source_sha256=source_sha256,
+            analysis_key=analysis_key,
+            git_sha=resolve_git_sha(self.settings.VIDEO_GIT_SHA),
+            model_id=model.model_id,
+            model_checksum=model.model_checksum,
+            thresholds=canonical_config["thresholds"],
+            ball_track_max_missing_seconds=(
+                self.settings.VIDEO_BALL_TRACK_MAX_MISSING_SECONDS
+            ),
+            ball_trajectory_seconds=self.settings.VIDEO_BALL_TRAJECTORY_SECONDS,
+            canonical_config=canonical_config,
         )
 
     @staticmethod

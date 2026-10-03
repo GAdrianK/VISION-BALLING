@@ -127,4 +127,93 @@ def download_artifact(
         raise HTTPException(status_code=404, detail="Artefact introuvable.") from exc
     if not path.is_file():
         raise HTTPException(status_code=404, detail="Artefact introuvable.")
-    return FileResponse(path=Path(path), media_type=media_type, filename=filename)
+    return FileResponse(
+        path=Path(path),
+        media_type=media_type,
+        filename=filename,
+        content_disposition_type=(
+            "inline" if artifact_name == "annotated_video" else "attachment"
+        ),
+    )
+
+
+# ==============================================================================
+# GROUNDED MULTIMODAL TACTICAL RAG & REPORT ENDPOINTS (EXP-26 / Chapter 8)
+# ==============================================================================
+
+from app.schemas.grounded_rag import (
+    GroundedMatchAnswer,
+    MatchReportResponse,
+    VideoAnalysisQueryRequest,
+)
+from app.services.grounded_rag_service import GroundedTacticalRAGService
+from app.services.match_evidence_store import MatchEvidenceRegistry
+from app.services.match_report_generator import MatchReportGenerator
+
+_report_generator = MatchReportGenerator()
+
+
+def get_grounded_rag_service() -> GroundedTacticalRAGService:
+    try:
+        from app.main import rag_engine
+    except ImportError:
+        rag_engine = None
+    return GroundedTacticalRAGService(
+        rag_engine=rag_engine,
+        openai_api_key=settings.OPENAI_API_KEY,
+        openrouter_api_key=settings.openrouter_key,
+    )
+
+
+@router.post("/{analysis_id}/query", response_model=GroundedMatchAnswer)
+def query_video_analysis(
+    analysis_id: str,
+    payload: VideoAnalysisQueryRequest,
+    rag_service: GroundedTacticalRAGService = Depends(get_grounded_rag_service),
+) -> GroundedMatchAnswer:
+    """Interroge les évidences tactiques validées de la vidéo analysée avec ancrage strict."""
+    try:
+        return rag_service.query(
+            query_text=payload.query,
+            analysis_id=analysis_id,
+            max_evidence_events=payload.max_evidence_events,
+            include_knowledge_base=payload.include_knowledge_base,
+        )
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Erreur d'interrogation vidéo : {exc}") from exc
+
+
+@router.get("/{analysis_id}/timeline")
+def get_video_analysis_timeline(analysis_id: str) -> list:
+    """Renvoie la chronologie ordonnée des événements tactiques de la vidéo."""
+    store = MatchEvidenceRegistry.get_or_load(analysis_id)
+    if not store.is_loaded or not store.timeline:
+        raise HTTPException(status_code=404, detail="Chronologie introuvable pour cette analyse.")
+    return [e.model_dump() if hasattr(e, "model_dump") else e.__dict__ for e in store.timeline]
+
+
+@router.get("/{analysis_id}/events")
+def get_video_analysis_events(analysis_id: str) -> list:
+    """Renvoie l'index complet des événements probants de la vidéo."""
+    store = MatchEvidenceRegistry.get_or_load(analysis_id)
+    if not store.is_loaded or not store.events_by_id:
+        raise HTTPException(status_code=404, detail="Événements introuvables pour cette analyse.")
+    return [e.model_dump() if hasattr(e, "model_dump") else e.__dict__ for e in store.events_by_id.values()]
+
+
+@router.get("/{analysis_id}/summary")
+def get_video_analysis_summary(analysis_id: str) -> dict:
+    """Renvoie les agrégats tactiques et bandes de fiabilité par équipe."""
+    store = MatchEvidenceRegistry.get_or_load(analysis_id)
+    if not store.is_loaded or not store.team_summaries:
+        raise HTTPException(status_code=404, detail="Résumé tactique introuvable pour cette analyse.")
+    return store.team_summaries
+
+
+@router.post("/{analysis_id}/report", response_model=MatchReportResponse)
+def generate_video_analysis_report(analysis_id: str) -> MatchReportResponse:
+    """Génère le rapport d'intelligence tactique 100% ancré pour la vidéo."""
+    try:
+        return _report_generator.generate_report(analysis_id)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Erreur de génération du rapport : {exc}") from exc

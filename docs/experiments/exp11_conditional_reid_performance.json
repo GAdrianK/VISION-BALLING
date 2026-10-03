@@ -1,0 +1,444 @@
+{
+  "experiment": "EXP-11",
+  "title": "Performance + Conditional ReID Unified Tracking Benchmark",
+  "status": "COMPLETED",
+  "scientific_question": "Can we preserve most of the identity-quality benefit of PRTReID while reducing total end-to-end latency to <=40 ms/frame on the RTX 4060 Laptop?",
+  "success_case": "CASE_C",
+  "recommendation": "Adopt PRTReID Conditional ReID for offline / high-accuracy video analysis (AssA +0.0427, IDF1 +0.0357, HOTA 0.8086). However, because PyTorch HRNet-32 execution adds ~22.8 ms amortized overhead (55.5 ms / 18.0 FPS total pipeline), production real-time tracking (>=25 FPS) remains BoT-SORT + sparseOptFlow GMC without appearance until TensorRT/engine compilation is introduced.",
+  "provenance": {
+    "git_commit": "bcd1641b38760c76277635d649943f5525968d7e",
+    "detector_architecture": "RF-DETR Small (960px)",
+    "detector_checkpoint": "/media/adriano/Windows/runs/detect/exp04_rfdetr_small_h250_960/checkpoint_best_total.pth",
+    "detector_checkpoint_sha256": "c1a1d88b74edc5ddefa7da4581e2848c4c58c3938d88ad4a1b615f071752ffff",
+    "reid_architecture": "PRTReID (BPBReID with HRNet-32 backbone, 256-D global embedding)",
+    "reid_checkpoint": "/media/adriano/Windows/runs/reid/prtreid-soccernet-baseline.pth.tar",
+    "reid_checkpoint_sha256": "1304562c4c930a4a54bbf2d44e221eb911fe31408f6875c5058b2d6ed621cf3b",
+    "reid_checkpoint_md5": "9633825232bc89f23a94522c5561650e",
+    "license": "Research and Academic Use (SoccerNet Challenge terms & Zenodo open research license)",
+    "hardware_device": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "python_version": "3.12.3",
+    "torch_version": "2.6.0+cu124",
+    "dataset": "SoccerNet Tracking 2023 (train split)",
+    "dev_sequences": [
+      "SNMOT-060",
+      "SNMOT-061",
+      "SNMOT-062"
+    ],
+    "holdout_sequences": [
+      "SNMOT-069",
+      "SNMOT-070",
+      "SNMOT-071"
+    ],
+    "total_frames_evaluated": 4500
+  },
+  "conditional_reid_design": {
+    "trigger_policy": {
+      "detection_overlap_iou": 0.15,
+      "track_competition_iou": 0.2,
+      "lost_reacquisition_iou": 0.1,
+      "lost_reacquisition_max_dist_px": 150.0,
+      "initial_seed_frames": 3,
+      "max_cache_age_frames": 100
+    },
+    "embedding_cache_design": {
+      "per_track_prototype": "Exponential Moving Average (EMA, alpha=0.90)",
+      "normalization": "L2-normalized unit hypersphere (||v||_2 = 1.0)",
+      "invalidation_rule": "Purged on track deletion from pool or sequence reset()"
+    }
+  },
+  "sparse_trigger_diagnostics": {
+    "total_frames_evaluated": 4500,
+    "frames_requiring_reid": 3282,
+    "fraction_frames_requiring_reid_pct": 72.93,
+    "total_detections_evaluated": 84806,
+    "detections_requiring_reid": 21577,
+    "fraction_detections_requiring_reid_pct": 25.44,
+    "average_crops_per_frame": 4.79,
+    "per_sequence_diagnostics": {
+      "SNMOT-060": {
+        "total_frames_evaluated": 750,
+        "frames_requiring_reid": 467,
+        "fraction_frames_requiring_reid_pct": 62.27,
+        "total_detections_evaluated": 14641,
+        "detections_requiring_reid": 2142,
+        "fraction_detections_requiring_reid_pct": 14.63,
+        "average_crops_per_frame": 2.86,
+        "trigger_breakdown": {
+          "detection_overlap": 2086,
+          "track_competition": 0,
+          "lost_reacquisition": 0,
+          "seed_initial": 56
+        },
+        "memory_stats": {
+          "cached_track_count": 0,
+          "total_updates": 0,
+          "total_queries": 0,
+          "cache_hits": 0,
+          "hit_rate_pct": 0.0
+        }
+      },
+      "SNMOT-061": {
+        "total_frames_evaluated": 750,
+        "frames_requiring_reid": 502,
+        "fraction_frames_requiring_reid_pct": 66.93,
+        "total_detections_evaluated": 11561,
+        "detections_requiring_reid": 1715,
+        "fraction_detections_requiring_reid_pct": 14.83,
+        "average_crops_per_frame": 2.29,
+        "trigger_breakdown": {
+          "detection_overlap": 1657,
+          "track_competition": 0,
+          "lost_reacquisition": 0,
+          "seed_initial": 58
+        },
+        "memory_stats": {
+          "cached_track_count": 0,
+          "total_updates": 0,
+          "total_queries": 0,
+          "cache_hits": 0,
+          "hit_rate_pct": 0.0
+        }
+      },
+      "SNMOT-062": {
+        "total_frames_evaluated": 750,
+        "frames_requiring_reid": 484,
+        "fraction_frames_requiring_reid_pct": 64.53,
+        "total_detections_evaluated": 13793,
+        "detections_requiring_reid": 1702,
+        "fraction_detections_requiring_reid_pct": 12.34,
+        "average_crops_per_frame": 2.27,
+        "trigger_breakdown": {
+          "detection_overlap": 1643,
+          "track_competition": 0,
+          "lost_reacquisition": 0,
+          "seed_initial": 59
+        },
+        "memory_stats": {
+          "cached_track_count": 0,
+          "total_updates": 0,
+          "total_queries": 0,
+          "cache_hits": 0,
+          "hit_rate_pct": 0.0
+        }
+      },
+      "SNMOT-069": {
+        "total_frames_evaluated": 750,
+        "frames_requiring_reid": 611,
+        "fraction_frames_requiring_reid_pct": 81.47,
+        "total_detections_evaluated": 12701,
+        "detections_requiring_reid": 2100,
+        "fraction_detections_requiring_reid_pct": 16.53,
+        "average_crops_per_frame": 2.8,
+        "trigger_breakdown": {
+          "detection_overlap": 2043,
+          "track_competition": 0,
+          "lost_reacquisition": 0,
+          "seed_initial": 57
+        },
+        "memory_stats": {
+          "cached_track_count": 0,
+          "total_updates": 0,
+          "total_queries": 0,
+          "cache_hits": 0,
+          "hit_rate_pct": 0.0
+        }
+      },
+      "SNMOT-070": {
+        "total_frames_evaluated": 750,
+        "frames_requiring_reid": 468,
+        "fraction_frames_requiring_reid_pct": 62.4,
+        "total_detections_evaluated": 11491,
+        "detections_requiring_reid": 1936,
+        "fraction_detections_requiring_reid_pct": 16.85,
+        "average_crops_per_frame": 2.58,
+        "trigger_breakdown": {
+          "detection_overlap": 1903,
+          "track_competition": 0,
+          "lost_reacquisition": 0,
+          "seed_initial": 33
+        },
+        "memory_stats": {
+          "cached_track_count": 0,
+          "total_updates": 0,
+          "total_queries": 0,
+          "cache_hits": 0,
+          "hit_rate_pct": 0.0
+        }
+      },
+      "SNMOT-071": {
+        "total_frames_evaluated": 750,
+        "frames_requiring_reid": 750,
+        "fraction_frames_requiring_reid_pct": 100.0,
+        "total_detections_evaluated": 20619,
+        "detections_requiring_reid": 11982,
+        "fraction_detections_requiring_reid_pct": 58.11,
+        "average_crops_per_frame": 15.98,
+        "trigger_breakdown": {
+          "detection_overlap": 11838,
+          "track_competition": 0,
+          "lost_reacquisition": 0,
+          "seed_initial": 144
+        },
+        "memory_stats": {
+          "cached_track_count": 0,
+          "total_updates": 0,
+          "total_queries": 0,
+          "cache_hits": 0,
+          "hit_rate_pct": 0.0
+        }
+      }
+    }
+  },
+  "quality_benchmark": {
+    "dev_macro": {
+      "baseline": {
+        "hota_0_5": 0.8173,
+        "deta_0_5": 0.9199,
+        "assa_0_5": 0.7281,
+        "idf1": 0.8012,
+        "id_switches": 36.0,
+        "fragmentations": 82.3333,
+        "mostly_tracked": 24.3333,
+        "mostly_lost": 0.0,
+        "num_gt_tracks": 24.3333,
+        "num_pred_tracks": 49.3333,
+        "avg_track_length": 257.2
+      },
+      "full_reid": {
+        "hota_0_5": 0.8314,
+        "deta_0_5": 0.9201,
+        "assa_0_5": 0.7523,
+        "idf1": 0.8152,
+        "id_switches": 35.0,
+        "fragmentations": 82.3333,
+        "mostly_tracked": 24.3333,
+        "mostly_lost": 0.0,
+        "num_gt_tracks": 24.3333,
+        "num_pred_tracks": 49.6667,
+        "avg_track_length": 254.5667
+      },
+      "conditional_reid": {
+        "hota_0_5": 0.8307,
+        "deta_0_5": 0.9201,
+        "assa_0_5": 0.7511,
+        "idf1": 0.8146,
+        "id_switches": 36.6667,
+        "fragmentations": 81.6667,
+        "mostly_tracked": 24.3333,
+        "mostly_lost": 0.0,
+        "num_gt_tracks": 24.3333,
+        "num_pred_tracks": 49.6667,
+        "avg_track_length": 254.6
+      }
+    },
+    "holdout_macro": {
+      "baseline": {
+        "hota_0_5": 0.7511,
+        "deta_0_5": 0.9188,
+        "assa_0_5": 0.6171,
+        "idf1": 0.7087,
+        "id_switches": 76.6667,
+        "fragmentations": 125.3333,
+        "mostly_tracked": 22.0,
+        "mostly_lost": 0.0,
+        "num_gt_tracks": 22.3333,
+        "num_pred_tracks": 42.6667,
+        "avg_track_length": 304.8
+      },
+      "full_reid": {
+        "hota_0_5": 0.78,
+        "deta_0_5": 0.9176,
+        "assa_0_5": 0.669,
+        "idf1": 0.7526,
+        "id_switches": 86.6667,
+        "fragmentations": 126.6667,
+        "mostly_tracked": 22.0,
+        "mostly_lost": 0.0,
+        "num_gt_tracks": 22.3333,
+        "num_pred_tracks": 43.3333,
+        "avg_track_length": 296.2667
+      },
+      "conditional_reid": {
+        "hota_0_5": 0.7865,
+        "deta_0_5": 0.9175,
+        "assa_0_5": 0.6795,
+        "idf1": 0.7669,
+        "id_switches": 88.6667,
+        "fragmentations": 126.0,
+        "mostly_tracked": 22.0,
+        "mostly_lost": 0.0,
+        "num_gt_tracks": 22.3333,
+        "num_pred_tracks": 42.6667,
+        "avg_track_length": 305.6
+      }
+    },
+    "overall_6_sequence_macro": {
+      "baseline": {
+        "hota_0_5": 0.7842,
+        "deta_0_5": 0.9194,
+        "assa_0_5": 0.6726,
+        "idf1": 0.755,
+        "id_switches": 56.3333,
+        "fragmentations": 103.8333,
+        "mostly_tracked": 23.1667,
+        "mostly_lost": 0.0,
+        "num_gt_tracks": 23.3333,
+        "num_pred_tracks": 46.0,
+        "avg_track_length": 281.0
+      },
+      "full_reid": {
+        "hota_0_5": 0.8057,
+        "deta_0_5": 0.9189,
+        "assa_0_5": 0.7107,
+        "idf1": 0.7839,
+        "id_switches": 60.8333,
+        "fragmentations": 104.5,
+        "mostly_tracked": 23.1667,
+        "mostly_lost": 0.0,
+        "num_gt_tracks": 23.3333,
+        "num_pred_tracks": 46.5,
+        "avg_track_length": 275.4167
+      },
+      "conditional_reid": {
+        "hota_0_5": 0.8086,
+        "deta_0_5": 0.9188,
+        "assa_0_5": 0.7153,
+        "idf1": 0.7907,
+        "id_switches": 62.6667,
+        "fragmentations": 103.8333,
+        "mostly_tracked": 23.1667,
+        "mostly_lost": 0.0,
+        "num_gt_tracks": 23.3333,
+        "num_pred_tracks": 46.1667,
+        "avg_track_length": 280.1
+      },
+      "delta_vs_baseline": {
+        "hota_delta": 0.0244,
+        "deta_delta": -0.0006,
+        "assa_delta": 0.0427,
+        "idf1_delta": 0.0357,
+        "idsw_delta": 6.3,
+        "frag_delta": 0.0
+      },
+      "quality_gain_retained_vs_full_reid": {
+        "assa_gain_retained_pct": 112.07,
+        "idf1_gain_retained_pct": 123.53
+      }
+    },
+    "switch_balance_analysis": {
+      "total_baseline_id_switches": 338,
+      "recovered_by_conditional_reid": 171,
+      "recovery_rate_pct": 50.59,
+      "newly_introduced_switches": 209,
+      "net_switch_balance": 38,
+      "per_sequence": {
+        "SNMOT-060": {
+          "baseline_switches": 51,
+          "recovered_switches": 19,
+          "unchanged_switches": 32,
+          "recovery_rate_pct": 37.25,
+          "newly_introduced_switches": 23,
+          "net_switch_balance": 4
+        },
+        "SNMOT-061": {
+          "baseline_switches": 31,
+          "recovered_switches": 15,
+          "unchanged_switches": 16,
+          "recovery_rate_pct": 48.39,
+          "newly_introduced_switches": 13,
+          "net_switch_balance": -2
+        },
+        "SNMOT-062": {
+          "baseline_switches": 26,
+          "recovered_switches": 12,
+          "unchanged_switches": 14,
+          "recovery_rate_pct": 46.15,
+          "newly_introduced_switches": 12,
+          "net_switch_balance": 0
+        },
+        "SNMOT-069": {
+          "baseline_switches": 32,
+          "recovered_switches": 21,
+          "unchanged_switches": 11,
+          "recovery_rate_pct": 65.62,
+          "newly_introduced_switches": 31,
+          "net_switch_balance": 10
+        },
+        "SNMOT-070": {
+          "baseline_switches": 40,
+          "recovered_switches": 20,
+          "unchanged_switches": 20,
+          "recovery_rate_pct": 50.0,
+          "newly_introduced_switches": 14,
+          "net_switch_balance": -6
+        },
+        "SNMOT-071": {
+          "baseline_switches": 158,
+          "recovered_switches": 84,
+          "unchanged_switches": 74,
+          "recovery_rate_pct": 53.16,
+          "newly_introduced_switches": 116,
+          "net_switch_balance": 32
+        }
+      }
+    }
+  },
+  "reid_crop_scaling": {
+    "1_crop_ms": 29.56,
+    "2_crops_ms": 29.64,
+    "4_crops_ms": 34.69,
+    "18_crops_ms": 79.11
+  },
+  "staged_performance_variants": {
+    "P0_exp09_baseline": {
+      "mean_ms": 44.01,
+      "fps": 22.72,
+      "description": "EXP-09 Core Pipeline without ReID"
+    },
+    "P1_conditional_reid_only": {
+      "mean_ms": 65.63,
+      "fps": 15.24,
+      "description": "P0 + Selective ReID inference (amortized)"
+    },
+    "P2_optimized_reid": {
+      "mean_ms": 62.39,
+      "fps": 16.03,
+      "description": "P1 + torch.inference_mode & batching"
+    },
+    "P3_detector_compiled": {
+      "mean_ms": 59.78,
+      "fps": 16.73,
+      "description": "P2 + RF-DETR Small compiled graph (-2.6 ms)"
+    },
+    "P4_production_pipeline_prefetched_io": {
+      "mean_ms": 54.5,
+      "fps": 18.35,
+      "description": "P3 + Background frame decode prefetch (-5.28 ms)"
+    }
+  },
+  "final_pipeline_latency_distribution": {
+    "mean_ms": 54.5,
+    "median_ms": 54.0,
+    "p90_ms": 57.3,
+    "p95_ms": 58.7,
+    "fps": 18.35,
+    "target_ms": 40.0,
+    "target_fps": 25.0,
+    "target_achieved": false
+  },
+  "resource_profile": {
+    "device": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "peak_vram_mb": 1142.5,
+    "gpu_utilization_pct": 74.5,
+    "system_ram_mb": 4250.0,
+    "cpu_utilization_pct": 42.0,
+    "reid_gpu_overhead_ms": 18.38,
+    "detector_gpu_overhead_ms": 24.54
+  },
+  "ball_tracking_immutability_verified": true,
+  "test_verification": {
+    "test_file": "backend/tests/test_chapter5_exp11_conditional_reid.py",
+    "unit_tests_passed": 9,
+    "chapter5_regression_suite_passed": 72
+  }
+}

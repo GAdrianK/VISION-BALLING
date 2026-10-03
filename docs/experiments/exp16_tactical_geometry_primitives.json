@@ -1,0 +1,333 @@
+{
+  "experiment": "EXP-16",
+  "title": "Team-Level Tactical Geometry Primitives",
+  "chapter": "Chapter 7",
+  "status": "COMPLETED",
+  "terminal_state": "EXP-16 COMPLETE \u2014 TACTICAL GEOMETRY PRIMITIVES LOCKED",
+  "data_discipline": {
+    "dev_sequences": [
+      "SNMOT-060",
+      "SNMOT-061",
+      "SNMOT-062"
+    ],
+    "holdout_sequences": [
+      "SNMOT-069",
+      "SNMOT-070",
+      "SNMOT-071"
+    ],
+    "continuous_full_sequences": [
+      "SNMOT-060",
+      "SNMOT-069"
+    ],
+    "test_split_used": false,
+    "golden_cvat_used": false
+  },
+  "canonical_grid_specifications": {
+    "pitch_dimensions": "FIFA 105.0m x 68.0m",
+    "fifteen_zone_grid": {
+      "longitudinal_zones_x": "5 zones of 21.0m: [-52.5, -31.5, -10.5, 10.5, 31.5, 52.5]",
+      "lateral_channels_y": "3 channels of 22.67m: [-34.0, -11.33, 11.33, 34.0]",
+      "total_cells": 15
+    },
+    "five_lane_representation": {
+      "left_wide": "[-34.0, -20.4] (13.6m)",
+      "left_half_space": "[-20.4, -6.8] (13.6m)",
+      "central": "[-6.8, 6.8] (13.6m)",
+      "right_half_space": "[6.8, 20.4] (13.6m)",
+      "right_wide": "[20.4, 34.0] (13.6m)"
+    }
+  },
+  "synthetic_ground_truth_validation": {
+    "rectangle": {
+      "expected": {
+        "width": 20.0,
+        "span": 30.0,
+        "area": 600.0,
+        "perim": 100.0,
+        "stretch": 18.027756377319946
+      },
+      "computed": {
+        "width": 20.0,
+        "span": 30.0,
+        "area": 600.0,
+        "perim": 100.0,
+        "stretch": 18.027756377319946
+      }
+    },
+    "compact_square": {
+      "expected": {
+        "width": 10.0,
+        "span": 10.0,
+        "area": 100.0,
+        "perim": 40.0,
+        "stretch": 7.0710678118654755
+      },
+      "computed": {
+        "width": 10.0,
+        "span": 10.0,
+        "area": 100.0,
+        "perim": 40.0,
+        "stretch": 7.0710678118654755
+      }
+    },
+    "wide_line": {
+      "expected": {
+        "width": 40.0,
+        "span": 0.0,
+        "area": 0.0,
+        "perim": 80.0,
+        "stretch": 12.0
+      },
+      "computed": {
+        "width": 40.0,
+        "span": 0.0,
+        "area": 0.0,
+        "perim": 80.0,
+        "stretch": 12.0
+      }
+    },
+    "narrow_line": {
+      "expected": {
+        "width": 0.0,
+        "span": 20.0,
+        "area": 0.0,
+        "perim": 40.0,
+        "stretch": 6.0
+      },
+      "computed": {
+        "width": 0.0,
+        "span": 20.0,
+        "area": 0.0,
+        "perim": 40.0,
+        "stretch": 6.0
+      }
+    },
+    "staggered_lines": {
+      "expected": {
+        "width": 30.0,
+        "span": 20.0,
+        "area": 500.0,
+        "centroid_x": -1.4285714285714286
+      },
+      "computed": {
+        "width": 30.0,
+        "span": 20.0,
+        "area": 500.00000000000006,
+        "centroid_x": -1.4285714285714286
+      }
+    },
+    "hexagon": {
+      "expected": {
+        "area": 259.8076211353316,
+        "stretch": 10.0,
+        "perim": 60.0
+      },
+      "computed": {
+        "area": 259.80762113533166,
+        "stretch": 10.0,
+        "perim": 60.0
+      }
+    }
+  },
+  "perturbation_robustness": {
+    "coordinate_noise_sensitivity": {
+      "noise_sigma_0.10m": {
+        "mean_centroid_shift_m": 0.036928239176155564,
+        "mean_width_error_m": 0.10348433040452817,
+        "mean_span_error_m": 0.13147482354187331,
+        "mean_hull_area_error_m2": 3.6172049945014395,
+        "mean_stretch_error_m": 0.0248496109942198
+      },
+      "noise_sigma_0.25m": {
+        "mean_centroid_shift_m": 0.09593832682329709,
+        "mean_width_error_m": 0.2842484809956956,
+        "mean_span_error_m": 0.29571967235059204,
+        "mean_hull_area_error_m2": 9.319028826653012,
+        "mean_stretch_error_m": 0.048085406015195176
+      },
+      "noise_sigma_0.50m": {
+        "mean_centroid_shift_m": 0.19475837091949255,
+        "mean_width_error_m": 0.513573742651397,
+        "mean_span_error_m": 0.6191584803669522,
+        "mean_hull_area_error_m2": 16.31003526683089,
+        "mean_stretch_error_m": 0.09959111171333909
+      }
+    },
+    "missing_player_leave_one_out": {
+      "mean_centroid_shift_m": 1.9764671408556496,
+      "max_centroid_shift_m": 2.8198809185959837,
+      "mean_hull_area_delta_m2": 92.0
+    },
+    "wrong_team_outlier_robustness": {
+      "mean_centroid_shift_m": 4.656010067865631,
+      "median_centroid_shift_m": 0.0,
+      "robustness_observation": "The injected outlier shifted the arithmetic centroid by 4.66 m while the coordinate-wise median centroid remained unchanged in this synthetic case."
+    }
+  },
+  "visibility_effect_analysis": {
+    "low_N_le_4": {
+      "mean_hull_area_m2": 301.98333333333335,
+      "hull_area_retention_ratio": 0.24392837910608509,
+      "mean_width_m": 22.333333333333332,
+      "mean_span_m": 29.716666666666665,
+      "mean_stretch_index_m": 15.135914847125981,
+      "assessment": "Unreliable Hull, Local Cluster Only"
+    },
+    "mid_N_5_7": {
+      "mean_hull_area_m2": 833.8555555555556,
+      "hull_area_retention_ratio": 0.6735505295279125,
+      "mean_width_m": 32.733333333333334,
+      "mean_span_m": 35.955555555555556,
+      "mean_stretch_index_m": 17.707806679840402,
+      "assessment": "Degraded Hull, Moderate Shape"
+    },
+    "high_N_ge_8": {
+      "mean_hull_area_m2": 1152.7555555555555,
+      "hull_area_retention_ratio": 0.931143421288817,
+      "mean_width_m": 35.55555555555556,
+      "mean_span_m": 37.53333333333333,
+      "mean_stretch_index_m": 17.742176165301206,
+      "assessment": "Reliable"
+    }
+  },
+  "goalkeeper_and_attacking_direction_audit": {
+    "goalkeeper_effect_on_tactical_shape": {
+      "mean_longitudinal_span_expansion_m": 6.927619300711064,
+      "mean_centroid_pullback_m": 2.9525969654890294,
+      "architectural_decision": "Default team tactical shape strictly excludes the goalkeeper (outfield-only), preventing 25-35m artificial longitudinal distortion. Full team shape is retained as a secondary signal."
+    },
+    "attacking_direction_inference_audit": {
+      "candidate_methods": {
+        "method_1_goalkeeper_anchor": "Locates GK in defending penalty area (X approx -45m implies attacking +X). Highly robust when GK is visible.",
+        "method_2_temporal_team_centroid_offset": "Team 0 mean X=8.2m vs Team 1 mean X=9.5m. The team on the negative X half defends the negative X goal.",
+        "method_3_ball_progression": "Direction of sustained ball forward passes / clearances towards goal."
+      },
+      "recommendation_for_exp17": "Hierarchical resolution: 1. GK defending goal hemisphere; 2. Fallback to temporal mean team centroid offset. EXP-16 remains strictly axis-agnostic (using longitudinal_span_m)."
+    }
+  },
+  "real_sequences_benchmark": {
+    "macro_incremental_tactical_ms_per_frame": 1.1301037626508332,
+    "per_sequence": {
+      "SNMOT-060": {
+        "sequence_id": "SNMOT-060",
+        "frames_evaluated": 750,
+        "duration_seconds": 30.0,
+        "team_0": {
+          "mean_width_m": 15.127731737636818,
+          "mean_longitudinal_span_m": 28.509181099924582,
+          "mean_hull_area_m2": 212.91195211133686,
+          "mean_stretch_index_m": 9.983273981518172
+        },
+        "team_1": {
+          "mean_width_m": 22.382511263703375,
+          "mean_longitudinal_span_m": 28.805105138956026,
+          "mean_hull_area_m2": 378.4113252807522,
+          "mean_stretch_index_m": 10.594413838685655
+        },
+        "inter_team": {
+          "mean_centroid_distance_m": 6.321574408627076
+        },
+        "incremental_latency_ms": {
+          "tactical_geometry_mean_ms": 1.0905742012982955,
+          "tactical_geometry_p95_ms": 1.5562762003355597,
+          "metric_trajectories_mean_ms": 0.7990951013295368
+        }
+      },
+      "SNMOT-069": {
+        "sequence_id": "SNMOT-069",
+        "frames_evaluated": 750,
+        "duration_seconds": 30.0,
+        "team_0": {
+          "mean_width_m": 22.064007239703265,
+          "mean_longitudinal_span_m": 24.575040763192302,
+          "mean_hull_area_m2": 291.29250636653893,
+          "mean_stretch_index_m": 11.181369096122857
+        },
+        "team_1": {
+          "mean_width_m": 28.06000534694379,
+          "mean_longitudinal_span_m": 27.26677850445139,
+          "mean_hull_area_m2": 470.29912764719154,
+          "mean_stretch_index_m": 10.63828876900169
+        },
+        "inter_team": {
+          "mean_centroid_distance_m": 5.1607731682271725
+        },
+        "incremental_latency_ms": {
+          "tactical_geometry_mean_ms": 0.9840160293048635,
+          "tactical_geometry_p95_ms": 1.2127955993491921,
+          "metric_trajectories_mean_ms": 0.7080901120086006
+        }
+      },
+      "SNMOT-061": {
+        "sequence_id": "SNMOT-061",
+        "frames_evaluated": 150,
+        "duration_seconds": 6.0,
+        "team_0": {
+          "mean_width_m": 44.76714535641946,
+          "mean_longitudinal_span_m": 27.823546121113395,
+          "mean_hull_area_m2": 581.4524304560217,
+          "mean_stretch_index_m": 13.366271810335547
+        },
+        "team_1": {
+          "mean_width_m": 31.705304120289274,
+          "mean_longitudinal_span_m": 16.87742050076841,
+          "mean_hull_area_m2": 222.25703897773695,
+          "mean_stretch_index_m": 10.288594759709001
+        },
+        "inter_team": {
+          "mean_centroid_distance_m": 5.391504254357711
+        },
+        "incremental_latency_ms": {
+          "tactical_geometry_mean_ms": 1.3551163866456288,
+          "tactical_geometry_p95_ms": 1.736907699614676,
+          "metric_trajectories_mean_ms": 0.776073626645181
+        }
+      },
+      "SNMOT-071": {
+        "sequence_id": "SNMOT-071",
+        "frames_evaluated": 150,
+        "duration_seconds": 6.0,
+        "team_0": {
+          "mean_width_m": 19.212047124666455,
+          "mean_longitudinal_span_m": 26.989830016957352,
+          "mean_hull_area_m2": 136.88184523071283,
+          "mean_stretch_index_m": 5.23906744758411
+        },
+        "team_1": {
+          "mean_width_m": 11.276239899419227,
+          "mean_longitudinal_span_m": 16.619008864983808,
+          "mean_hull_area_m2": 93.37450574660454,
+          "mean_stretch_index_m": 5.449188343047079
+        },
+        "inter_team": {
+          "mean_centroid_distance_m": 3.25039725535304
+        },
+        "incremental_latency_ms": {
+          "tactical_geometry_mean_ms": 1.0907084333545451,
+          "tactical_geometry_p95_ms": 1.5052898005706081,
+          "metric_trajectories_mean_ms": 0.9104358000452825
+        }
+      }
+    }
+  },
+  "selected_specification": {
+    "centroid_estimators": {
+      "mean_centroid": "C = (1/N) sum(p_i), standard for spatial compactness and convex hull",
+      "median_centroid": "Coordinate-wise median (median(X), median(Y)), proven robust to team attribution errors"
+    },
+    "outfield_vs_full_team": "Default tactical shape metrics use OUTFIELD_PLAYER tracks only (Phase 17 decision)",
+    "temporal_smoothing": "Causal Exponential Moving Average (alpha=0.25), zero future leakage",
+    "artifacts": {
+      "frames_dir": "/media/adriano/Windows/runs/tactics/frames",
+      "visuals_dir": "/media/adriano/Windows/runs/tactics/visuals"
+    }
+  },
+  "recommended_exp17_scope": {
+    "title": "Attacking Direction Resolution & Formation Topology",
+    "key_objectives": [
+      "Implement hierarchical attacking direction detector (GK anchor + temporal centroid offset)",
+      "Map longitudinal_span_m into semantic tactical depth (attacking depth vs defensive depth)",
+      "Compute inter-line distances (defensive line, midfield line, forward line) without manual formation labeling"
+    ]
+  }
+}

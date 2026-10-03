@@ -1,0 +1,64 @@
+{
+  "experiment": "EXP-22-TRAINING",
+  "timestamp": "2026-10-02 23:55:02",
+  "dataset_statistics": {
+    "train_candidates": 1146,
+    "train_positives": 151,
+    "train_negatives": 995,
+    "dev_candidates": 1319,
+    "dev_positives": 297,
+    "dev_negatives": 1022
+  },
+  "model_comparison_dev": {
+    "model_a_calibrated_logistic_regression": {
+      "pr_auc": 0.8602652441688282,
+      "roc_auc": 0.9492956308024803,
+      "brier_score": 0.07921622693538666,
+      "ece": 0.07159028944246601
+    },
+    "model_b_shallow_hist_gbdt": {
+      "pr_auc": 0.929261775216276,
+      "roc_auc": 0.9745827485553513,
+      "brier_score": 0.04230700433254242,
+      "ece": 0.030152625713562364
+    },
+    "selected_model": "HIST_GBDT"
+  },
+  "feature_ablations_dev": {
+    "A_image_only": {
+      "pr_auc": 0.898547115508043,
+      "roc_auc": 0.9472464369724645,
+      "brier_score": 0.055968950092340465,
+      "feature_count": 7
+    },
+    "B_image_temporal": {
+      "pr_auc": 0.9426307397400803,
+      "roc_auc": 0.9823084069659413,
+      "brier_score": 0.04202689076882282,
+      "feature_count": 12
+    },
+    "C_image_metric": {
+      "pr_auc": 0.8933683299197207,
+      "roc_auc": 0.9448710852820442,
+      "brier_score": 0.05403924777327023,
+      "feature_count": 11
+    },
+    "D_image_metric_temporal": {
+      "pr_auc": 0.9334723756112832,
+      "roc_auc": 0.9784735812133072,
+      "brier_score": 0.03806851253935739,
+      "feature_count": 19
+    },
+    "E_full_feature_set": {
+      "pr_auc": 0.9334723756112832,
+      "roc_auc": 0.9784735812133072,
+      "brier_score": 0.03806851253935739,
+      "feature_count": 24
+    }
+  },
+  "selected_dev_operating_point": {
+    "control_probability_threshold": 0.42,
+    "contested_margin_threshold": 0.1,
+    "player_control_confirm_frames": 2
+  }
+}

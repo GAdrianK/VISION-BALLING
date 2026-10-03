@@ -1,0 +1,384 @@
+{
+  "experiment": "EXP-17",
+  "title": "Attacking Direction & Oriented Tactical Lines",
+  "chapter": "Chapter 7",
+  "status": "COMPLETED",
+  "terminal_state": "EXP-17 COMPLETE \u2014 ORIENTED TACTICAL LINES LOCKED",
+  "data_discipline": {
+    "dev_sequences": [
+      "SNMOT-060",
+      "SNMOT-061",
+      "SNMOT-062"
+    ],
+    "holdout_sequences": [
+      "SNMOT-069",
+      "SNMOT-070",
+      "SNMOT-071"
+    ],
+    "continuous_full_sequences": [
+      "SNMOT-060",
+      "SNMOT-069"
+    ],
+    "test_split_used": false,
+    "golden_cvat_used": false,
+    "ground_truth_direction_used_at_inference": false
+  },
+  "coordinate_conventions": {
+    "pitch_coordinate_system": "Origin at center circle (0,0), X in [-52.5, +52.5], Y in [-34.0, +34.0]",
+    "oriented_coordinate_formula": "x_attack = attack_direction * x_pitch",
+    "semantic_interpretation": "x_attack min = closest to own goal, x_attack max = closest to opponent goal"
+  },
+  "synthetic_ground_truth_validation": {
+    "formation_4_4_2": {
+      "expected_line_count": 3,
+      "discovered_line_count": 3,
+      "expected_distribution": [
+        4,
+        4,
+        2
+      ],
+      "discovered_distribution": [
+        4,
+        4,
+        2
+      ],
+      "expected_line_names": [
+        "DEFENSIVE_LINE",
+        "MIDFIELD_LINE",
+        "ATTACKING_LINE"
+      ],
+      "discovered_line_names": [
+        "DEFENSIVE_LINE",
+        "MIDFIELD_LINE",
+        "ATTACKING_LINE"
+      ],
+      "line_x_attacks": [
+        -20.0,
+        0.0,
+        20.0
+      ],
+      "inter_line_distances_m": [
+        20.0,
+        20.0
+      ]
+    },
+    "formation_4_3_3": {
+      "expected_line_count": 3,
+      "discovered_line_count": 3,
+      "expected_distribution": [
+        4,
+        3,
+        3
+      ],
+      "discovered_distribution": [
+        4,
+        3,
+        3
+      ],
+      "discovered_line_names": [
+        "DEFENSIVE_LINE",
+        "MIDFIELD_LINE",
+        "ATTACKING_LINE"
+      ]
+    },
+    "formation_4_2_3_1": {
+      "expected_line_count": 4,
+      "discovered_line_count": 4,
+      "expected_distribution": [
+        4,
+        2,
+        3,
+        1
+      ],
+      "discovered_distribution": [
+        4,
+        2,
+        3,
+        1
+      ],
+      "expected_line_names": [
+        "DEFENSIVE_LINE",
+        "MIDFIELD_DEFENSIVE",
+        "MIDFIELD_OFFENSIVE",
+        "ATTACKING_LINE"
+      ],
+      "discovered_line_names": [
+        "DEFENSIVE_LINE",
+        "MIDFIELD_DEFENSIVE",
+        "MIDFIELD_OFFENSIVE",
+        "ATTACKING_LINE"
+      ]
+    },
+    "formation_2_line": {
+      "expected_line_count": 2,
+      "discovered_line_count": 2,
+      "expected_distribution": [
+        5,
+        5
+      ],
+      "discovered_distribution": [
+        5,
+        5
+      ],
+      "expected_line_names": [
+        "DEFENSIVE_LINE",
+        "ATTACKING_LINE"
+      ],
+      "discovered_line_names": [
+        "DEFENSIVE_LINE",
+        "ATTACKING_LINE"
+      ]
+    },
+    "formation_single_compact_block": {
+      "expected_line_count": 1,
+      "discovered_line_count": 1,
+      "discovered_distribution": [
+        10
+      ]
+    },
+    "noise_and_dispersion_stability": {
+      "noise_sigma_0.10m": {
+        "cluster_stability_rate": 1.0
+      },
+      "noise_sigma_0.25m": {
+        "cluster_stability_rate": 1.0
+      },
+      "noise_sigma_0.50m": {
+        "cluster_stability_rate": 1.0
+      },
+      "noise_sigma_1.00m": {
+        "cluster_stability_rate": 1.0
+      }
+    }
+  },
+  "attacking_direction_audit": {
+    "goalkeeper_anchor_case": {
+      "team_0_direction": "POSITIVE_X",
+      "team_0_confidence": 0.95,
+      "team_0_source": "GOALKEEPER_ANCHOR",
+      "team_1_direction": "NEGATIVE_X",
+      "team_1_source": "COMPLEMENTARY_INFERENCE"
+    },
+    "goalkeeper_midfield_rejection_case": {
+      "team_0_direction": "UNKNOWN",
+      "resolved_on_frame_1": false
+    },
+    "spatial_ordering_fallback_case": {
+      "frames_to_resolve": 10,
+      "team_0_direction": "POSITIVE_X",
+      "team_0_confidence": 0.7,
+      "team_0_source": "TEAM_SPATIAL_ORDERING",
+      "team_1_direction": "NEGATIVE_X"
+    },
+    "ambiguous_midfield_abstention_case": {
+      "team_0_direction": "UNKNOWN",
+      "confidence": 0.0,
+      "abstained_cleanly": true
+    },
+    "side_switch_hysteresis_case": {
+      "direction_at_frame_14": "POSITIVE_X",
+      "direction_at_frame_15": "NEGATIVE_X",
+      "side_switch_count": 1
+    }
+  },
+  "real_sequences_benchmark": {
+    "macro_incremental_tactical_lines_ms_per_frame": 0.34000331761065655,
+    "per_sequence": {
+      "SNMOT-060": {
+        "sequence_id": "SNMOT-060",
+        "frames_evaluated": 750,
+        "duration_seconds": 30.0,
+        "orientation_resolution": {
+          "resolved_coverage_pct": 88.4,
+          "mean_orientation_confidence": 0.6188,
+          "team_0_final_direction": "POSITIVE_X",
+          "team_1_final_direction": "NEGATIVE_X"
+        },
+        "team_0": {
+          "mean_oriented_depth_m": 29.088629973948056,
+          "mean_line_count": 2.2284820031298906,
+          "line_count_distribution": {
+            "lines_1_pct": 0.0,
+            "lines_2_pct": 31.92488262910798,
+            "lines_3_pct": 44.44444444444444,
+            "lines_4_pct": 6.416275430359937
+          },
+          "mean_inter_line_distance_m": 14.66775468642366,
+          "mean_line_persistence_frames": 50.952949438202246
+        },
+        "team_1": {
+          "mean_oriented_depth_m": 23.255153181393975,
+          "mean_line_count": 2.167420814479638,
+          "line_count_distribution": {
+            "lines_1_pct": 9.653092006033184,
+            "lines_2_pct": 63.95173453996983,
+            "lines_3_pct": 26.395173453996986,
+            "lines_4_pct": 0.0
+          },
+          "mean_inter_line_distance_m": 13.607207283941431,
+          "mean_line_persistence_frames": 50.150313152400834
+        },
+        "inter_team": {
+          "mean_defensive_line_gap_m": 22.081634367142875
+        },
+        "incremental_latency_ms": {
+          "oriented_lines_mean_ms": 0.43807921592815546,
+          "oriented_lines_p95_ms": 0.4697080497862771,
+          "tactical_geometry_mean_ms": 1.090965794615234,
+          "metric_trajectories_mean_ms": 0.8164442159759346
+        }
+      },
+      "SNMOT-069": {
+        "sequence_id": "SNMOT-069",
+        "frames_evaluated": 750,
+        "duration_seconds": 30.0,
+        "orientation_resolution": {
+          "resolved_coverage_pct": 95.6,
+          "mean_orientation_confidence": 0.6692,
+          "team_0_final_direction": "POSITIVE_X",
+          "team_1_final_direction": "NEGATIVE_X"
+        },
+        "team_0": {
+          "mean_oriented_depth_m": 26.245973228506454,
+          "mean_line_count": 2.340909090909091,
+          "line_count_distribution": {
+            "lines_1_pct": 12.784090909090908,
+            "lines_2_pct": 43.32386363636363,
+            "lines_3_pct": 40.909090909090914,
+            "lines_4_pct": 2.9829545454545454
+          },
+          "mean_inter_line_distance_m": 14.14186482264809,
+          "mean_line_persistence_frames": 78.57645631067962
+        },
+        "team_1": {
+          "mean_oriented_depth_m": 24.064026084603203,
+          "mean_line_count": 2.5327754532775453,
+          "line_count_distribution": {
+            "lines_1_pct": 1.813110181311018,
+            "lines_2_pct": 47.28033472803347,
+            "lines_3_pct": 46.72245467224547,
+            "lines_4_pct": 4.184100418410042
+          },
+          "mean_inter_line_distance_m": 13.912291530284158,
+          "mean_line_persistence_frames": 96.0501101321586
+        },
+        "inter_team": {
+          "mean_defensive_line_gap_m": 23.822262499114867
+        },
+        "incremental_latency_ms": {
+          "oriented_lines_mean_ms": 0.5019378480646992,
+          "oriented_lines_p95_ms": 0.5176159018446921,
+          "tactical_geometry_mean_ms": 0.9851809906297907,
+          "metric_trajectories_mean_ms": 0.7147336467217732
+        }
+      },
+      "SNMOT-061": {
+        "sequence_id": "SNMOT-061",
+        "frames_evaluated": 150,
+        "duration_seconds": 6.0,
+        "orientation_resolution": {
+          "resolved_coverage_pct": 80.66666666666666,
+          "mean_orientation_confidence": 0.5646666666666668,
+          "team_0_final_direction": "POSITIVE_X",
+          "team_1_final_direction": "NEGATIVE_X"
+        },
+        "team_0": {
+          "mean_oriented_depth_m": 23.086258022355505,
+          "mean_line_count": 2.041322314049587,
+          "line_count_distribution": {
+            "lines_1_pct": 0.0,
+            "lines_2_pct": 95.86776859504133,
+            "lines_3_pct": 4.132231404958678,
+            "lines_4_pct": 0.0
+          },
+          "mean_inter_line_distance_m": 15.684304790042665,
+          "mean_line_persistence_frames": 48.587044534412954
+        },
+        "team_1": {
+          "mean_oriented_depth_m": 19.02726043127653,
+          "mean_line_count": 2.0826446280991737,
+          "line_count_distribution": {
+            "lines_1_pct": 0.0,
+            "lines_2_pct": 91.73553719008265,
+            "lines_3_pct": 8.264462809917356,
+            "lines_4_pct": 0.0
+          },
+          "mean_inter_line_distance_m": 13.39140301111232,
+          "mean_line_persistence_frames": 58.73412698412698
+        },
+        "inter_team": {
+          "mean_defensive_line_gap_m": 23.790091565376066
+        },
+        "incremental_latency_ms": {
+          "oriented_lines_mean_ms": 0.2922788931755349,
+          "oriented_lines_p95_ms": 0.41094824864558166,
+          "tactical_geometry_mean_ms": 1.3264581864981058,
+          "metric_trajectories_mean_ms": 0.7708902332281772
+        }
+      },
+      "SNMOT-071": {
+        "sequence_id": "SNMOT-071",
+        "frames_evaluated": 150,
+        "duration_seconds": 6.0,
+        "orientation_resolution": {
+          "resolved_coverage_pct": 0.0,
+          "mean_orientation_confidence": 0.0,
+          "team_0_final_direction": "UNKNOWN",
+          "team_1_final_direction": "UNKNOWN"
+        },
+        "team_0": {
+          "mean_oriented_depth_m": 0.0,
+          "mean_line_count": 0.0,
+          "line_count_distribution": {
+            "lines_1": 0.0,
+            "lines_2": 0.0,
+            "lines_3": 0.0,
+            "lines_4": 0.0
+          },
+          "mean_inter_line_distance_m": 0.0,
+          "mean_line_persistence_frames": 0.0
+        },
+        "team_1": {
+          "mean_oriented_depth_m": 0.0,
+          "mean_line_count": 0.0,
+          "line_count_distribution": {
+            "lines_1": 0.0,
+            "lines_2": 0.0,
+            "lines_3": 0.0,
+            "lines_4": 0.0
+          },
+          "mean_inter_line_distance_m": 0.0,
+          "mean_line_persistence_frames": 0.0
+        },
+        "inter_team": {
+          "mean_defensive_line_gap_m": 0.0
+        },
+        "incremental_latency_ms": {
+          "oriented_lines_mean_ms": 0.12771731327423672,
+          "oriented_lines_p95_ms": 0.16772284980106625,
+          "tactical_geometry_mean_ms": 1.0443221065603818,
+          "metric_trajectories_mean_ms": 0.875168313383862
+        }
+      }
+    }
+  },
+  "selected_specification": {
+    "gap_threshold_m": 6.0,
+    "min_players_for_tactics": 4,
+    "side_switch_confirmation_frames": 15,
+    "line_matching_max_dist_m": 4.5,
+    "artifacts": {
+      "frames_dir": "/media/adriano/Windows/runs/tactics/frames",
+      "visuals_dir": "/media/adriano/Windows/runs/tactics/visuals",
+      "report_json": "/home/adriano/Documents/PROJET PERSO/VISION-BALLING/docs/experiments/exp17_attacking_direction_tactical_lines.json"
+    }
+  },
+  "recommended_exp18_scope": {
+    "title": "Tactical Phase Classification & Formation Dynamics",
+    "key_objectives": [
+      "Classify in-possession vs out-of-possession tactical phases",
+      "Analyze dynamic formation shifts (e.g. 4-4-2 in defense to 2-4-4 in attack)",
+      "Evaluate compactness and line compression during pressing and transitions"
+    ]
+  }
+}

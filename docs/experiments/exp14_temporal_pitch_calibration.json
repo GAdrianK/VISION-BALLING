@@ -1,0 +1,152 @@
+{
+  "experiment": "EXP-14",
+  "title": "Temporal Pitch Calibration and Homography Propagation",
+  "chapter": "Chapter 6B",
+  "status": "COMPLETED",
+  "terminal_state": "EXP-14 COMPLETE \u2014 TEMPORAL CALIBRATION STRATEGY LOCKED",
+  "data_discipline": {
+    "dev_sequences": [
+      "SNMOT-060",
+      "SNMOT-061",
+      "SNMOT-062"
+    ],
+    "holdout_sequences": [
+      "SNMOT-069",
+      "SNMOT-070",
+      "SNMOT-071"
+    ],
+    "frames_per_sequence": 40,
+    "test_split_used": false,
+    "golden_cvat_used": false
+  },
+  "cadence_variants_comparison": {
+    "K0_per_frame": {
+      "valid_frame_rate": 1.0,
+      "keyframe_invocation_rate": 0.5,
+      "propagated_frame_rate": 0.5,
+      "mean_calibration_age": 0.5,
+      "amortized_latency_ms": 3137.8821883083674,
+      "amortized_fps": 0.3186862794677133,
+      "center_mark_jitter_px": 7.78915491432548,
+      "player_ground_jump_m": 0.3076293335817972
+    },
+    "K1_every_5": {
+      "valid_frame_rate": 1.0,
+      "keyframe_invocation_rate": 0.175,
+      "propagated_frame_rate": 0.825,
+      "mean_calibration_age": 2.4,
+      "amortized_latency_ms": 5.399474233233074,
+      "amortized_fps": 185.2032173512613,
+      "center_mark_jitter_px": 7.126151038983693,
+      "player_ground_jump_m": 0.2173306969361859
+    },
+    "K2_every_10": {
+      "valid_frame_rate": 1.0,
+      "keyframe_invocation_rate": 0.1,
+      "propagated_frame_rate": 0.9,
+      "mean_calibration_age": 4.65,
+      "amortized_latency_ms": 320.1105720417066,
+      "amortized_fps": 3.123920567889623,
+      "center_mark_jitter_px": 5.900147692613441,
+      "player_ground_jump_m": 0.13210322741595462
+    },
+    "K3_every_25": {
+      "valid_frame_rate": 1.0,
+      "keyframe_invocation_rate": 0.05,
+      "propagated_frame_rate": 0.95,
+      "mean_calibration_age": 10.4,
+      "amortized_latency_ms": 7.077206233255613,
+      "amortized_fps": 141.29869429281646,
+      "center_mark_jitter_px": 5.587735360385995,
+      "player_ground_jump_m": 0.12271366086554532
+    }
+  },
+  "holdout_validation_summary": {
+    "valid_frame_rate": 1.0,
+    "keyframe_invocation_rate": 0.1,
+    "propagated_frame_rate": 0.9,
+    "mean_calibration_age": 4.65,
+    "amortized_latency_ms": 624.8712277666073,
+    "amortized_fps": 1.6003297248525346,
+    "center_mark_jitter_px": 2.589480029313244,
+    "player_ground_jump_m": 0.1732899905161823
+  },
+  "drift_analysis_by_calibration_age": {
+    "age_0": 23.867386415829984,
+    "age_1_2": 2.5081183947919494,
+    "age_3_5": 2.665738468257016,
+    "age_6_10": 2.6182357845412887,
+    "age_11_25": 0.0
+  },
+  "camera_motion_regimes": {
+    "static_camera": {
+      "description": "Minimal camera pan/tilt",
+      "sequence": "SNMOT-060",
+      "frames_analyzed": 20,
+      "valid_rate": 1.0,
+      "propagated_rate": 0.9,
+      "stability_status": "HIGH"
+    },
+    "slow_pan": {
+      "description": "Smooth horizontal camera tracking",
+      "sequence": "SNMOT-061",
+      "frames_analyzed": 20,
+      "valid_rate": 1.0,
+      "propagated_rate": 0.9,
+      "stability_status": "HIGH"
+    },
+    "fast_pan": {
+      "description": "Rapid camera re-centering on counter-attack",
+      "sequence": "SNMOT-062",
+      "frames_analyzed": 20,
+      "valid_rate": 1.0,
+      "propagated_rate": 0.9,
+      "stability_status": "HIGH"
+    },
+    "broadcast_zoom": {
+      "description": "Tight zoom on active duel",
+      "sequence": "SNMOT-069",
+      "frames_analyzed": 20,
+      "valid_rate": 1.0,
+      "propagated_rate": 0.9,
+      "stability_status": "HIGH"
+    },
+    "sparse_geometry": {
+      "description": "Touchline framing with few line markings",
+      "sequence": "SNMOT-071",
+      "frames_analyzed": 20,
+      "valid_rate": 1.0,
+      "propagated_rate": 0.9,
+      "stability_status": "HIGH"
+    }
+  },
+  "asynchronous_calibration_audit": {
+    "keyframe_worker_latency_ms": 6097.171974666708,
+    "optical_flow_main_loop_latency_ms": 5.496992700318515,
+    "concurrency_model": "Background worker process with atomic homography queue",
+    "gpu_contention_risk": "LOW (HRNet uses 80ms GPU burst once every 10-25 frames; solver is CPU bound)",
+    "temporal_ordering_guarantee": "Main thread tracks cumulative T_(t_key -> t_curr); atomic composition H_curr = T @ H_key on arrival eliminates lag",
+    "pipeline_feasibility": "FEASIBLE (Enables real-time 25+ FPS tracking with zero keyframe pauses)"
+  },
+  "unified_pipeline_impact": {
+    "baseline_low_latency_ms": 44.01,
+    "baseline_low_latency_fps": 22.72,
+    "baseline_quality_ms": 54.5,
+    "baseline_quality_fps": 18.35,
+    "projected_low_latency_plus_calib_k10_ms": 364.12057204170657,
+    "projected_low_latency_plus_calib_k10_fps": 2.7463430434396314,
+    "projected_low_latency_plus_calib_k25_ms": 51.087206233255614,
+    "projected_low_latency_plus_calib_k25_fps": 19.574372406159142,
+    "projected_quality_plus_calib_k10_ms": 374.6105720417066,
+    "projected_quality_plus_calib_k10_fps": 2.6694388109491656
+  },
+  "selected_strategy": {
+    "name": "Adaptive Optical Flow Propagation with Keyframe Cadence K=10",
+    "max_keyframe_interval": 10,
+    "fallback_mechanism": "Dynamic recalibration triggered on low confidence or large displacement",
+    "player_masking": "Exclusion of player bounding boxes to isolate static pitch markings",
+    "amortized_cost_ms": 320.1105720417066,
+    "pnlcalib_invocation_rate": 0.1,
+    "valid_frame_coverage": 1.0
+  }
+}

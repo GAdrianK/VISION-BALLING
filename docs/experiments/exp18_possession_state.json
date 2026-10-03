@@ -1,0 +1,456 @@
+{
+  "experiment": "EXP-18",
+  "title": "Ball Control, Team Possession & Possession Changes",
+  "chapter": "Chapter 7",
+  "status": "COMPLETED",
+  "terminal_state": "EXP-18 COMPLETE \u2014 POSSESSION STATE ENGINE LOCKED",
+  "data_discipline": {
+    "possession_dev_sequences": [
+      "SNMOT-060",
+      "SNMOT-063",
+      "SNMOT-064"
+    ],
+    "possession_holdout_sequences": [
+      "SNMOT-066",
+      "SNMOT-068",
+      "SNMOT-069"
+    ],
+    "continuous_full_sequences": [
+      "SNMOT-060",
+      "SNMOT-069"
+    ],
+    "test_split_used": false,
+    "golden_cvat_used": false,
+    "ground_truth_possession_used_at_inference": false
+  },
+  "ball_limitation_accounting": {
+    "coordinate_nature": "Ground-plane metric projection Z=0 (not true 3D)",
+    "mitigation_strategy": "Image-space footpoint proximity fused with normalized bbox distance, tracking confidence gating, and aerial ground-jump speed thresholding (25 m/s)"
+  },
+  "synthetic_scenarios_validation": {
+    "acquisition": {
+      "status": "SECURE",
+      "team": "TEAM_0",
+      "player_id": 1,
+      "success": true
+    },
+    "same_team_handoff": {
+      "transit_status": "PROVISIONAL_TRANSIT",
+      "reception_player_id": 2,
+      "turnovers_emitted": 0,
+      "success": true
+    },
+    "opponent_takeover": {
+      "final_team": "TEAM_1",
+      "turnovers_emitted": 1,
+      "confirmation_delay_frames": 5,
+      "success": true
+    },
+    "contested_duel": {
+      "control_state": "CONTESTED",
+      "possession_team": "CONTESTED",
+      "success": true
+    },
+    "id_switch_robustness": {
+      "possession_team": "TEAM_0",
+      "turnovers_emitted": 0,
+      "success": true
+    }
+  },
+  "dev_hysteresis_selection": {
+    "evaluated_candidates": [
+      2,
+      3,
+      5
+    ],
+    "selected_carrier_confirm_frames": 3,
+    "selection_rationale": "3 frames provides optimal balance between filtering transient 1-frame footpoint glitches and minimizing acquisition delay (0.12s at 25 FPS)",
+    "results": {
+      "confirm_frames_2": {
+        "frame_accuracy_pct": 72.0,
+        "macro_f1": 0.2523671497584541,
+        "carrier_accuracy_pct": 71.0
+      },
+      "confirm_frames_3": {
+        "frame_accuracy_pct": 71.33333333333334,
+        "macro_f1": 0.2513343037360504,
+        "carrier_accuracy_pct": 70.0
+      },
+      "confirm_frames_5": {
+        "frame_accuracy_pct": 70.0,
+        "macro_f1": 0.24924131179637787,
+        "carrier_accuracy_pct": 68.0
+      }
+    }
+  },
+  "ground_truth_evaluation": {
+    "possession_gt_version": "possession_gt_v1",
+    "macro_dev_frame_accuracy_pct": 62.22222222222222,
+    "macro_holdout_frame_accuracy_pct": 62.22222222222223,
+    "macro_dev_f1": 0.34400354106903636,
+    "macro_holdout_f1": 0.29878625490224947,
+    "per_sequence": {
+      "SNMOT-060": {
+        "frames_compared": 150,
+        "team_possession_frame_accuracy_pct": 71.33333333333334,
+        "valid_prediction_coverage_pct": 98.66666666666667,
+        "macro_f1": 0.2513343037360504,
+        "per_state_breakdown": {
+          "CONTESTED": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1
+          },
+          "NEUTRAL": {
+            "precision": 1.0,
+            "recall": 0.2857142857142857,
+            "f1": 0.4444444444444445,
+            "support": 49
+          },
+          "TEAM_0": {
+            "precision": 0.7045454545454546,
+            "recall": 0.9587628865979382,
+            "f1": 0.8122270742358078,
+            "support": 97
+          },
+          "TEAM_1": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 3
+          },
+          "UNKNOWN": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        },
+        "carrier_accuracy_pct": 70.0,
+        "unambiguous_carrier_frames": 100
+      },
+      "SNMOT-063": {
+        "frames_compared": 150,
+        "team_possession_frame_accuracy_pct": 56.666666666666664,
+        "valid_prediction_coverage_pct": 98.66666666666667,
+        "macro_f1": 0.3701793620674076,
+        "per_state_breakdown": {
+          "CONTESTED": {
+            "precision": 0.5,
+            "recall": 0.11764705882352941,
+            "f1": 0.19047619047619047,
+            "support": 17
+          },
+          "NEUTRAL": {
+            "precision": 0.6428571428571429,
+            "recall": 0.2647058823529412,
+            "f1": 0.37499999999999994,
+            "support": 34
+          },
+          "TEAM_0": {
+            "precision": 0.6170212765957447,
+            "recall": 0.6304347826086957,
+            "f1": 0.6236559139784946,
+            "support": 46
+          },
+          "TEAM_1": {
+            "precision": 0.5421686746987951,
+            "recall": 0.8490566037735849,
+            "f1": 0.6617647058823528,
+            "support": 53
+          },
+          "UNKNOWN": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        },
+        "carrier_accuracy_pct": 71.71717171717171,
+        "unambiguous_carrier_frames": 99
+      },
+      "SNMOT-064": {
+        "frames_compared": 150,
+        "team_possession_frame_accuracy_pct": 58.666666666666664,
+        "valid_prediction_coverage_pct": 100.0,
+        "macro_f1": 0.4104969574036511,
+        "per_state_breakdown": {
+          "NEUTRAL": {
+            "precision": 0.05084745762711865,
+            "recall": 0.3333333333333333,
+            "f1": 0.08823529411764705,
+            "support": 9
+          },
+          "TEAM_1": {
+            "precision": 0.9340659340659341,
+            "recall": 0.6028368794326241,
+            "f1": 0.7327586206896551,
+            "support": 141
+          }
+        },
+        "carrier_accuracy_pct": 50.35460992907801,
+        "unambiguous_carrier_frames": 141
+      },
+      "SNMOT-069": {
+        "frames_compared": 150,
+        "team_possession_frame_accuracy_pct": 56.00000000000001,
+        "valid_prediction_coverage_pct": 98.66666666666667,
+        "macro_f1": 0.23931623931623933,
+        "per_state_breakdown": {
+          "NEUTRAL": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "TEAM_0": {
+            "precision": 1.0,
+            "recall": 0.56,
+            "f1": 0.717948717948718,
+            "support": 150
+          },
+          "UNKNOWN": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        },
+        "carrier_accuracy_pct": 19.333333333333332,
+        "unambiguous_carrier_frames": 150
+      },
+      "SNMOT-066": {
+        "frames_compared": 150,
+        "team_possession_frame_accuracy_pct": 98.66666666666667,
+        "valid_prediction_coverage_pct": 100.0,
+        "macro_f1": 0.4966442953020134,
+        "per_state_breakdown": {
+          "NEUTRAL": {
+            "precision": 0.9866666666666667,
+            "recall": 1.0,
+            "f1": 0.9932885906040269,
+            "support": 148
+          },
+          "TEAM_1": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2
+          }
+        },
+        "carrier_accuracy_pct": 0.0,
+        "unambiguous_carrier_frames": 2
+      },
+      "SNMOT-068": {
+        "frames_compared": 150,
+        "team_possession_frame_accuracy_pct": 32.0,
+        "valid_prediction_coverage_pct": 100.0,
+        "macro_f1": 0.16039823008849557,
+        "per_state_breakdown": {
+          "CONTESTED": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "NEUTRAL": {
+            "precision": 0.9523809523809523,
+            "recall": 0.3389830508474576,
+            "f1": 0.5,
+            "support": 118
+          },
+          "TEAM_0": {
+            "precision": 0.07692307692307693,
+            "recall": 0.8888888888888888,
+            "f1": 0.14159292035398233,
+            "support": 9
+          },
+          "TEAM_1": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 23
+          }
+        },
+        "carrier_accuracy_pct": 53.125,
+        "unambiguous_carrier_frames": 32
+      }
+    }
+  },
+  "real_sequences_benchmark": {
+    "macro_incremental_possession_ms_per_frame": 0.1588116279971372,
+    "per_sequence": {
+      "SNMOT-060": {
+        "sequence_id": "SNMOT-060",
+        "frames_evaluated": 750,
+        "duration_seconds": 30.0,
+        "possession_duration_breakdown": {
+          "team_0_seconds": 11.04,
+          "team_0_pct": 36.8,
+          "team_1_seconds": 8.08,
+          "team_1_pct": 26.93333333333333,
+          "contested_seconds": 0.72,
+          "contested_pct": 2.4,
+          "neutral_seconds": 10.08,
+          "neutral_pct": 33.6,
+          "unknown_seconds": 0.08,
+          "unknown_pct": 0.26666666666666666
+        },
+        "confirmed_turnovers_count": 2,
+        "incremental_latency_ms": {
+          "control_scoring_mean_ms": 0.138975097288494,
+          "state_machine_mean_ms": 0.009767369396286085,
+          "total_possession_mean_ms": 0.14874246668478008,
+          "total_possession_p95_ms": 0.20239549921825528
+        }
+      },
+      "SNMOT-063": {
+        "sequence_id": "SNMOT-063",
+        "frames_evaluated": 150,
+        "duration_seconds": 6.0,
+        "possession_duration_breakdown": {
+          "team_0_seconds": 1.88,
+          "team_0_pct": 31.333333333333336,
+          "team_1_seconds": 3.32,
+          "team_1_pct": 55.333333333333336,
+          "contested_seconds": 0.16,
+          "contested_pct": 2.666666666666667,
+          "neutral_seconds": 0.56,
+          "neutral_pct": 9.333333333333334,
+          "unknown_seconds": 0.08,
+          "unknown_pct": 1.3333333333333335
+        },
+        "confirmed_turnovers_count": 1,
+        "incremental_latency_ms": {
+          "control_scoring_mean_ms": 0.1456554535009976,
+          "state_machine_mean_ms": 0.010429706526338123,
+          "total_possession_mean_ms": 0.15608516002733572,
+          "total_possession_p95_ms": 0.25089330010814576
+        }
+      },
+      "SNMOT-064": {
+        "sequence_id": "SNMOT-064",
+        "frames_evaluated": 150,
+        "duration_seconds": 6.0,
+        "possession_duration_breakdown": {
+          "team_0_seconds": 0.0,
+          "team_0_pct": 0.0,
+          "team_1_seconds": 3.64,
+          "team_1_pct": 60.66666666666667,
+          "contested_seconds": 0.0,
+          "contested_pct": 0.0,
+          "neutral_seconds": 2.36,
+          "neutral_pct": 39.33333333333333,
+          "unknown_seconds": 0.0,
+          "unknown_pct": 0.0
+        },
+        "confirmed_turnovers_count": 0,
+        "incremental_latency_ms": {
+          "control_scoring_mean_ms": 0.17456298674611995,
+          "state_machine_mean_ms": 0.009305860003223643,
+          "total_possession_mean_ms": 0.1838688467493436,
+          "total_possession_p95_ms": 0.2981154997542031
+        }
+      },
+      "SNMOT-069": {
+        "sequence_id": "SNMOT-069",
+        "frames_evaluated": 750,
+        "duration_seconds": 30.0,
+        "possession_duration_breakdown": {
+          "team_0_seconds": 6.64,
+          "team_0_pct": 22.133333333333333,
+          "team_1_seconds": 10.48,
+          "team_1_pct": 34.93333333333333,
+          "contested_seconds": 0.32,
+          "contested_pct": 1.0666666666666667,
+          "neutral_seconds": 12.48,
+          "neutral_pct": 41.6,
+          "unknown_seconds": 0.08,
+          "unknown_pct": 0.26666666666666666
+        },
+        "confirmed_turnovers_count": 1,
+        "incremental_latency_ms": {
+          "control_scoring_mean_ms": 0.123119917329556,
+          "state_machine_mean_ms": 0.009698763916579386,
+          "total_possession_mean_ms": 0.13281868124613538,
+          "total_possession_p95_ms": 0.19299949854030274
+        }
+      },
+      "SNMOT-066": {
+        "sequence_id": "SNMOT-066",
+        "frames_evaluated": 150,
+        "duration_seconds": 6.0,
+        "possession_duration_breakdown": {
+          "team_0_seconds": 0.0,
+          "team_0_pct": 0.0,
+          "team_1_seconds": 0.0,
+          "team_1_pct": 0.0,
+          "contested_seconds": 0.0,
+          "contested_pct": 0.0,
+          "neutral_seconds": 6.0,
+          "neutral_pct": 100.0,
+          "unknown_seconds": 0.0,
+          "unknown_pct": 0.0
+        },
+        "confirmed_turnovers_count": 0,
+        "incremental_latency_ms": {
+          "control_scoring_mean_ms": 0.19378186644947468,
+          "state_machine_mean_ms": 0.008433913511301702,
+          "total_possession_mean_ms": 0.20221577996077636,
+          "total_possession_p95_ms": 0.3166902515658875
+        }
+      },
+      "SNMOT-068": {
+        "sequence_id": "SNMOT-068",
+        "frames_evaluated": 150,
+        "duration_seconds": 6.0,
+        "possession_duration_breakdown": {
+          "team_0_seconds": 4.16,
+          "team_0_pct": 69.33333333333334,
+          "team_1_seconds": 0.0,
+          "team_1_pct": 0.0,
+          "contested_seconds": 0.16,
+          "contested_pct": 2.666666666666667,
+          "neutral_seconds": 1.68,
+          "neutral_pct": 28.000000000000004,
+          "unknown_seconds": 0.0,
+          "unknown_pct": 0.0
+        },
+        "confirmed_turnovers_count": 0,
+        "incremental_latency_ms": {
+          "control_scoring_mean_ms": 0.1198741599364439,
+          "state_machine_mean_ms": 0.009264673378008107,
+          "total_possession_mean_ms": 0.129138833314452,
+          "total_possession_p95_ms": 0.18550864897406424
+        }
+      }
+    }
+  },
+  "failure_taxonomy": {
+    "aerial_balls": "Ground-plane Z=0 diverges from physical trajectory; mitigated via aerial jump detector",
+    "dense_duels": "Opposing players in same bbox cluster; properly represented as CONTESTED",
+    "camera_pan_ball_loss": "Handled via bounded 12-frame provisional hold before transitioning to UNKNOWN",
+    "id_switches": "Team possession state machine isolates team label from tracker track_id, preventing spurious turnovers"
+  },
+  "selected_specification": {
+    "carrier_confirm_frames": 3,
+    "turnover_confirm_frames": 5,
+    "free_ball_grace_frames": 15,
+    "max_ball_occlusion_frames": 12,
+    "min_team_label_confidence": 0.45,
+    "artifacts": {
+      "frames_dir": "/media/adriano/Windows/runs/tactics/frames",
+      "visuals_dir": "/media/adriano/Windows/runs/tactics/visuals",
+      "report_json": "/home/adriano/Documents/PROJET PERSO/VISION-BALLING/docs/experiments/exp18_possession_state.json"
+    }
+  },
+  "recommended_exp19_scope": {
+    "title": "Pass Detection & Event Trajectories",
+    "key_objectives": [
+      "Infer completed passes, intercepted passes, and ball out-of-play events",
+      "Model ball flight vectors between sender and receiver",
+      "Connect possession changes to tactical transition initiation"
+    ]
+  }
+}

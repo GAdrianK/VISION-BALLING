@@ -1,0 +1,649 @@
+{
+  "experiment": "EXP-21",
+  "description": "Dynamic Formation Structure Inference Benchmark",
+  "timestamp": "2026-10-02T23:32:23",
+  "platform": "linux",
+  "python_version": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "config": {
+    "full_evidence_threshold": 9,
+    "partial_evidence_threshold": 7,
+    "low_evidence_threshold": 6,
+    "temporal_window_frames": 50,
+    "min_consensus_ratio": 0.65,
+    "ambiguity_margin": 0.2,
+    "wingback_ambiguity_threshold": 0.35
+  },
+  "synthetic_verification": {
+    "canonical_4-4-2": true,
+    "canonical_4-3-3": true,
+    "canonical_4-2-3-1": true,
+    "canonical_4-1-4-1": true,
+    "canonical_3-5-2": true,
+    "canonical_3-4-3": true,
+    "canonical_5-3-2": true,
+    "canonical_5-4-1": true,
+    "one_missing_player_partial": true,
+    "low_visibility_unknown": true,
+    "set_piece_deformation": true
+  },
+  "perturbation_analysis": {
+    "coordinate_noise": {
+      "noise_0.10m": {
+        "mean_dist_change": 0.0,
+        "prototype_flips": 0,
+        "stability_ratio": 1.0
+      },
+      "noise_0.25m": {
+        "mean_dist_change": 0.0,
+        "prototype_flips": 0,
+        "stability_ratio": 1.0
+      },
+      "noise_0.50m": {
+        "mean_dist_change": 0.0,
+        "prototype_flips": 0,
+        "stability_ratio": 1.0
+      },
+      "noise_1.00m": {
+        "mean_dist_change": 0.0,
+        "prototype_flips": 0,
+        "stability_ratio": 1.0
+      }
+    },
+    "missing_player_dropout": {
+      "visible_outfield": 9,
+      "visibility_class": "FULL_EVIDENCE",
+      "top_prototype": "3-5-2",
+      "distance_442": 2.5,
+      "distance_352": 1.0
+    }
+  },
+  "grid_search_window_dev": {
+    "W=25": {
+      "switches_per_minute": 112.0,
+      "mean_duration_s": 1.0344827586206897,
+      "accuracy": 0.018666666666666668,
+      "macro_f1": 0.03988603988603989,
+      "stable_pct": 15.4
+    },
+    "W=50": {
+      "switches_per_minute": 68.0,
+      "mean_duration_s": 1.6666666666666667,
+      "accuracy": 0.048,
+      "macro_f1": 0.0718562874251497,
+      "stable_pct": 11.333333333333332
+    },
+    "W=75": {
+      "switches_per_minute": 52.0,
+      "mean_duration_s": 2.142857142857143,
+      "accuracy": 0.05266666666666667,
+      "macro_f1": 0.0710431654676259,
+      "stable_pct": 9.866666666666667
+    }
+  },
+  "overall_summary": {
+    "dev_mean_accuracy": 0.008,
+    "dev_mean_macro_f1": 0.011976047904191616,
+    "holdout_mean_accuracy": 0.0,
+    "holdout_mean_macro_f1": 0.0,
+    "incremental_latency_ms": 0.07566733748495204,
+    "p95_latency_ms": 0.1160021914226187,
+    "budget_target_ms": 0.3,
+    "is_budget_compliant": true,
+    "total_frames_evaluated": 3000
+  },
+  "dev_sequences": {
+    "SNMOT-060": {
+      "gt_evaluation": {
+        "evaluable_frames": 1500,
+        "accuracy": 0.048,
+        "balanced_accuracy": 0.072,
+        "macro_f1": 0.0718562874251497,
+        "per_class": {
+          "3-5-2": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 250
+          },
+          "4-3-3": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 750
+          },
+          "5-3-2": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 250
+          },
+          "AMBIGUOUS": {
+            "precision": 0.2868525896414343,
+            "recall": 0.288,
+            "f1_score": 0.2874251497005988,
+            "support": 250
+          }
+        },
+        "structure_metrics": {
+          "line_count_accuracy": 0.2104,
+          "players_per_line_exact_match": 0.0,
+          "mean_line_edit_distance": 13.1488
+        }
+      },
+      "temporal_stability": {
+        "switches_per_minute": 68.0,
+        "total_transitions": 34,
+        "mean_state_duration_seconds": 1.6666666666666667,
+        "state_distribution": {
+          "STABLE_pct": 11.333333333333332,
+          "TRANSITIONING_pct": 25.133333333333336,
+          "AMBIGUOUS_pct": 16.733333333333334,
+          "PARTIAL_pct": 13.466666666666665,
+          "UNKNOWN_pct": 33.33333333333333
+        }
+      },
+      "timing": {
+        "mean_latency_ms": 0.14210232128486192,
+        "median_latency_ms": 0.144702000397956,
+        "p95_latency_ms": 0.22257055006775772,
+        "max_latency_ms": 0.3408310003578663,
+        "total_frames": 750
+      }
+    },
+    "SNMOT-061": {
+      "gt_evaluation": {
+        "evaluable_frames": 300,
+        "accuracy": 0.0,
+        "balanced_accuracy": 0.0,
+        "macro_f1": 0.0,
+        "per_class": {
+          "4-3-3": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 150
+          },
+          "4-4-2": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 150
+          }
+        },
+        "structure_metrics": {
+          "line_count_accuracy": 0.0,
+          "players_per_line_exact_match": 0.0,
+          "mean_line_edit_distance": 14.913333333333334
+        }
+      },
+      "temporal_stability": {
+        "switches_per_minute": 10.0,
+        "total_transitions": 1,
+        "mean_state_duration_seconds": 4.0,
+        "state_distribution": {
+          "STABLE_pct": 0.0,
+          "TRANSITIONING_pct": 14.666666666666666,
+          "AMBIGUOUS_pct": 0.0,
+          "PARTIAL_pct": 35.333333333333336,
+          "UNKNOWN_pct": 50.0
+        }
+      },
+      "timing": {
+        "mean_latency_ms": 0.07676056013830627,
+        "median_latency_ms": 0.0563709982088767,
+        "p95_latency_ms": 0.14042770035302962,
+        "max_latency_ms": 0.24879799821064807,
+        "total_frames": 150
+      }
+    },
+    "SNMOT-062": {
+      "gt_evaluation": {
+        "evaluable_frames": 300,
+        "accuracy": 0.0,
+        "balanced_accuracy": 0.0,
+        "macro_f1": 0.0,
+        "per_class": {
+          "4-3-3": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 300
+          }
+        },
+        "structure_metrics": {
+          "line_count_accuracy": 0.08333333333333333,
+          "players_per_line_exact_match": 0.0,
+          "mean_line_edit_distance": 15.768333333333333
+        }
+      },
+      "temporal_stability": {
+        "switches_per_minute": 10.0,
+        "total_transitions": 1,
+        "mean_state_duration_seconds": 4.0,
+        "state_distribution": {
+          "STABLE_pct": 0.0,
+          "TRANSITIONING_pct": 48.66666666666667,
+          "AMBIGUOUS_pct": 0.0,
+          "PARTIAL_pct": 1.3333333333333335,
+          "UNKNOWN_pct": 50.0
+        }
+      },
+      "timing": {
+        "mean_latency_ms": 0.1178561201231787,
+        "median_latency_ms": 0.11754600200220011,
+        "p95_latency_ms": 0.16580999745201544,
+        "max_latency_ms": 0.34050999965984374,
+        "total_frames": 150
+      }
+    },
+    "SNMOT-063": {
+      "gt_evaluation": {
+        "evaluable_frames": 300,
+        "accuracy": 0.0,
+        "balanced_accuracy": 0.0,
+        "macro_f1": 0.0,
+        "per_class": {
+          "4-2-3-1": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 150
+          },
+          "4-4-2": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 150
+          }
+        },
+        "structure_metrics": {
+          "line_count_accuracy": 0.0,
+          "players_per_line_exact_match": 0.0,
+          "mean_line_edit_distance": 12.0
+        }
+      },
+      "temporal_stability": {
+        "switches_per_minute": 0.0,
+        "total_transitions": 0,
+        "mean_state_duration_seconds": 6.0,
+        "state_distribution": {
+          "STABLE_pct": 0.0,
+          "TRANSITIONING_pct": 0.0,
+          "AMBIGUOUS_pct": 0.0,
+          "PARTIAL_pct": 50.0,
+          "UNKNOWN_pct": 50.0
+        }
+      },
+      "timing": {
+        "mean_latency_ms": 0.046229686728717446,
+        "median_latency_ms": 0.046171500798664056,
+        "p95_latency_ms": 0.058766501570062246,
+        "max_latency_ms": 0.07236599776661023,
+        "total_frames": 150
+      }
+    },
+    "SNMOT-064": {
+      "gt_evaluation": {
+        "evaluable_frames": 300,
+        "accuracy": 0.0,
+        "balanced_accuracy": 0.0,
+        "macro_f1": 0.0,
+        "per_class": {
+          "4-4-2": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 300
+          }
+        },
+        "structure_metrics": {
+          "line_count_accuracy": 0.0,
+          "players_per_line_exact_match": 0.0,
+          "mean_line_edit_distance": 12.0
+        }
+      },
+      "temporal_stability": {
+        "switches_per_minute": 0.0,
+        "total_transitions": 0,
+        "mean_state_duration_seconds": 6.0,
+        "state_distribution": {
+          "STABLE_pct": 0.0,
+          "TRANSITIONING_pct": 0.0,
+          "AMBIGUOUS_pct": 0.0,
+          "PARTIAL_pct": 50.0,
+          "UNKNOWN_pct": 50.0
+        }
+      },
+      "timing": {
+        "mean_latency_ms": 0.04660968693012061,
+        "median_latency_ms": 0.046697499783476815,
+        "p95_latency_ms": 0.05759029845648905,
+        "max_latency_ms": 0.12303100083954632,
+        "total_frames": 150
+      }
+    },
+    "SNMOT-065": {
+      "gt_evaluation": {
+        "evaluable_frames": 300,
+        "accuracy": 0.0,
+        "balanced_accuracy": 0.0,
+        "macro_f1": 0.0,
+        "per_class": {
+          "4-3-3": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 150
+          },
+          "4-4-2": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 150
+          }
+        },
+        "structure_metrics": {
+          "line_count_accuracy": 0.0,
+          "players_per_line_exact_match": 0.0,
+          "mean_line_edit_distance": 12.0
+        }
+      },
+      "temporal_stability": {
+        "switches_per_minute": 0.0,
+        "total_transitions": 0,
+        "mean_state_duration_seconds": 6.0,
+        "state_distribution": {
+          "STABLE_pct": 0.0,
+          "TRANSITIONING_pct": 0.0,
+          "AMBIGUOUS_pct": 0.0,
+          "PARTIAL_pct": 50.0,
+          "UNKNOWN_pct": 50.0
+        }
+      },
+      "timing": {
+        "mean_latency_ms": 0.047405760245358884,
+        "median_latency_ms": 0.047454499508603476,
+        "p95_latency_ms": 0.060186999871802975,
+        "max_latency_ms": 0.07996999920578673,
+        "total_frames": 150
+      }
+    }
+  },
+  "holdout_sequences": {
+    "SNMOT-066": {
+      "gt_evaluation": {
+        "evaluable_frames": 300,
+        "accuracy": 0.0,
+        "balanced_accuracy": 0.0,
+        "macro_f1": 0.0,
+        "per_class": {
+          "4-2-3-1": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 150
+          },
+          "4-3-3": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 150
+          }
+        },
+        "structure_metrics": {
+          "line_count_accuracy": 0.0,
+          "players_per_line_exact_match": 0.0,
+          "mean_line_edit_distance": 12.0
+        }
+      },
+      "temporal_stability": {
+        "switches_per_minute": 0.0,
+        "total_transitions": 0,
+        "mean_state_duration_seconds": 6.0,
+        "state_distribution": {
+          "STABLE_pct": 0.0,
+          "TRANSITIONING_pct": 0.0,
+          "AMBIGUOUS_pct": 0.0,
+          "PARTIAL_pct": 50.0,
+          "UNKNOWN_pct": 50.0
+        }
+      },
+      "timing": {
+        "mean_latency_ms": 0.046111239838258676,
+        "median_latency_ms": 0.04645199987862725,
+        "p95_latency_ms": 0.055804098883527324,
+        "max_latency_ms": 0.06489099905593321,
+        "total_frames": 150
+      }
+    },
+    "SNMOT-067": {
+      "gt_evaluation": {
+        "evaluable_frames": 0,
+        "accuracy": 0.0,
+        "balanced_accuracy": 0.0,
+        "macro_f1": 0.0,
+        "per_class": {},
+        "structure_metrics": {
+          "line_count_accuracy": 0.0,
+          "players_per_line_exact_match": 0.0,
+          "mean_line_edit_distance": 0.0
+        }
+      },
+      "temporal_stability": {
+        "switches_per_minute": 10.0,
+        "total_transitions": 1,
+        "mean_state_duration_seconds": 4.0,
+        "state_distribution": {
+          "STABLE_pct": 0.0,
+          "TRANSITIONING_pct": 0.0,
+          "AMBIGUOUS_pct": 0.0,
+          "PARTIAL_pct": 68.66666666666667,
+          "UNKNOWN_pct": 31.333333333333336
+        }
+      },
+      "timing": {
+        "mean_latency_ms": 0.05584411332771803,
+        "median_latency_ms": 0.053926500186207704,
+        "p95_latency_ms": 0.08109345108096022,
+        "max_latency_ms": 0.1180219987872988,
+        "total_frames": 150
+      }
+    },
+    "SNMOT-068": {
+      "gt_evaluation": {
+        "evaluable_frames": 300,
+        "accuracy": 0.0,
+        "balanced_accuracy": 0.0,
+        "macro_f1": 0.0,
+        "per_class": {
+          "4-3-3": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 150
+          },
+          "4-4-2": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 150
+          }
+        },
+        "structure_metrics": {
+          "line_count_accuracy": 0.06666666666666667,
+          "players_per_line_exact_match": 0.0,
+          "mean_line_edit_distance": 11.815
+        }
+      },
+      "temporal_stability": {
+        "switches_per_minute": 30.0,
+        "total_transitions": 3,
+        "mean_state_duration_seconds": 2.4,
+        "state_distribution": {
+          "STABLE_pct": 0.0,
+          "TRANSITIONING_pct": 6.666666666666667,
+          "AMBIGUOUS_pct": 0.33333333333333337,
+          "PARTIAL_pct": 43.0,
+          "UNKNOWN_pct": 50.0
+        }
+      },
+      "timing": {
+        "mean_latency_ms": 0.06334677326473563,
+        "median_latency_ms": 0.04535100015345961,
+        "p95_latency_ms": 0.13725449880439555,
+        "max_latency_ms": 0.2835829982359428,
+        "total_frames": 150
+      }
+    },
+    "SNMOT-069": {
+      "gt_evaluation": {
+        "evaluable_frames": 1500,
+        "accuracy": 0.0,
+        "balanced_accuracy": 0.0,
+        "macro_f1": 0.0,
+        "per_class": {
+          "3-4-3": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 250
+          },
+          "4-3-3": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 750
+          },
+          "5-4-1": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 250
+          },
+          "AMBIGUOUS": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 250
+          }
+        },
+        "structure_metrics": {
+          "line_count_accuracy": 0.0632,
+          "players_per_line_exact_match": 0.0,
+          "mean_line_edit_distance": 10.6708
+        }
+      },
+      "temporal_stability": {
+        "switches_per_minute": 40.0,
+        "total_transitions": 20,
+        "mean_state_duration_seconds": 2.727272727272727,
+        "state_distribution": {
+          "STABLE_pct": 16.933333333333334,
+          "TRANSITIONING_pct": 7.933333333333334,
+          "AMBIGUOUS_pct": 5.533333333333333,
+          "PARTIAL_pct": 23.666666666666668,
+          "UNKNOWN_pct": 45.93333333333333
+        }
+      },
+      "timing": {
+        "mean_latency_ms": 0.10342729470479146,
+        "median_latency_ms": 0.12479450015234761,
+        "p95_latency_ms": 0.19217420140193997,
+        "max_latency_ms": 0.36409400127013214,
+        "total_frames": 750
+      }
+    },
+    "SNMOT-070": {
+      "gt_evaluation": {
+        "evaluable_frames": 300,
+        "accuracy": 0.0,
+        "balanced_accuracy": 0.0,
+        "macro_f1": 0.0,
+        "per_class": {
+          "4-2-3-1": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 150
+          },
+          "4-4-2": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 150
+          }
+        },
+        "structure_metrics": {
+          "line_count_accuracy": 0.07333333333333333,
+          "players_per_line_exact_match": 0.0,
+          "mean_line_edit_distance": 11.708333333333334
+        }
+      },
+      "temporal_stability": {
+        "switches_per_minute": 20.0,
+        "total_transitions": 2,
+        "mean_state_duration_seconds": 3.0,
+        "state_distribution": {
+          "STABLE_pct": 5.666666666666666,
+          "TRANSITIONING_pct": 30.333333333333336,
+          "AMBIGUOUS_pct": 0.0,
+          "PARTIAL_pct": 14.000000000000002,
+          "UNKNOWN_pct": 50.0
+        }
+      },
+      "timing": {
+        "mean_latency_ms": 0.116265400016952,
+        "median_latency_ms": 0.13008950008952525,
+        "p95_latency_ms": 0.1623255004233215,
+        "max_latency_ms": 0.22879999960423447,
+        "total_frames": 150
+      }
+    },
+    "SNMOT-071": {
+      "gt_evaluation": {
+        "evaluable_frames": 300,
+        "accuracy": 0.0,
+        "balanced_accuracy": 0.0,
+        "macro_f1": 0.0,
+        "per_class": {
+          "4-3-3": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 150
+          },
+          "5-3-2": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 150
+          }
+        },
+        "structure_metrics": {
+          "line_count_accuracy": 0.0,
+          "players_per_line_exact_match": 0.0,
+          "mean_line_edit_distance": 12.0
+        }
+      },
+      "temporal_stability": {
+        "switches_per_minute": 0.0,
+        "total_transitions": 0,
+        "mean_state_duration_seconds": 6.0,
+        "state_distribution": {
+          "STABLE_pct": 0.0,
+          "TRANSITIONING_pct": 0.0,
+          "AMBIGUOUS_pct": 0.0,
+          "PARTIAL_pct": 50.0,
+          "UNKNOWN_pct": 50.0
+        }
+      },
+      "timing": {
+        "mean_latency_ms": 0.04604909321642481,
+        "median_latency_ms": 0.04588100091496017,
+        "p95_latency_ms": 0.05802249870612285,
+        "max_latency_ms": 0.08601099762017839,
+        "total_frames": 150
+      }
+    }
+  }
+}

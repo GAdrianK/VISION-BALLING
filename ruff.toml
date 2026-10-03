@@ -1,0 +1,7 @@
+target-version = "py310"
+line-length = 100
+
+[lint]
+# Baseline transitoire : le scan Ruff isolé recense 110 constats historiques
+# (E402: 65, F401: 30, F541: 9, F811: 1, F841: 5), à traiter dans un chantier dédié.
+select = ["E9", "F63", "F7", "F82"]

@@ -1,0 +1,93 @@
+{
+  "manifest_version": "1.0.0",
+  "created_at": "2026-09-03T00:00:00Z",
+  "dataset_role": "golden_eval",
+  "selection_method": "Manual visual inspection of five candidate windows per golden, followed by five-frame detailed contact sheets for selected windows.",
+  "sequence_count": 6,
+  "sequences": [
+    {
+      "sequence_id": "TRACK-G01-01",
+      "golden_id": "GOLDEN-01-BROADCAST",
+      "golden_sha256": "9bfa4242b1512799c45d802f650cc76bf519b248c54254a7fecdd236f21bd39b",
+      "start_frame": 500,
+      "end_frame": 549,
+      "start_timestamp": "00:00:20.000000000",
+      "end_timestamp": "00:00:21.960000000",
+      "fps": 25.0,
+      "frame_count": 50,
+      "duration_seconds": 2.0,
+      "selection_reason": "Normal continuous play near midfield with several players, the referee and the ball visibly moving between opponents.",
+      "difficulty_tags": ["normal_play", "ball_visible", "multiple_players"]
+    },
+    {
+      "sequence_id": "TRACK-G01-02",
+      "golden_id": "GOLDEN-01-BROADCAST",
+      "golden_sha256": "9bfa4242b1512799c45d802f650cc76bf519b248c54254a7fecdd236f21bd39b",
+      "start_frame": 2500,
+      "end_frame": 2549,
+      "start_timestamp": "00:01:40.000000000",
+      "end_timestamp": "00:01:41.960000000",
+      "fps": 25.0,
+      "frame_count": 50,
+      "duration_seconds": 2.0,
+      "selection_reason": "Attacking phase with a dense group of players and a broadcast pan following play toward the right side.",
+      "difficulty_tags": ["camera_pan", "player_density", "partial_occlusion"]
+    },
+    {
+      "sequence_id": "TRACK-G02-01",
+      "golden_id": "GOLDEN-02-TACTICAL-WIDE",
+      "golden_sha256": "1cec8e8b8ac0ceff71352821cba1dbf4d83da4a834f82209fba323285ae1731e",
+      "start_frame": 1500,
+      "end_frame": 1549,
+      "start_timestamp": "00:01:00.000000000",
+      "end_timestamp": "00:01:01.960000000",
+      "fps": 25.0,
+      "frame_count": 50,
+      "duration_seconds": 2.0,
+      "selection_reason": "Dense play concentrated in the far-right zone of a full-pitch panoramic view.",
+      "difficulty_tags": ["small_players", "small_ball", "dense_zone"]
+    },
+    {
+      "sequence_id": "TRACK-G02-02",
+      "golden_id": "GOLDEN-02-TACTICAL-WIDE",
+      "golden_sha256": "1cec8e8b8ac0ceff71352821cba1dbf4d83da4a834f82209fba323285ae1731e",
+      "start_frame": 4500,
+      "end_frame": 4549,
+      "start_timestamp": "00:03:00.000000000",
+      "end_timestamp": "00:03:01.960000000",
+      "fps": 25.0,
+      "frame_count": 50,
+      "duration_seconds": 2.0,
+      "selection_reason": "Wide transition around midfield involving both team shapes across a large portion of the pitch.",
+      "difficulty_tags": ["wide_transition", "full_pitch", "small_objects"]
+    },
+    {
+      "sequence_id": "TRACK-G03-01",
+      "golden_id": "GOLDEN-03-DIFFICULT",
+      "golden_sha256": "804876b65364612e56ee9ca078023e9ce5c473cea9887b67d44fac5f07ad14e9",
+      "start_frame": 406,
+      "end_frame": 463,
+      "start_timestamp": "00:00:14.000000000",
+      "end_timestamp": "00:00:15.965517241",
+      "fps": 29.0,
+      "frame_count": 58,
+      "duration_seconds": 2.0,
+      "selection_reason": "Relatively stable and exploitable period with the pitch, goal area and active players visible despite distance and glare.",
+      "difficulty_tags": ["stadium_glare", "small_distant_players", "crowd_background"]
+    },
+    {
+      "sequence_id": "TRACK-G03-02",
+      "golden_id": "GOLDEN-03-DIFFICULT",
+      "golden_sha256": "804876b65364612e56ee9ca078023e9ce5c473cea9887b67d44fac5f07ad14e9",
+      "start_frame": 522,
+      "end_frame": 579,
+      "start_timestamp": "00:00:18.000000000",
+      "end_timestamp": "00:00:19.965517241",
+      "fps": 29.0,
+      "frame_count": 58,
+      "duration_seconds": 2.0,
+      "selection_reason": "Genuinely difficult handheld transition with rapid camera motion, foreground arms and fingers, crowd occlusion and intermittent loss of the pitch.",
+      "difficulty_tags": ["strong_camera_motion", "motion_blur", "foreground_occlusion", "crowd", "partial_loss_of_pitch"]
+    }
+  ]
+}

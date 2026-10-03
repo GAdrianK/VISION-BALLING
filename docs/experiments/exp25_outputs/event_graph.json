@@ -1,0 +1,144 @@
+{
+  "node_count": 82,
+  "edge_count": 23,
+  "edges": [
+    {
+      "source_id": "poss_change_47_TEAM_0_to_TEAM_1",
+      "target_id": "trans_47_72_TEAM_0_NEUTRAL_TRANSITION",
+      "relation": "CAUSES",
+      "weight": 1.0
+    },
+    {
+      "source_id": "press_47_56_TEAM_0",
+      "target_id": "trans_47_72_TEAM_0_NEUTRAL_TRANSITION",
+      "relation": "SUPPORTS",
+      "weight": 1.0
+    },
+    {
+      "source_id": "poss_change_55_TEAM_0_to_TEAM_1",
+      "target_id": "trans_55_80_TEAM_0_COUNTERPRESS_CANDIDATE",
+      "relation": "CAUSES",
+      "weight": 1.0
+    },
+    {
+      "source_id": "poss_change_256_TEAM_0_to_TEAM_1",
+      "target_id": "trans_256_281_TEAM_0_NEUTRAL_TRANSITION",
+      "relation": "CAUSES",
+      "weight": 1.0
+    },
+    {
+      "source_id": "press_256_270_TEAM_0",
+      "target_id": "trans_256_281_TEAM_0_NEUTRAL_TRANSITION",
+      "relation": "SUPPORTS",
+      "weight": 1.0
+    },
+    {
+      "source_id": "poss_change_194_TEAM_0_to_TEAM_1",
+      "target_id": "trans_194_219_TEAM_0_DEFENSIVE_RECOVERY_CANDIDATE",
+      "relation": "CAUSES",
+      "weight": 1.0
+    },
+    {
+      "source_id": "press_194_255_TEAM_0",
+      "target_id": "trans_194_219_TEAM_0_DEFENSIVE_RECOVERY_CANDIDATE",
+      "relation": "SUPPORTS",
+      "weight": 1.0
+    },
+    {
+      "source_id": "poss_change_303_TEAM_1_to_TEAM_0",
+      "target_id": "trans_303_328_TEAM_1_DEFENSIVE_RECOVERY_CANDIDATE",
+      "relation": "CAUSES",
+      "weight": 1.0
+    },
+    {
+      "source_id": "press_316_350_TEAM_1",
+      "target_id": "trans_303_328_TEAM_1_DEFENSIVE_RECOVERY_CANDIDATE",
+      "relation": "SUPPORTS",
+      "weight": 1.0
+    },
+    {
+      "source_id": "poss_change_206_TEAM_1_to_TEAM_0",
+      "target_id": "trans_206_231_TEAM_1_NEUTRAL_TRANSITION",
+      "relation": "CAUSES",
+      "weight": 1.0
+    },
+    {
+      "source_id": "poss_change_236_TEAM_0_to_TEAM_1",
+      "target_id": "trans_236_261_TEAM_0_NEUTRAL_TRANSITION",
+      "relation": "CAUSES",
+      "weight": 1.0
+    },
+    {
+      "source_id": "poss_change_286_TEAM_0_to_TEAM_1",
+      "target_id": "trans_300_325_TEAM_0_NEUTRAL_TRANSITION",
+      "relation": "CAUSES",
+      "weight": 1.0
+    },
+    {
+      "source_id": "poss_change_300_TEAM_0_to_TEAM_1",
+      "target_id": "trans_300_325_TEAM_0_NEUTRAL_TRANSITION",
+      "relation": "CAUSES",
+      "weight": 1.0
+    },
+    {
+      "source_id": "press_187_295_TEAM_1",
+      "target_id": "trans_206_231_TEAM_1_NEUTRAL_TRANSITION",
+      "relation": "SUPPORTS",
+      "weight": 1.0
+    },
+    {
+      "source_id": "press_203_260_TEAM_0",
+      "target_id": "trans_236_261_TEAM_0_NEUTRAL_TRANSITION",
+      "relation": "SUPPORTS",
+      "weight": 1.0
+    },
+    {
+      "source_id": "press_286_302_TEAM_0",
+      "target_id": "trans_300_325_TEAM_0_NEUTRAL_TRANSITION",
+      "relation": "SUPPORTS",
+      "weight": 1.0
+    },
+    {
+      "source_id": "press_303_311_TEAM_0",
+      "target_id": "trans_300_325_TEAM_0_NEUTRAL_TRANSITION",
+      "relation": "SUPPORTS",
+      "weight": 1.0
+    },
+    {
+      "source_id": "press_317_350_TEAM_0",
+      "target_id": "trans_300_325_TEAM_0_NEUTRAL_TRANSITION",
+      "relation": "SUPPORTS",
+      "weight": 1.0
+    },
+    {
+      "source_id": "poss_change_178_TEAM_0_to_TEAM_1",
+      "target_id": "trans_178_203_TEAM_0_DEFENSIVE_RECOVERY_CANDIDATE",
+      "relation": "CAUSES",
+      "weight": 1.0
+    },
+    {
+      "source_id": "poss_change_311_TEAM_1_to_TEAM_0",
+      "target_id": "trans_311_336_TEAM_1_NEUTRAL_TRANSITION",
+      "relation": "CAUSES",
+      "weight": 1.0
+    },
+    {
+      "source_id": "press_274_311_TEAM_1",
+      "target_id": "trans_311_336_TEAM_1_NEUTRAL_TRANSITION",
+      "relation": "SUPPORTS",
+      "weight": 1.0
+    },
+    {
+      "source_id": "press_329_350_TEAM_1",
+      "target_id": "trans_311_336_TEAM_1_NEUTRAL_TRANSITION",
+      "relation": "SUPPORTS",
+      "weight": 1.0
+    },
+    {
+      "source_id": "poss_change_259_TEAM_0_to_TEAM_1",
+      "target_id": "trans_259_284_TEAM_0_DEFENSIVE_RECOVERY_CANDIDATE",
+      "relation": "CAUSES",
+      "weight": 1.0
+    }
+  ]
+}

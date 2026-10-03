@@ -1,0 +1,75 @@
+{
+  "experiment": "exp04_rfdetr_small_h250_960",
+  "model_id": "rf-detr-small",
+  "architecture_family": "transformer_detr",
+  "resolution": 960,
+  "batch_size": 2,
+  "grad_accum_steps": 2,
+  "effective_batch_size": 4,
+  "epochs": 30,
+  "training": {
+    "duration_seconds": 37844.061,
+    "duration_hours": 10.51,
+    "peak_vram_allocated_mb": 2289.51,
+    "peak_vram_reserved_mb": 3474.0,
+    "checkpoint_best_sha256": "c1a1d88b74edc5ddefa7da4581e2848c4c58c3938d88ad4a1b615f071752ffff",
+    "checkpoint_best_bytes": 131450266,
+    "checkpoint_best_path": "/media/adriano/Windows/runs/detect/exp04_rfdetr_small_h250_960/checkpoint_best_total.pth"
+  },
+  "rfdetr_native_val": {
+    "ema_map_50": 0.8328,
+    "ema_map_50_95": 0.5387,
+    "f1_sweep": 0.8578
+  },
+  "canonical_benchmark_metrics": {
+    "mAP_50": 0.8074,
+    "macro_f1": 0.8496,
+    "overall_precision": 0.8439,
+    "overall_recall": 0.8556,
+    "overall_f1": 0.8497,
+    "ball": {
+      "ap50": 0.6542,
+      "precision": 0.7131,
+      "recall": 0.7483,
+      "f1": 0.7303
+    },
+    "person": {
+      "ap50": 0.9605,
+      "precision": 0.9748,
+      "recall": 0.9629,
+      "f1": 0.9688
+    },
+    "fps": 33.44,
+    "duration_seconds": 81.523,
+    "peak_rss_mb": 3542.68
+  },
+  "comparison_vs_exp03": {
+    "ball_precision_delta": 0.0658,
+    "ball_recall_delta": 0.0957,
+    "ball_f1_delta": 0.0803,
+    "ball_ap50_delta": 0.091,
+    "person_f1_delta": 0.0066,
+    "person_ap50_delta": 0.017,
+    "macro_f1_delta": 0.0435,
+    "map50_delta": 0.0541,
+    "fps_ratio": 0.4203
+  },
+  "comparison_vs_exp02": {
+    "ball_precision_delta": 0.0842,
+    "ball_recall_delta": 0.1696,
+    "ball_f1_delta": 0.1276,
+    "ball_ap50_delta": 0.1677,
+    "person_f1_delta": 0.0112,
+    "person_ap50_delta": 0.0264,
+    "macro_f1_delta": 0.0694,
+    "map50_delta": 0.0971
+  },
+  "provenance": {
+    "git_head": "cf7ccc255de5d97ff89720fce8ad2c3bd7a03f47",
+    "dataset_yaml_sha256": "b6bba6a0479fbaeb9c37b5313069360745ec176a0e09ff0e4d473e605951c907",
+    "semantic_fingerprint": "3429cefcbf8483a49867936c5441afefd845842162ce02c06797aabc016f2c90",
+    "initial_weights_sha256": "d81979a9213a2109345158ce9232668df4c1ae52e9b8db3f2ec0a8cbad959b33",
+    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "gpu_memory_mib": 8188
+  }
+}

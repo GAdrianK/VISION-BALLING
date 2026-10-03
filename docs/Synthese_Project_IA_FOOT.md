@@ -1,9 +1,11 @@
 # ⚽ Dossier de Synthèse : Football IQ Assistant (MVP & V2 PRO)
 
+> **Statut : historique / non normatif.** Cette synthèse conserve le contexte du prototype initial. L'état courant est décrit dans [`../README.md`](../README.md) et [`project_status.md`](project_status.md).
+
 Ce dossier rassemble l'ensemble des concepts tactiques, des solutions d'ingénierie et des perspectives d'évolution du projet **Football IQ Assistant** pour vous préparer au mieux à votre entretien de recrutement.
 
 Le PDF correspondant a été compilé avec succès et est disponible à l'emplacement suivant :  
-👉 [Synthese_Projet_IA_FOOT.pdf](file:///home/adriano/Documents/PROJET%20PERSO/IA%20FOOT/docs/Synthese_Projet_IA_FOOT.pdf)
+👉 [Synthese_Projet_IA_FOOT.pdf](Synthese_Projet_IA_FOOT.pdf)
 
 ---
 

@@ -3,12 +3,20 @@ __pycache__/
 *.py[cod]
 *$py.class
 .pytest_cache/
+backend/.pytest-tmp/
+.ruff_cache/
 
 # Virtual environments
 backend/venv/
 backend/.venv/
 venv/
 ENV/
+.venv-training
+.venv-training/
+.venv-rfdetr
+.venv-rfdetr/
+.venv-reid
+.venv-reid/
 
 # Configuration & Secrets
 backend/.env
@@ -35,6 +43,14 @@ backend/data/video_uploads/
 backend/data/video_results/
 backend/data/parent_store.db
 backend/evaluation/benchmark_results.json
+benchmark_*.json
+data/external/
+
+data/benchmarks/
+data/soccernet/
+/data/golden/
+*.gt.txt
+
 
 # Logs
 *.log
@@ -57,12 +73,15 @@ frontend-vanilla/
 /synapseX/
 
 # Vidéos et poids de modèles locaux
+/runs/
 *.mp4
 *.mov
 *.mkv
 *.avi
 *.webm
 *.pt
+*.pth
+*.ckpt
 *.onnx
 
 # Misc

@@ -87,8 +87,15 @@ class TacticalReranker:
         if not ranked_pool:
             for cand in candidate_pool:
                 cand_copy = cand.copy()
-                cand_copy["scores"] = cand["scores"].copy()
-                cand_copy["scores"]["rerank"] = cand["scores"]["hybrid"]
+                scores = cand.get("scores", {})
+                if isinstance(scores, dict):
+                    scores_copy = scores.copy()
+                    hybrid_val = scores_copy.get("hybrid", cand.get("score", 0.0))
+                else:
+                    scores_copy = {}
+                    hybrid_val = float(cand.get("score", 0.0))
+                scores_copy["rerank"] = hybrid_val
+                cand_copy["scores"] = scores_copy
                 ranked_pool.append(cand_copy)
             ranked_pool.sort(key=lambda x: x["scores"]["rerank"], reverse=True)
 
@@ -97,17 +104,18 @@ class TacticalReranker:
 
         # 2. Résolution des documents parents depuis SQLite
         for rank, item in enumerate(final_top):
-            parent_id = item["parent_id"]
+            parent_id = item.get("parent_id")
             parent_text = ""
-            parent_source = item["metadata"]["source"]
-            
+            metadata = item.get("metadata", {})
+            parent_source = metadata.get("source", item.get("source", "tactical_kb"))
+
             if parent_id:
                 parent_data = self.parent_store.get_parent(parent_id)
                 if parent_data:
                     parent_source, parent_text = parent_data
                 else:
                     logger.warning(f"Document parent {parent_id} introuvable dans SQLite.")
-            
+
             item["parent_context"] = {
                 "parent_id": parent_id,
                 "source": parent_source,

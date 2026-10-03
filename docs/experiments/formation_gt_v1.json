@@ -1,0 +1,190 @@
+{
+  "version": "formation_gt_v1",
+  "description": "Ground truth temporal interval annotations for dynamic formation structure (EXP-21) across 12 SoccerNet tracking clips",
+  "definitions": {
+    "4-4-2": "4 defenders, 4 midfielders, 2 forwards",
+    "4-3-3": "4 defenders, 3 midfielders, 3 forwards",
+    "4-2-3-1": "4 defenders, 2 defensive midfielders, 3 attacking midfielders, 1 striker",
+    "4-1-4-1": "4 defenders, 1 holding midfielder, 4 advanced midfielders, 1 striker",
+    "3-5-2": "3 central defenders, 5 midfielders (including wingbacks), 2 strikers",
+    "3-4-3": "3 central defenders, 4 midfielders, 3 forwards",
+    "5-3-2": "5 defenders (3 CBs + 2 deep wingbacks), 3 midfielders, 2 strikers",
+    "5-4-1": "5 defenders, 4 midfielders, 1 striker",
+    "AMBIGUOUS": "Wingback ambiguity (3-back vs 5-back), dynamic transition, or split lines with low margin",
+    "NOT_VISIBLE": "Broadcast camera zoom or pan cutting off >4 outfield players (N <= 6)"
+  },
+  "partitions": {
+    "DEV_SEQUENCES": [
+      "SNMOT-060",
+      "SNMOT-061",
+      "SNMOT-062",
+      "SNMOT-063",
+      "SNMOT-064",
+      "SNMOT-065"
+    ],
+    "HOLDOUT_SEQUENCES": [
+      "SNMOT-066",
+      "SNMOT-067",
+      "SNMOT-068",
+      "SNMOT-069",
+      "SNMOT-070",
+      "SNMOT-071"
+    ]
+  },
+  "DEV": {
+    "SNMOT-060": [
+      {
+        "start_frame": 1,
+        "end_frame": 250,
+        "team_0": "4-3-3",
+        "team_1": "3-5-2",
+        "confidence": 0.85,
+        "rationale": "Team 0 shows 4-3-3 structure with 4 defenders, 3 central midfielders and 3 advanced players; Team 1 operates in 3-5-2 structure with 3 central defenders and wingbacks"
+      },
+      {
+        "start_frame": 251,
+        "end_frame": 500,
+        "team_0": "4-3-3",
+        "team_1": "5-3-2",
+        "confidence": 0.80,
+        "rationale": "Team 1 wingbacks drop into 5-man backline under sustained Team 0 attack"
+      },
+      {
+        "start_frame": 501,
+        "end_frame": 750,
+        "team_0": "4-3-3",
+        "team_1": "AMBIGUOUS",
+        "confidence": 0.75,
+        "rationale": "Turnover and transition phase: Team 1 shape oscillates between 3-5-2 and 5-3-2"
+      }
+    ],
+    "SNMOT-061": [
+      {
+        "start_frame": 1,
+        "end_frame": 150,
+        "team_0": "4-4-2",
+        "team_1": "4-3-3",
+        "confidence": 0.85,
+        "rationale": "Two compact lines of 4 for Team 0; Team 1 holding 4-3-3 shape"
+      }
+    ],
+    "SNMOT-062": [
+      {
+        "start_frame": 1,
+        "end_frame": 150,
+        "team_0": "4-3-3",
+        "team_1": "4-3-3",
+        "confidence": 0.90,
+        "rationale": "High line pressing 4-3-3 from Team 0 against deep 4-3-3 structure of Team 1"
+      }
+    ],
+    "SNMOT-063": [
+      {
+        "start_frame": 1,
+        "end_frame": 150,
+        "team_0": "4-2-3-1",
+        "team_1": "4-4-2",
+        "confidence": 0.85,
+        "rationale": "Team 0 shows distinct double pivot behind attacking trident (4-2-3-1); Team 1 in classic 4-4-2"
+      }
+    ],
+    "SNMOT-064": [
+      {
+        "start_frame": 1,
+        "end_frame": 150,
+        "team_0": "4-4-2",
+        "team_1": "4-4-2",
+        "confidence": 0.90,
+        "rationale": "Both sides set up in symmetric two-bank 4-4-2 blocks in middle third"
+      }
+    ],
+    "SNMOT-065": [
+      {
+        "start_frame": 1,
+        "end_frame": 150,
+        "team_0": "4-3-3",
+        "team_1": "4-4-2",
+        "confidence": 0.85,
+        "rationale": "Team 0 high 4-3-3 block; Team 1 compact 4-4-2 low block"
+      }
+    ]
+  },
+  "HOLDOUT": {
+    "SNMOT-066": [
+      {
+        "start_frame": 1,
+        "end_frame": 150,
+        "team_0": "4-2-3-1",
+        "team_1": "4-3-3",
+        "confidence": 0.80,
+        "rationale": "Team 0 staggered midfield with two holding midfielders; Team 1 4-3-3"
+      }
+    ],
+    "SNMOT-067": [
+      {
+        "start_frame": 1,
+        "end_frame": 150,
+        "team_0": "NOT_VISIBLE",
+        "team_1": "NOT_VISIBLE",
+        "confidence": 0.95,
+        "rationale": "Tight box cluster and low visibility on uncalibrated camera sequence"
+      }
+    ],
+    "SNMOT-068": [
+      {
+        "start_frame": 1,
+        "end_frame": 150,
+        "team_0": "4-3-3",
+        "team_1": "4-4-2",
+        "confidence": 0.90,
+        "rationale": "High line 4-3-3 holding halfway against 4-4-2 defensive shape"
+      }
+    ],
+    "SNMOT-069": [
+      {
+        "start_frame": 1,
+        "end_frame": 250,
+        "team_0": "4-3-3",
+        "team_1": "3-4-3",
+        "confidence": 0.85,
+        "rationale": "Team 0 standard 4-3-3; Team 1 3-4-3 with wide wingbacks"
+      },
+      {
+        "start_frame": 251,
+        "end_frame": 500,
+        "team_0": "4-3-3",
+        "team_1": "5-4-1",
+        "confidence": 0.80,
+        "rationale": "Team 1 wingbacks drop deep into 5-4-1 defensive shape under sustained pressure"
+      },
+      {
+        "start_frame": 501,
+        "end_frame": 750,
+        "team_0": "4-3-3",
+        "team_1": "AMBIGUOUS",
+        "confidence": 0.75,
+        "rationale": "Transition phase with contested wingback positions"
+      }
+    ],
+    "SNMOT-070": [
+      {
+        "start_frame": 1,
+        "end_frame": 150,
+        "team_0": "4-4-2",
+        "team_1": "4-2-3-1",
+        "confidence": 0.80,
+        "rationale": "Midfield contest between 4-4-2 and 4-2-3-1 shape"
+      }
+    ],
+    "SNMOT-071": [
+      {
+        "start_frame": 1,
+        "end_frame": 150,
+        "team_0": "4-3-3",
+        "team_1": "5-3-2",
+        "confidence": 0.90,
+        "rationale": "Total siege: Team 0 in high 4-3-3 against 5-3-2 low block"
+      }
+    ]
+  }
+}

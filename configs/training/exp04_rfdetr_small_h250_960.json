@@ -1,0 +1,142 @@
+{
+  "spec_version": "1.0.0",
+  "experiment_id": "exp04_rfdetr_small_h250_960",
+  "status": "READY_TO_RUN",
+  "runtime": {
+    "python": "3.12.3",
+    "rfdetr": "1.11.0",
+    "torch": "2.6.0+cu124",
+    "torchvision": "0.21.0+cu124",
+    "cuda": "12.4",
+    "device": "NVIDIA GeForce RTX 4060 Laptop GPU"
+  },
+  "dataset": {
+    "name": "SoccerNet-v3 H250 YOLO",
+    "dataset_role": "training",
+    "classes": {
+      "0": "ball",
+      "1": "person"
+    },
+    "expected_split_counts": {
+      "train": 14368,
+      "valid": 2726,
+      "test": 2692
+    },
+    "data_yaml_sha256": "b6bba6a0479fbaeb9c37b5313069360745ec176a0e09ff0e4d473e605951c907",
+    "semantic_fingerprint": "3429cefcbf8483a49867936c5441afefd845842162ce02c06797aabc016f2c90"
+  },
+  "initial_model": {
+    "model_id": "rf-detr-small",
+    "variant": "RFDETRSmall",
+    "filename": "rf-detr-small.pth",
+    "bytes": 386045550,
+    "sha256": "d81979a9213a2109345158ce9232668df4c1ae52e9b8db3f2ec0a8cbad959b33",
+    "provenance": "Official Roboflow / RF-DETR release",
+    "fresh_start_required": true,
+    "forbidden_initial_checkpoint": "EXP-03 best.pt"
+  },
+  "training": {
+    "model": "RFDETRSmall",
+    "epochs": 30,
+    "resolution": 960,
+    "batch_size": 2,
+    "grad_accum_steps": 2,
+    "effective_batch_size": 4,
+    "gradient_checkpointing": true,
+    "lr": 0.0001,
+    "lr_encoder": 0.00015,
+    "optimizer": "adamw",
+    "weight_decay": 0.0001,
+    "multi_scale": "per-batch",
+    "expanded_scales": true,
+    "use_ema": true,
+    "ema_decay": 0.993,
+    "ema_tau": 100,
+    "ema_update_interval": 1,
+    "early_stopping": false,
+    "clip_max_norm": 0.1,
+    "amp_dtype": "auto",
+    "num_workers": 2,
+    "seed": 42,
+    "run_test": false,
+    "patch_size": 16,
+    "num_windows": 2,
+    "num_queries": 300
+  },
+  "evaluation": {
+    "split": "valid",
+    "expected_images": 2726,
+    "iou_threshold": 0.5,
+    "ball_confidence": 0.25,
+    "person_confidence": 0.45,
+    "canonical_evaluator": "backend/app/video_analysis/benchmark_metrics.py",
+    "required_metrics": [
+      "mAP_50",
+      "macro_f1",
+      "ball_precision",
+      "ball_recall",
+      "ball_f1",
+      "ball_ap50",
+      "person_f1",
+      "person_ap50",
+      "fps",
+      "peak_rss_mb"
+    ]
+  },
+  "references": {
+    "exp02": {
+      "source": "docs/experiments/exp02_yolo11n_h250_960_b4.json",
+      "mAP_50": 0.7103,
+      "macro_f1": 0.7802,
+      "fps": 75.48,
+      "ball": {
+        "precision": 0.6289,
+        "recall": 0.5787,
+        "f1": 0.6027,
+        "ap50": 0.4865
+      },
+      "person": {
+        "precision": 0.9794,
+        "recall": 0.9368,
+        "f1": 0.9576,
+        "ap50": 0.9341
+      },
+      "checkpoint_best": {
+        "bytes": 5489299,
+        "sha256": "d2f23dee97207135b6c225e708864b4e1b6f7deb191f9d0f8410281091b56a45"
+      }
+    },
+    "exp03": {
+      "source": "docs/experiments/exp03_yolo11s_h250_960_b4.json",
+      "mAP_50": 0.7533,
+      "macro_f1": 0.8061,
+      "fps": 79.57,
+      "ball": {
+        "precision": 0.6473,
+        "recall": 0.6526,
+        "f1": 0.6500,
+        "ap50": 0.5632
+      },
+      "person": {
+        "precision": 0.9785,
+        "recall": 0.9464,
+        "f1": 0.9622,
+        "ap50": 0.9435
+      },
+      "checkpoint_best": {
+        "bytes": 19194899,
+        "sha256": "46f5f8d94db71ef0786ca15aeb6a7aaea8d7c1c213ec6390002d005f3add518c"
+      }
+    }
+  },
+  "privacy_and_split": {
+    "prohibited_training_sources": [
+      "data/golden",
+      "golden_eval",
+      "CVAT golden exports"
+    ],
+    "weights_in_git": false,
+    "dataset_in_git": false,
+    "runs_in_git": false
+  }
+}

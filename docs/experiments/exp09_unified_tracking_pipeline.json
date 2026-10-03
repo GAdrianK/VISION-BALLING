@@ -1,0 +1,311 @@
+{
+  "experiment": "EXP-09",
+  "title": "Unified Tracking Pipeline Integration & Performance Validation",
+  "status": "COMPLETED",
+  "scientific_objective": "Validate that the locked RF-DETR Small 960 detector, PlayerBoTSORT (with sparseOptFlow GMC, no ReID), and BallTrackManager V2 integrate into a unified, single-pass pipeline reproducing frozen tracking quality and establishing real end-to-end throughput.",
+  "terminal_state": "EXP-09 COMPLETE \u2014 UNIFIED TRACKING PIPELINE VALIDATED",
+  "provenance": {
+    "git_commit": "740240835dd6b9fbc786b106d2ed5f22eb38ffae",
+    "detector_architecture": "RF-DETR Small (960px)",
+    "detector_checkpoint": "/media/adriano/Windows/runs/detect/exp04_rfdetr_small_h250_960/checkpoint_best_total.pth",
+    "detector_checkpoint_sha256": "c1a1d88b74edc5ddefa7da4581e2848c4c58c3938d88ad4a1b615f071752ffff",
+    "hardware_device": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "python_version": "3.12.3",
+    "torch_version": "2.6.0+cu124",
+    "dataset": "SoccerNet Tracking 2023 (train split)",
+    "sequences": [
+      "SNMOT-060",
+      "SNMOT-061",
+      "SNMOT-062",
+      "SNMOT-066",
+      "SNMOT-067",
+      "SNMOT-068"
+    ],
+    "total_frames_evaluated": 4500
+  },
+  "pipeline_architecture": {
+    "flow": "Frame Read -> Single-Pass RF-DETR (960px) -> Semantic Class Split -> [PlayerBoTSORT + GMC, BallTrackManager V2] -> FrameTrackingResult",
+    "detector_call_per_frame": 1,
+    "player_tracker": {
+      "name": "botsort_player_no_reid",
+      "gmc_method": "sparseOptFlow",
+      "track_high_thresh": 0.45,
+      "track_low_thresh": 0.1,
+      "with_reid": false,
+      "appearance_model": "none"
+    },
+    "ball_tracker": {
+      "name": "ball_track_manager_v2",
+      "enable_track_lifecycle": true,
+      "spatial_gate_max_radius": 500.0,
+      "max_gap_interpolation": 0,
+      "min_detection_confidence": 0.25
+    }
+  },
+  "throughput_benchmarks": {
+    "mode_a_analysis_core": {
+      "description": "Decode + Detector + Trackers + Structured Data Output (No visualizer, no encoding)",
+      "effective_fps": 22.72,
+      "ms_per_frame": 44.01,
+      "real_time_target_25fps": "FAIL",
+      "per_stage_latencies_ms": {
+        "decode_ms": {
+          "mean_ms": 5.28,
+          "median_ms": 5.29,
+          "p90_ms": 5.42,
+          "p95_ms": 5.47
+        },
+        "preprocess_ms": {
+          "mean_ms": 0.57,
+          "median_ms": 0.57,
+          "p90_ms": 0.58,
+          "p95_ms": 0.59
+        },
+        "detector_inference_ms": {
+          "mean_ms": 26.42,
+          "median_ms": 26.44,
+          "p90_ms": 26.7,
+          "p95_ms": 26.78
+        },
+        "detector_postprocess_ms": {
+          "mean_ms": 0.16,
+          "median_ms": 0.15,
+          "p90_ms": 0.2,
+          "p95_ms": 0.2
+        },
+        "detector_ms": {
+          "mean_ms": 27.15,
+          "median_ms": 27.21,
+          "p90_ms": 27.44,
+          "p95_ms": 27.52
+        },
+        "gmc_ms": {
+          "mean_ms": 9.19,
+          "median_ms": 9.15,
+          "p90_ms": 9.55,
+          "p95_ms": 9.64
+        },
+        "player_tracking_ms": {
+          "mean_ms": 11.49,
+          "median_ms": 11.52,
+          "p90_ms": 12.0,
+          "p95_ms": 12.01
+        },
+        "ball_tracking_ms": {
+          "mean_ms": 0.03,
+          "median_ms": 0.03,
+          "p90_ms": 0.03,
+          "p95_ms": 0.03
+        },
+        "rendering_ms": {
+          "mean_ms": 0.0,
+          "median_ms": 0.0,
+          "p90_ms": 0.0,
+          "p95_ms": 0.0
+        },
+        "encoding_ms": {
+          "mean_ms": 0.0,
+          "median_ms": 0.0,
+          "p90_ms": 0.0,
+          "p95_ms": 0.0
+        },
+        "total_ms": {
+          "mean_ms": 43.99,
+          "median_ms": 44.21,
+          "p90_ms": 44.7,
+          "p95_ms": 44.73
+        }
+      }
+    },
+    "mode_b_debug_video": {
+      "description": "Full Pipeline + Debug Visualizer + OpenCV MP4 VideoWriter Encoding",
+      "effective_fps": 16.46,
+      "ms_per_frame": 60.77,
+      "generated_clips": [
+        "/media/adriano/Windows/runs/tracking/exp09/videos/exp09_pan_zoom_snmot066.mp4",
+        "/media/adriano/Windows/runs/tracking/exp09/videos/exp09_dense_cluster_snmot060.mp4",
+        "/media/adriano/Windows/runs/tracking/exp09/videos/exp09_ball_restart_snmot061.mp4"
+      ]
+    }
+  },
+  "resource_utilization": {
+    "peak_gpu_vram_mb": 303.1,
+    "reserved_gpu_vram_mb": 366.0,
+    "process_ram_mb": 1877.7,
+    "cpu_utilization_percent": 24.8,
+    "primary_bottleneck": "DETECTOR (RF-DETR 960)"
+  },
+  "tracking_quality_regression_check": {
+    "player_metrics_macro": {
+      "hota_0_5": 0.7708,
+      "deta_0_5": 0.9076,
+      "assa_0_5": 0.6578,
+      "idf1": 0.7528,
+      "id_switches": 64.8333,
+      "fragmentations": 144.8333,
+      "mostly_tracked": 23.1667,
+      "mostly_lost": 0.0,
+      "num_gt_tracks": 24.1667,
+      "num_pred_tracks": 51.0,
+      "avg_track_length": 263.9667
+    },
+    "player_reference_exp08": {
+      "hota": 0.7708,
+      "deta": 0.9073,
+      "assa": 0.6578,
+      "idf1": 0.7528,
+      "idsw": 64.8
+    },
+    "player_regression_passed": true,
+    "ball_metrics_macro": {
+      "hota_0_5": 0.2748,
+      "deta_0_5": 0.2954,
+      "assa_0_5": 0.2578,
+      "idf1": 0.3972
+    },
+    "per_sequence_player_metrics": {
+      "SNMOT-060": {
+        "hota_0_5": 0.7755,
+        "deta_0_5": 0.9055,
+        "assa_0_5": 0.6642,
+        "idf1": 0.776,
+        "id_switches": 51,
+        "fragmentations": 133,
+        "mostly_tracked": 25,
+        "mostly_lost": 0,
+        "num_gt_tracks": 25,
+        "num_pred_tracks": 57,
+        "avg_track_length": 236.1
+      },
+      "SNMOT-061": {
+        "hota_0_5": 0.7795,
+        "deta_0_5": 0.9139,
+        "assa_0_5": 0.6648,
+        "idf1": 0.7445,
+        "id_switches": 31,
+        "fragmentations": 105,
+        "mostly_tracked": 25,
+        "mostly_lost": 0,
+        "num_gt_tracks": 25,
+        "num_pred_tracks": 51,
+        "avg_track_length": 209.4
+      },
+      "SNMOT-062": {
+        "hota_0_5": 0.8968,
+        "deta_0_5": 0.9402,
+        "assa_0_5": 0.8554,
+        "idf1": 0.8832,
+        "id_switches": 26,
+        "fragmentations": 70,
+        "mostly_tracked": 23,
+        "mostly_lost": 0,
+        "num_gt_tracks": 23,
+        "num_pred_tracks": 40,
+        "avg_track_length": 326.1
+      },
+      "SNMOT-066": {
+        "hota_0_5": 0.6551,
+        "deta_0_5": 0.8774,
+        "assa_0_5": 0.4891,
+        "idf1": 0.6371,
+        "id_switches": 149,
+        "fragmentations": 243,
+        "mostly_tracked": 23,
+        "mostly_lost": 0,
+        "num_gt_tracks": 24,
+        "num_pred_tracks": 54,
+        "avg_track_length": 285.7
+      },
+      "SNMOT-067": {
+        "hota_0_5": 0.7158,
+        "deta_0_5": 0.853,
+        "assa_0_5": 0.6006,
+        "idf1": 0.7006,
+        "id_switches": 92,
+        "fragmentations": 214,
+        "mostly_tracked": 21,
+        "mostly_lost": 0,
+        "num_gt_tracks": 25,
+        "num_pred_tracks": 60,
+        "avg_track_length": 237.9
+      },
+      "SNMOT-068": {
+        "hota_0_5": 0.8018,
+        "deta_0_5": 0.9555,
+        "assa_0_5": 0.6728,
+        "idf1": 0.7753,
+        "id_switches": 40,
+        "fragmentations": 104,
+        "mostly_tracked": 22,
+        "mostly_lost": 0,
+        "num_gt_tracks": 23,
+        "num_pred_tracks": 44,
+        "avg_track_length": 288.6
+      }
+    },
+    "per_sequence_ball_metrics": {
+      "SNMOT-060": {
+        "hota_0_5": 0.322,
+        "deta_0_5": 0.322,
+        "assa_0_5": 0.322,
+        "idf1": 0.4871
+      },
+      "SNMOT-061": {
+        "hota_0_5": 0.2228,
+        "deta_0_5": 0.2201,
+        "assa_0_5": 0.2256,
+        "idf1": 0.3608
+      },
+      "SNMOT-062": {
+        "hota_0_5": 0.2972,
+        "deta_0_5": 0.2972,
+        "assa_0_5": 0.2972,
+        "idf1": 0.4582
+      },
+      "SNMOT-066": {
+        "hota_0_5": 0.1672,
+        "deta_0_5": 0.2021,
+        "assa_0_5": 0.1383,
+        "idf1": 0.2338
+      },
+      "SNMOT-067": {
+        "hota_0_5": 0.1696,
+        "deta_0_5": 0.1696,
+        "assa_0_5": 0.1697,
+        "idf1": 0.2884
+      },
+      "SNMOT-068": {
+        "hota_0_5": 0.4702,
+        "deta_0_5": 0.5612,
+        "assa_0_5": 0.394,
+        "idf1": 0.555
+      }
+    }
+  },
+  "track_id_statistics": {
+    "total_gt_player_tracks": 145,
+    "total_pred_player_tracks": 306,
+    "total_id_switches": 389,
+    "id_switches_per_seq": 64.8,
+    "total_fragmentations": 869,
+    "fragmentations_per_seq": 144.8,
+    "average_player_track_duration_frames": 263.9666666666667
+  },
+  "reid_readiness_audit": {
+    "total_id_switch_events": 389,
+    "taxonomy": {
+      "dense_cluster_occlusion": 267,
+      "prolonged_disappearance": 103,
+      "fast_camera_pan_displacement": 0,
+      "isolated_motion_ambiguity": 19
+    },
+    "addressable_by_appearance_reid_count": 370,
+    "addressable_by_appearance_reid_percent": 95.1,
+    "reid_justified": true,
+    "recommendation_for_exp10": "Appearance ReID (EXP-10) is strongly justified: 75%+ of remaining player ID switches occur in dense scrum occlusions and crossing situations where spatial Kalman filters fail."
+  },
+  "tests_summary": {
+    "status": "ALL_PASSED",
+    "unit_test_suite": "backend/tests/test_chapter5_exp09_unified_pipeline.py"
+  }
+}

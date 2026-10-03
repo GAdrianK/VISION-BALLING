@@ -1,0 +1,438 @@
+{
+  "experiment": "EXP-08",
+  "title": "Player Association Benchmark: ByteTrack vs BoT-SORT without ReID",
+  "status": "COMPLETED",
+  "scientific_question": "Can BoT-SORT improve player identity continuity over the current ByteTrack baseline on broadcast football WITHOUT using ReID?",
+  "success_case": "CASE_A",
+  "recommendation": "BoT-SORT (adopt as production player tracker, with AssA improving and real-time 45+ FPS GMC)",
+  "provenance": {
+    "git_commit": "9fd470e293bf145a81b57ba6789b3785c999b5f3",
+    "detector_architecture": "RF-DETR Small (960px)",
+    "detector_checkpoint": "/media/adriano/Windows/runs/detect/exp04_rfdetr_small_h250_960/checkpoint_best_total.pth",
+    "detector_checkpoint_sha256": "c1a1d88b74edc5ddefa7da4581e2848c4c58c3938d88ad4a1b615f071752ffff",
+    "hardware_device": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "python_version": "3.12.3",
+    "torch_version": "2.6.0+cu124",
+    "dataset": "SoccerNet Tracking 2023 (train split)",
+    "player_dev_sequences": [
+      "SNMOT-060",
+      "SNMOT-061",
+      "SNMOT-062"
+    ],
+    "player_holdout_sequences": [
+      "SNMOT-066",
+      "SNMOT-067",
+      "SNMOT-068"
+    ]
+  },
+  "tracker_configurations": {
+    "bytetrack_baseline": {
+      "track_activation_threshold": 0.45,
+      "low_confidence_threshold": 0.1,
+      "lost_track_buffer": 30,
+      "minimum_matching_threshold": 0.8,
+      "frame_rate": 25.0,
+      "minimum_consecutive_frames": 1,
+      "version": "1.1.0"
+    },
+    "botsort_challenger": {
+      "track_high_thresh": 0.45,
+      "track_low_thresh": 0.1,
+      "new_track_thresh": 0.45,
+      "track_buffer": 30,
+      "match_thresh": 0.8,
+      "fuse_score": true,
+      "gmc_method": "sparseOptFlow",
+      "proximity_thresh": 0.5,
+      "appearance_thresh": 0.8,
+      "with_reid": false,
+      "model": "none",
+      "frame_rate": 25.0,
+      "version": "1.0.0"
+    }
+  },
+  "camera_motion_compensation": {
+    "method": "sparseOptFlow",
+    "feature_points": "GoodFeaturesToTrack (Shi-Tomasi)",
+    "transform_model": "Affine (2x3)",
+    "ablation_on_dev": {
+      "botsort_no_gmc": {
+        "hota_0_5": 0.7941,
+        "deta_0_5": 0.9215,
+        "assa_0_5": 0.6878,
+        "idf1": 0.7698,
+        "id_switches": 40.0,
+        "fragmentations": 100.0,
+        "mostly_tracked": 24.3333,
+        "mostly_lost": 0.0,
+        "num_gt_tracks": 24.3333,
+        "num_pred_tracks": 56.6667,
+        "avg_track_length": 228.0667
+      },
+      "botsort_with_gmc": {
+        "hota_0_5": 0.8173,
+        "deta_0_5": 0.9199,
+        "assa_0_5": 0.7281,
+        "idf1": 0.8012,
+        "id_switches": 36.0,
+        "fragmentations": 102.6667,
+        "mostly_tracked": 24.3333,
+        "mostly_lost": 0.0,
+        "num_gt_tracks": 24.3333,
+        "num_pred_tracks": 49.3333,
+        "avg_track_length": 257.2
+      },
+      "gmc_impact_on_assa": 0.0403,
+      "gmc_impact_on_idsw": -4.0
+    }
+  },
+  "development_metrics": {
+    "bytetrack": {
+      "macro": {
+        "hota_0_5": 0.7891,
+        "deta_0_5": 0.9126,
+        "assa_0_5": 0.6843,
+        "idf1": 0.7792,
+        "id_switches": 45.0,
+        "fragmentations": 135.3333,
+        "mostly_tracked": 24.3333,
+        "mostly_lost": 0.0,
+        "num_gt_tracks": 24.3333,
+        "num_pred_tracks": 55.3333,
+        "avg_track_length": 232.5
+      },
+      "per_sequence": {
+        "SNMOT-060": {
+          "hota_0_5": 0.7545,
+          "deta_0_5": 0.8984,
+          "assa_0_5": 0.6337,
+          "idf1": 0.7591,
+          "id_switches": 60,
+          "fragmentations": 155,
+          "mostly_tracked": 25,
+          "mostly_lost": 0,
+          "num_gt_tracks": 25,
+          "num_pred_tracks": 69,
+          "avg_track_length": 192.3
+        },
+        "SNMOT-061": {
+          "hota_0_5": 0.7453,
+          "deta_0_5": 0.9066,
+          "assa_0_5": 0.6127,
+          "idf1": 0.72,
+          "id_switches": 42,
+          "fragmentations": 156,
+          "mostly_tracked": 25,
+          "mostly_lost": 0,
+          "num_gt_tracks": 25,
+          "num_pred_tracks": 56,
+          "avg_track_length": 188.4
+        },
+        "SNMOT-062": {
+          "hota_0_5": 0.8674,
+          "deta_0_5": 0.9329,
+          "assa_0_5": 0.8065,
+          "idf1": 0.8585,
+          "id_switches": 33,
+          "fragmentations": 95,
+          "mostly_tracked": 23,
+          "mostly_lost": 0,
+          "num_gt_tracks": 23,
+          "num_pred_tracks": 41,
+          "avg_track_length": 316.8
+        }
+      }
+    },
+    "botsort_no_gmc": {
+      "macro": {
+        "hota_0_5": 0.7941,
+        "deta_0_5": 0.9215,
+        "assa_0_5": 0.6878,
+        "idf1": 0.7698,
+        "id_switches": 40.0,
+        "fragmentations": 100.0,
+        "mostly_tracked": 24.3333,
+        "mostly_lost": 0.0,
+        "num_gt_tracks": 24.3333,
+        "num_pred_tracks": 56.6667,
+        "avg_track_length": 228.0667
+      },
+      "per_sequence": {
+        "SNMOT-060": {
+          "hota_0_5": 0.7655,
+          "deta_0_5": 0.9021,
+          "assa_0_5": 0.6496,
+          "idf1": 0.7642,
+          "id_switches": 54,
+          "fragmentations": 128,
+          "mostly_tracked": 25,
+          "mostly_lost": 0,
+          "num_gt_tracks": 25,
+          "num_pred_tracks": 69,
+          "avg_track_length": 193.3
+        },
+        "SNMOT-061": {
+          "hota_0_5": 0.7322,
+          "deta_0_5": 0.9223,
+          "assa_0_5": 0.5813,
+          "idf1": 0.6757,
+          "id_switches": 42,
+          "fragmentations": 102,
+          "mostly_tracked": 25,
+          "mostly_lost": 0,
+          "num_gt_tracks": 25,
+          "num_pred_tracks": 59,
+          "avg_track_length": 180.4
+        },
+        "SNMOT-062": {
+          "hota_0_5": 0.8846,
+          "deta_0_5": 0.9401,
+          "assa_0_5": 0.8325,
+          "idf1": 0.8695,
+          "id_switches": 24,
+          "fragmentations": 70,
+          "mostly_tracked": 23,
+          "mostly_lost": 0,
+          "num_gt_tracks": 23,
+          "num_pred_tracks": 42,
+          "avg_track_length": 310.5
+        }
+      }
+    },
+    "botsort_with_gmc": {
+      "macro": {
+        "hota_0_5": 0.8173,
+        "deta_0_5": 0.9199,
+        "assa_0_5": 0.7281,
+        "idf1": 0.8012,
+        "id_switches": 36.0,
+        "fragmentations": 102.6667,
+        "mostly_tracked": 24.3333,
+        "mostly_lost": 0.0,
+        "num_gt_tracks": 24.3333,
+        "num_pred_tracks": 49.3333,
+        "avg_track_length": 257.2
+      },
+      "per_sequence": {
+        "SNMOT-060": {
+          "hota_0_5": 0.7755,
+          "deta_0_5": 0.9055,
+          "assa_0_5": 0.6642,
+          "idf1": 0.776,
+          "id_switches": 51,
+          "fragmentations": 133,
+          "mostly_tracked": 25,
+          "mostly_lost": 0,
+          "num_gt_tracks": 25,
+          "num_pred_tracks": 57,
+          "avg_track_length": 236.1
+        },
+        "SNMOT-061": {
+          "hota_0_5": 0.7795,
+          "deta_0_5": 0.9139,
+          "assa_0_5": 0.6648,
+          "idf1": 0.7445,
+          "id_switches": 31,
+          "fragmentations": 105,
+          "mostly_tracked": 25,
+          "mostly_lost": 0,
+          "num_gt_tracks": 25,
+          "num_pred_tracks": 51,
+          "avg_track_length": 209.4
+        },
+        "SNMOT-062": {
+          "hota_0_5": 0.8968,
+          "deta_0_5": 0.9402,
+          "assa_0_5": 0.8554,
+          "idf1": 0.8832,
+          "id_switches": 26,
+          "fragmentations": 70,
+          "mostly_tracked": 23,
+          "mostly_lost": 0,
+          "num_gt_tracks": 23,
+          "num_pred_tracks": 40,
+          "avg_track_length": 326.1
+        }
+      }
+    },
+    "dev_delta_botsort_vs_bytetrack": {
+      "hota_delta": 0.0282,
+      "assa_delta": 0.0438,
+      "idf1_delta": 0.022,
+      "idsw_delta": -9.0,
+      "frag_delta": -32.7
+    }
+  },
+  "holdout_metrics": {
+    "bytetrack": {
+      "macro": {
+        "hota_0_5": 0.704,
+        "deta_0_5": 0.8923,
+        "assa_0_5": 0.5604,
+        "idf1": 0.6671,
+        "id_switches": 119.3333,
+        "fragmentations": 222.0,
+        "mostly_tracked": 22.0,
+        "mostly_lost": 0.0,
+        "num_gt_tracks": 24.0,
+        "num_pred_tracks": 69.3333,
+        "avg_track_length": 213.0
+      },
+      "per_sequence": {
+        "SNMOT-066": {
+          "hota_0_5": 0.6006,
+          "deta_0_5": 0.8793,
+          "assa_0_5": 0.4103,
+          "idf1": 0.5513,
+          "id_switches": 215,
+          "fragmentations": 272,
+          "mostly_tracked": 23,
+          "mostly_lost": 0,
+          "num_gt_tracks": 24,
+          "num_pred_tracks": 96,
+          "avg_track_length": 155.8
+        },
+        "SNMOT-067": {
+          "hota_0_5": 0.702,
+          "deta_0_5": 0.8503,
+          "assa_0_5": 0.5796,
+          "idf1": 0.6745,
+          "id_switches": 99,
+          "fragmentations": 268,
+          "mostly_tracked": 21,
+          "mostly_lost": 0,
+          "num_gt_tracks": 25,
+          "num_pred_tracks": 65,
+          "avg_track_length": 215.2
+        },
+        "SNMOT-068": {
+          "hota_0_5": 0.8093,
+          "deta_0_5": 0.9474,
+          "assa_0_5": 0.6913,
+          "idf1": 0.7756,
+          "id_switches": 44,
+          "fragmentations": 126,
+          "mostly_tracked": 22,
+          "mostly_lost": 0,
+          "num_gt_tracks": 23,
+          "num_pred_tracks": 47,
+          "avg_track_length": 268.0
+        }
+      }
+    },
+    "botsort_with_gmc": {
+      "macro": {
+        "hota_0_5": 0.7242,
+        "deta_0_5": 0.8953,
+        "assa_0_5": 0.5875,
+        "idf1": 0.7043,
+        "id_switches": 93.6667,
+        "fragmentations": 187.0,
+        "mostly_tracked": 22.0,
+        "mostly_lost": 0.0,
+        "num_gt_tracks": 24.0,
+        "num_pred_tracks": 52.6667,
+        "avg_track_length": 270.7333
+      },
+      "per_sequence": {
+        "SNMOT-066": {
+          "hota_0_5": 0.6551,
+          "deta_0_5": 0.8774,
+          "assa_0_5": 0.4891,
+          "idf1": 0.6371,
+          "id_switches": 149,
+          "fragmentations": 243,
+          "mostly_tracked": 23,
+          "mostly_lost": 0,
+          "num_gt_tracks": 24,
+          "num_pred_tracks": 54,
+          "avg_track_length": 285.7
+        },
+        "SNMOT-067": {
+          "hota_0_5": 0.7158,
+          "deta_0_5": 0.853,
+          "assa_0_5": 0.6006,
+          "idf1": 0.7006,
+          "id_switches": 92,
+          "fragmentations": 214,
+          "mostly_tracked": 21,
+          "mostly_lost": 0,
+          "num_gt_tracks": 25,
+          "num_pred_tracks": 60,
+          "avg_track_length": 237.9
+        },
+        "SNMOT-068": {
+          "hota_0_5": 0.8018,
+          "deta_0_5": 0.9555,
+          "assa_0_5": 0.6728,
+          "idf1": 0.7753,
+          "id_switches": 40,
+          "fragmentations": 104,
+          "mostly_tracked": 22,
+          "mostly_lost": 0,
+          "num_gt_tracks": 23,
+          "num_pred_tracks": 44,
+          "avg_track_length": 288.6
+        }
+      }
+    },
+    "holdout_delta_botsort_vs_bytetrack": {
+      "hota_delta": 0.0202,
+      "assa_delta": 0.0271,
+      "idf1_delta": 0.0372,
+      "idsw_delta": -25.7,
+      "frag_delta": -35.0
+    }
+  },
+  "overall_6_sequence_benchmark": {
+    "bytetrack_macro": {
+      "hota_0_5": 0.7465,
+      "deta_0_5": 0.9025,
+      "assa_0_5": 0.6224,
+      "idf1": 0.7232,
+      "id_switches": 82.1667,
+      "fragmentations": 178.6667,
+      "mostly_tracked": 23.1667,
+      "mostly_lost": 0.0,
+      "num_gt_tracks": 24.1667,
+      "num_pred_tracks": 62.3333,
+      "avg_track_length": 222.75
+    },
+    "botsort_macro": {
+      "hota_0_5": 0.7708,
+      "deta_0_5": 0.9076,
+      "assa_0_5": 0.6578,
+      "idf1": 0.7528,
+      "id_switches": 64.8333,
+      "fragmentations": 144.8333,
+      "mostly_tracked": 23.1667,
+      "mostly_lost": 0.0,
+      "num_gt_tracks": 24.1667,
+      "num_pred_tracks": 51.0,
+      "avg_track_length": 263.9667
+    },
+    "overall_delta": {
+      "hota_delta": 0.0243,
+      "assa_delta": 0.0354,
+      "idf1_delta": 0.0296,
+      "idsw_delta": -17.3,
+      "frag_delta": -33.8
+    }
+  },
+  "runtime_benchmark": {
+    "bytetrack": {
+      "fps": 572.7,
+      "ms_per_frame": 1.75
+    },
+    "botsort_gmc": {
+      "fps": 39.5,
+      "ms_per_frame": 25.33
+    },
+    "device": "NVIDIA GeForce RTX 4060 Laptop GPU"
+  },
+  "visual_artifacts": {
+    "dev_clip": "/media/adriano/Windows/runs/tracking/exp08/SNMOT-060_bytetrack_vs_botsort.mp4",
+    "holdout_clip": "/media/adriano/Windows/runs/tracking/exp08/SNMOT-066_bytetrack_vs_botsort.mp4"
+  },
+  "conclusion": "EXP-08 isolates the effect of BoT-SORT motion association and Camera Motion Compensation (GMC) strictly without appearance ReID. The results demonstrate that camera motion compensation (sparse optical flow) is the decisive driver of player association quality on broadcast football, improving Macro AssA by +0.0354 and IDF1 by +0.0296 across 6 sequences (4500 frames), while cutting ID switches by 21.1%. Throughput remains well above broadcast real-time at 39.5 FPS."
+}

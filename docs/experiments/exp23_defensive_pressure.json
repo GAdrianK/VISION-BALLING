@@ -1,0 +1,405 @@
+{
+  "experiment": "EXP-23",
+  "description": "Defensive Pressure & Engagement Intelligence Benchmark",
+  "timestamp": "2026-10-03 11:23:36",
+  "platform": "Linux-7.0.0-34-generic-x86_64-with-glibc2.39",
+  "python_version": "3.12.3",
+  "synthetic_scenarios": {
+    "isolated_carrier": {
+      "pressure_index": 0.0027285683980621997,
+      "class": "NO_PRESSURE",
+      "success": true
+    },
+    "one_passive_defender": {
+      "pressure_index": 0.2584330915382622,
+      "class": "LIGHT_PRESSURE",
+      "success": true
+    },
+    "one_rapidly_closing_defender": {
+      "pressure_index": 0.3680391251680368,
+      "closing_speed": 4.0,
+      "success": true
+    },
+    "two_sided_pressure": {
+      "pressure_index": 0.44432515661625316,
+      "sectors_occupied": 2,
+      "success": true
+    },
+    "three_player_surround": {
+      "pressure_index": 0.7704177623493789,
+      "class": "STRONG_PRESSURE",
+      "success": true
+    },
+    "high_density_stationary": {
+      "n_defenders_r5": 4,
+      "pressure_index": 0.7704177623493789,
+      "success": true
+    },
+    "low_distance_moving_away": {
+      "p_retreat": 0.2997522150301564,
+      "p_stat": 0.4172422133238252,
+      "success": true
+    },
+    "collective_team_step": {
+      "is_compressing": true,
+      "success": true
+    },
+    "ball_only_target": {
+      "target_type": "BALL",
+      "success": true
+    },
+    "unknown_target": {
+      "target_type": "UNKNOWN",
+      "class": "NOT_VISIBLE",
+      "success": true
+    }
+  },
+  "monotonicity_checks": {
+    "distance_monotonic": true,
+    "closing_speed_monotonic": true,
+    "density_monotonic": true,
+    "all_monotonic": true
+  },
+  "performance_summary": {
+    "dev_semantic_accuracy_pct": 23.111111111111114,
+    "dev_balanced_accuracy_pct": 35.15976112667289,
+    "dev_macro_f1": 0.1842010068812601,
+    "holdout_semantic_accuracy_pct": 37.65128205128205,
+    "holdout_balanced_accuracy_pct": 37.4766837969383,
+    "holdout_macro_f1": 0.24606122583146708
+  },
+  "runtime": {
+    "mean_pressure_latency_ms": 0.056287334672257806,
+    "target_ms": 0.5,
+    "is_budget_compliant": true
+  },
+  "decision_gate": {
+    "are_signals_monotonic": true,
+    "is_runtime_compliant": true,
+    "verdict": "EXP_23_COMPLETE_DEFENSIVE_PRESSURE_SIGNALS_LOCKED"
+  },
+  "dev_sequences": {
+    "SNMOT-060": {
+      "frames_evaluated": 150,
+      "abstention_rate_pct": 10.0,
+      "classification_metrics": {
+        "accuracy_pct": 30.0,
+        "balanced_accuracy_pct": 22.197420634920636,
+        "macro_f1": 0.19327731092436973
+      },
+      "stratification": {
+        "high_confidence_carrier_acc": 12.903225806451612,
+        "med_confidence_carrier_acc": 0.0,
+        "low_confidence_carrier_acc": 0.0,
+        "ball_only_fallback_acc": 57.8125,
+        "high_confidence_count": 62,
+        "ball_only_count": 64
+      },
+      "continuous_signal_distributions": {
+        "mean_pressure_index": 0.1904370283463252,
+        "p95_pressure_index": 0.6394226096814056,
+        "mean_nearest_defender_dist_m": 4.620282286799753,
+        "closing_speed_status": "AVAILABLE",
+        "mean_closing_speed_mps": 1.2589534989102156,
+        "median_closing_speed_mps": 0.4188867485610974,
+        "p10_closing_speed_mps": -1.9658709505542986,
+        "p90_closing_speed_mps": 5.136548550336931,
+        "min_closing_speed_mps": -6.151744804072873,
+        "max_closing_speed_mps": 5.323312565029577,
+        "nonzero_closing_fraction": 0.9478260869565217,
+        "mean_density_r2": 0.12,
+        "mean_density_r5": 0.44,
+        "mean_coverage_ratio": 0.13416666666666666,
+        "mean_free_space_radius_m": 7.042216419879812
+      },
+      "transition_boundary_diagnostic": {
+        "turnover_count": 0,
+        "mean_pressure_around_turnover": 0.0,
+        "mean_nearest_dist_around_turnover_m": 0.0,
+        "mean_closing_speed_around_turnover_mps": 0.0
+      }
+    },
+    "SNMOT-063": {
+      "frames_evaluated": 150,
+      "abstention_rate_pct": 14.000000000000002,
+      "classification_metrics": {
+        "accuracy_pct": 35.333333333333336,
+        "balanced_accuracy_pct": 33.28186274509804,
+        "macro_f1": 0.3208641712578721
+      },
+      "stratification": {
+        "high_confidence_carrier_acc": 23.376623376623375,
+        "med_confidence_carrier_acc": 0.0,
+        "low_confidence_carrier_acc": 0.0,
+        "ball_only_fallback_acc": 46.0,
+        "high_confidence_count": 77,
+        "ball_only_count": 50
+      },
+      "continuous_signal_distributions": {
+        "mean_pressure_index": 0.3274323853031776,
+        "p95_pressure_index": 0.78821482591375,
+        "mean_nearest_defender_dist_m": 3.0508237472759405,
+        "closing_speed_status": "AVAILABLE",
+        "mean_closing_speed_mps": 0.8124026185660369,
+        "median_closing_speed_mps": 0.8524742306638216,
+        "p10_closing_speed_mps": -1.198014504105622,
+        "p90_closing_speed_mps": 2.661980524075117,
+        "min_closing_speed_mps": -2.141538028665118,
+        "max_closing_speed_mps": 3.3233212260133573,
+        "nonzero_closing_fraction": 0.9911504424778761,
+        "mean_density_r2": 0.16,
+        "mean_density_r5": 1.5866666666666667,
+        "mean_coverage_ratio": 0.305,
+        "mean_free_space_radius_m": 5.998287222947875
+      },
+      "transition_boundary_diagnostic": {
+        "turnover_count": 1,
+        "mean_pressure_around_turnover": 0.5431424311912725,
+        "mean_nearest_dist_around_turnover_m": 1.9499950797985772,
+        "mean_closing_speed_around_turnover_mps": 1.955199140118665
+      }
+    },
+    "SNMOT-064": {
+      "frames_evaluated": 150,
+      "abstention_rate_pct": 35.333333333333336,
+      "classification_metrics": {
+        "accuracy_pct": 4.0,
+        "balanced_accuracy_pct": 50.0,
+        "macro_f1": 0.038461538461538464
+      },
+      "stratification": {
+        "high_confidence_carrier_acc": 7.228915662650602,
+        "med_confidence_carrier_acc": 0.0,
+        "low_confidence_carrier_acc": 0.0,
+        "ball_only_fallback_acc": 0.0,
+        "high_confidence_count": 83,
+        "ball_only_count": 3
+      },
+      "continuous_signal_distributions": {
+        "mean_pressure_index": 0.04695633466871328,
+        "p95_pressure_index": 0.14882558854170264,
+        "mean_nearest_defender_dist_m": 6.792580147689947,
+        "closing_speed_status": "AVAILABLE",
+        "mean_closing_speed_mps": -0.02088735589673942,
+        "median_closing_speed_mps": 0.37103736672580256,
+        "p10_closing_speed_mps": -1.5271599881197968,
+        "p90_closing_speed_mps": 0.7770491879939911,
+        "min_closing_speed_mps": -1.7512447048291113,
+        "max_closing_speed_mps": 1.0298883002094192,
+        "nonzero_closing_fraction": 1.0,
+        "mean_density_r2": 0.0,
+        "mean_density_r5": 0.0,
+        "mean_coverage_ratio": 0.06916666666666667,
+        "mean_free_space_radius_m": 9.856683559219036
+      },
+      "transition_boundary_diagnostic": {
+        "turnover_count": 0,
+        "mean_pressure_around_turnover": 0.0,
+        "mean_nearest_dist_around_turnover_m": 0.0,
+        "mean_closing_speed_around_turnover_mps": 0.0
+      }
+    }
+  },
+  "holdout_sequences": {
+    "SNMOT-066": {
+      "frames_evaluated": 150,
+      "abstention_rate_pct": 0.0,
+      "classification_metrics": {
+        "accuracy_pct": 67.33333333333333,
+        "balanced_accuracy_pct": 50.0,
+        "macro_f1": 0.40239043824701193
+      },
+      "stratification": {
+        "high_confidence_carrier_acc": 0.0,
+        "med_confidence_carrier_acc": 0.0,
+        "low_confidence_carrier_acc": 0.0,
+        "ball_only_fallback_acc": 67.33333333333333,
+        "high_confidence_count": 0,
+        "ball_only_count": 150
+      },
+      "continuous_signal_distributions": {
+        "mean_pressure_index": 0.0,
+        "p95_pressure_index": 0.0,
+        "mean_nearest_defender_dist_m": null,
+        "closing_speed_status": "NOT_AVAILABLE",
+        "mean_closing_speed_mps": null,
+        "median_closing_speed_mps": null,
+        "p10_closing_speed_mps": null,
+        "p90_closing_speed_mps": null,
+        "min_closing_speed_mps": null,
+        "max_closing_speed_mps": null,
+        "nonzero_closing_fraction": null,
+        "mean_density_r2": 0.0,
+        "mean_density_r5": 0.0,
+        "mean_coverage_ratio": 0.0,
+        "mean_free_space_radius_m": 15.0
+      },
+      "transition_boundary_diagnostic": {
+        "turnover_count": 0,
+        "mean_pressure_around_turnover": 0.0,
+        "mean_nearest_dist_around_turnover_m": 0.0,
+        "mean_closing_speed_around_turnover_mps": 0.0
+      }
+    },
+    "SNMOT-068": {
+      "frames_evaluated": 150,
+      "abstention_rate_pct": 5.333333333333334,
+      "classification_metrics": {
+        "accuracy_pct": 56.00000000000001,
+        "balanced_accuracy_pct": 35.20950594121326,
+        "macro_f1": 0.3141285521231847
+      },
+      "stratification": {
+        "high_confidence_carrier_acc": 40.0,
+        "med_confidence_carrier_acc": 100.0,
+        "low_confidence_carrier_acc": 0.0,
+        "ball_only_fallback_acc": 58.91472868217055,
+        "high_confidence_count": 10,
+        "ball_only_count": 129
+      },
+      "continuous_signal_distributions": {
+        "mean_pressure_index": 0.09389070142141435,
+        "p95_pressure_index": 0.4917995721779847,
+        "mean_nearest_defender_dist_m": 6.8471972248744235,
+        "closing_speed_status": "AVAILABLE",
+        "mean_closing_speed_mps": 2.7895598525307257,
+        "median_closing_speed_mps": 1.9507147601623096,
+        "p10_closing_speed_mps": -12.590764385945151,
+        "p90_closing_speed_mps": 22.76372049228634,
+        "min_closing_speed_mps": -20.311219158827143,
+        "max_closing_speed_mps": 24.892990310910896,
+        "nonzero_closing_fraction": 1.0,
+        "mean_density_r2": 0.05333333333333334,
+        "mean_density_r5": 0.18666666666666668,
+        "mean_coverage_ratio": 0.07666666666666666,
+        "mean_free_space_radius_m": 10.977950630938048
+      },
+      "transition_boundary_diagnostic": {
+        "turnover_count": 1,
+        "mean_pressure_around_turnover": 0.24570886356559102,
+        "mean_nearest_dist_around_turnover_m": 3.4611909885201784,
+        "mean_closing_speed_around_turnover_mps": 2.646083135279632
+      }
+    },
+    "SNMOT-069": {
+      "frames_evaluated": 150,
+      "abstention_rate_pct": 68.0,
+      "classification_metrics": {
+        "accuracy_pct": 0.0,
+        "balanced_accuracy_pct": 0.0,
+        "macro_f1": 0.0
+      },
+      "stratification": {
+        "high_confidence_carrier_acc": 0.0,
+        "med_confidence_carrier_acc": 0.0,
+        "low_confidence_carrier_acc": 0.0,
+        "ball_only_fallback_acc": 0.0,
+        "high_confidence_count": 28,
+        "ball_only_count": 20
+      },
+      "continuous_signal_distributions": {
+        "mean_pressure_index": 0.018797638558029947,
+        "p95_pressure_index": 0.10088959826793957,
+        "mean_nearest_defender_dist_m": 6.227735732719501,
+        "closing_speed_status": "AVAILABLE",
+        "mean_closing_speed_mps": -0.022687266148867912,
+        "median_closing_speed_mps": -0.013549186846830052,
+        "p10_closing_speed_mps": -0.08351344148526549,
+        "p90_closing_speed_mps": 0.01851642127333911,
+        "min_closing_speed_mps": -0.13014453626849615,
+        "max_closing_speed_mps": 0.27802614581312435,
+        "nonzero_closing_fraction": 0.7241379310344828,
+        "mean_density_r2": 0.0,
+        "mean_density_r5": 0.0,
+        "mean_coverage_ratio": 0.04666666666666667,
+        "mean_free_space_radius_m": 13.30402890832577
+      },
+      "transition_boundary_diagnostic": {
+        "turnover_count": 0,
+        "mean_pressure_around_turnover": 0.0,
+        "mean_nearest_dist_around_turnover_m": 0.0,
+        "mean_closing_speed_around_turnover_mps": 0.0
+      }
+    },
+    "SNMOT-070": {
+      "frames_evaluated": 150,
+      "abstention_rate_pct": 38.0,
+      "classification_metrics": {
+        "accuracy_pct": 43.58974358974359,
+        "balanced_accuracy_pct": 52.17391304347826,
+        "macro_f1": 0.33796296296296297
+      },
+      "stratification": {
+        "high_confidence_carrier_acc": 14.285714285714285,
+        "med_confidence_carrier_acc": 0.0,
+        "low_confidence_carrier_acc": 0.0,
+        "ball_only_fallback_acc": 64.86486486486487,
+        "high_confidence_count": 49,
+        "ball_only_count": 44
+      },
+      "continuous_signal_distributions": {
+        "mean_pressure_index": 0.031398232723364165,
+        "p95_pressure_index": 0.19611619594270796,
+        "mean_nearest_defender_dist_m": 9.940552728747516,
+        "closing_speed_status": "AVAILABLE",
+        "mean_closing_speed_mps": 5.267917308593221,
+        "median_closing_speed_mps": 6.1130812690812855,
+        "p10_closing_speed_mps": 0.7652582560057276,
+        "p90_closing_speed_mps": 6.868741557488411,
+        "min_closing_speed_mps": -2.0141448975399245,
+        "max_closing_speed_mps": 6.941332413713274,
+        "nonzero_closing_fraction": 1.0,
+        "mean_density_r2": 0.0,
+        "mean_density_r5": 0.06666666666666667,
+        "mean_coverage_ratio": 0.020833333333333332,
+        "mean_free_space_radius_m": 13.111139685399072
+      },
+      "transition_boundary_diagnostic": {
+        "turnover_count": 0,
+        "mean_pressure_around_turnover": 0.0,
+        "mean_nearest_dist_around_turnover_m": 0.0,
+        "mean_closing_speed_around_turnover_mps": 0.0
+      }
+    },
+    "SNMOT-071": {
+      "frames_evaluated": 150,
+      "abstention_rate_pct": 0.0,
+      "classification_metrics": {
+        "accuracy_pct": 21.333333333333336,
+        "balanced_accuracy_pct": 50.0,
+        "macro_f1": 0.17582417582417584
+      },
+      "stratification": {
+        "high_confidence_carrier_acc": 0.0,
+        "med_confidence_carrier_acc": 0.0,
+        "low_confidence_carrier_acc": 0.0,
+        "ball_only_fallback_acc": 22.22222222222222,
+        "high_confidence_count": 6,
+        "ball_only_count": 144
+      },
+      "continuous_signal_distributions": {
+        "mean_pressure_index": 0.0014591937143214574,
+        "p95_pressure_index": 0.0,
+        "mean_nearest_defender_dist_m": 8.892034580551014,
+        "closing_speed_status": "AVAILABLE",
+        "mean_closing_speed_mps": 0.6565006662795879,
+        "median_closing_speed_mps": 0.6733331653455087,
+        "p10_closing_speed_mps": 0.3144295918482951,
+        "p90_closing_speed_mps": 0.9817392416449602,
+        "min_closing_speed_mps": 0.2186903582942611,
+        "max_closing_speed_mps": 1.0495958932668399,
+        "nonzero_closing_fraction": 1.0,
+        "mean_density_r2": 0.0,
+        "mean_density_r5": 0.0,
+        "mean_coverage_ratio": 0.0,
+        "mean_free_space_radius_m": 14.755681383222038
+      },
+      "transition_boundary_diagnostic": {
+        "turnover_count": 0,
+        "mean_pressure_around_turnover": 0.0,
+        "mean_nearest_dist_around_turnover_m": 0.0,
+        "mean_closing_speed_around_turnover_mps": 0.0
+      }
+    }
+  }
+}
