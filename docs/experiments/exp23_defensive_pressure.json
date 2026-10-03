@@ -1,0 +1,349 @@
+{
+  "experiment": "EXP-23",
+  "description": "Defensive Pressure & Engagement Intelligence Benchmark",
+  "timestamp": "2026-10-03 11:10:41",
+  "platform": "Linux-7.0.0-34-generic-x86_64-with-glibc2.39",
+  "python_version": "3.12.3",
+  "synthetic_scenarios": {
+    "isolated_carrier": {
+      "pressure_index": 0.0027285683980621997,
+      "class": "NO_PRESSURE",
+      "success": true
+    },
+    "one_passive_defender": {
+      "pressure_index": 0.2584330915382622,
+      "class": "LIGHT_PRESSURE",
+      "success": true
+    },
+    "one_rapidly_closing_defender": {
+      "pressure_index": 0.3680391251680368,
+      "closing_speed": 4.0,
+      "success": true
+    },
+    "two_sided_pressure": {
+      "pressure_index": 0.44432515661625316,
+      "sectors_occupied": 2,
+      "success": true
+    },
+    "three_player_surround": {
+      "pressure_index": 0.7704177623493789,
+      "class": "STRONG_PRESSURE",
+      "success": true
+    },
+    "high_density_stationary": {
+      "n_defenders_r5": 4,
+      "pressure_index": 0.7704177623493789,
+      "success": true
+    },
+    "low_distance_moving_away": {
+      "p_retreat": 0.2997522150301564,
+      "p_stat": 0.4172422133238252,
+      "success": true
+    },
+    "collective_team_step": {
+      "is_compressing": true,
+      "success": true
+    },
+    "ball_only_target": {
+      "target_type": "BALL",
+      "success": true
+    },
+    "unknown_target": {
+      "target_type": "UNKNOWN",
+      "class": "NOT_VISIBLE",
+      "success": true
+    }
+  },
+  "monotonicity_checks": {
+    "distance_monotonic": true,
+    "closing_speed_monotonic": true,
+    "density_monotonic": true,
+    "all_monotonic": true
+  },
+  "performance_summary": {
+    "dev_semantic_accuracy_pct": 22.666666666666668,
+    "dev_balanced_accuracy_pct": 34.348253190164954,
+    "dev_macro_f1": 0.1662448309247442,
+    "holdout_semantic_accuracy_pct": 37.67179487179487,
+    "holdout_balanced_accuracy_pct": 37.388367729831145,
+    "holdout_macro_f1": 0.2396859977394643
+  },
+  "runtime": {
+    "mean_pressure_latency_ms": 0.05298736266377091,
+    "target_ms": 0.5,
+    "is_budget_compliant": true
+  },
+  "decision_gate": {
+    "are_signals_monotonic": true,
+    "is_runtime_compliant": true,
+    "verdict": "EXP_23_COMPLETE_DEFENSIVE_PRESSURE_SIGNALS_LOCKED"
+  },
+  "dev_sequences": {
+    "SNMOT-060": {
+      "frames_evaluated": 150,
+      "abstention_rate_pct": 10.0,
+      "classification_metrics": {
+        "accuracy_pct": 33.33333333333333,
+        "balanced_accuracy_pct": 24.42956349206349,
+        "macro_f1": 0.21191522157996145
+      },
+      "stratification": {
+        "high_confidence_carrier_acc": 20.967741935483872,
+        "med_confidence_carrier_acc": 0.0,
+        "low_confidence_carrier_acc": 0.0,
+        "ball_only_fallback_acc": 57.8125,
+        "high_confidence_count": 62,
+        "ball_only_count": 64
+      },
+      "continuous_signal_distributions": {
+        "mean_pressure_index": 0.15894965353420287,
+        "p95_pressure_index": 0.5128121655590813,
+        "mean_nearest_defender_dist_m": 4.620282286799753,
+        "mean_closing_speed_mps": 0.0,
+        "mean_density_r2": 0.12,
+        "mean_density_r5": 0.44,
+        "mean_coverage_ratio": 0.13416666666666666,
+        "mean_free_space_radius_m": 7.042216419879812
+      },
+      "transition_boundary_diagnostic": {
+        "turnover_count": 0,
+        "mean_pressure_around_turnover": 0.0,
+        "mean_nearest_dist_around_turnover_m": 0.0,
+        "mean_closing_speed_around_turnover_mps": 0.0
+      }
+    },
+    "SNMOT-063": {
+      "frames_evaluated": 150,
+      "abstention_rate_pct": 14.000000000000002,
+      "classification_metrics": {
+        "accuracy_pct": 30.666666666666664,
+        "balanced_accuracy_pct": 28.61519607843137,
+        "macro_f1": 0.24835773273273273
+      },
+      "stratification": {
+        "high_confidence_carrier_acc": 15.584415584415584,
+        "med_confidence_carrier_acc": 0.0,
+        "low_confidence_carrier_acc": 0.0,
+        "ball_only_fallback_acc": 44.0,
+        "high_confidence_count": 77,
+        "ball_only_count": 50
+      },
+      "continuous_signal_distributions": {
+        "mean_pressure_index": 0.2889197382273922,
+        "p95_pressure_index": 0.6184382394351711,
+        "mean_nearest_defender_dist_m": 3.0508237472759405,
+        "mean_closing_speed_mps": 0.0,
+        "mean_density_r2": 0.16,
+        "mean_density_r5": 1.5866666666666667,
+        "mean_coverage_ratio": 0.305,
+        "mean_free_space_radius_m": 5.998287222947875
+      },
+      "transition_boundary_diagnostic": {
+        "turnover_count": 1,
+        "mean_pressure_around_turnover": 0.4461388742768955,
+        "mean_nearest_dist_around_turnover_m": 1.9499950797985772,
+        "mean_closing_speed_around_turnover_mps": 0.0
+      }
+    },
+    "SNMOT-064": {
+      "frames_evaluated": 150,
+      "abstention_rate_pct": 35.333333333333336,
+      "classification_metrics": {
+        "accuracy_pct": 4.0,
+        "balanced_accuracy_pct": 50.0,
+        "macro_f1": 0.038461538461538464
+      },
+      "stratification": {
+        "high_confidence_carrier_acc": 7.228915662650602,
+        "med_confidence_carrier_acc": 0.0,
+        "low_confidence_carrier_acc": 0.0,
+        "ball_only_fallback_acc": 0.0,
+        "high_confidence_count": 83,
+        "ball_only_count": 3
+      },
+      "continuous_signal_distributions": {
+        "mean_pressure_index": 0.04483717467854287,
+        "p95_pressure_index": 0.1459703997906024,
+        "mean_nearest_defender_dist_m": 6.792580147689947,
+        "mean_closing_speed_mps": 0.0,
+        "mean_density_r2": 0.0,
+        "mean_density_r5": 0.0,
+        "mean_coverage_ratio": 0.06916666666666667,
+        "mean_free_space_radius_m": 9.856683559219036
+      },
+      "transition_boundary_diagnostic": {
+        "turnover_count": 0,
+        "mean_pressure_around_turnover": 0.0,
+        "mean_nearest_dist_around_turnover_m": 0.0,
+        "mean_closing_speed_around_turnover_mps": 0.0
+      }
+    }
+  },
+  "holdout_sequences": {
+    "SNMOT-066": {
+      "frames_evaluated": 150,
+      "abstention_rate_pct": 0.0,
+      "classification_metrics": {
+        "accuracy_pct": 67.33333333333333,
+        "balanced_accuracy_pct": 50.0,
+        "macro_f1": 0.40239043824701193
+      },
+      "stratification": {
+        "high_confidence_carrier_acc": 0.0,
+        "med_confidence_carrier_acc": 0.0,
+        "low_confidence_carrier_acc": 0.0,
+        "ball_only_fallback_acc": 67.33333333333333,
+        "high_confidence_count": 0,
+        "ball_only_count": 150
+      },
+      "continuous_signal_distributions": {
+        "mean_pressure_index": 0.0,
+        "p95_pressure_index": 0.0,
+        "mean_nearest_defender_dist_m": 0.0,
+        "mean_closing_speed_mps": 0.0,
+        "mean_density_r2": 0.0,
+        "mean_density_r5": 0.0,
+        "mean_coverage_ratio": 0.0,
+        "mean_free_space_radius_m": 15.0
+      },
+      "transition_boundary_diagnostic": {
+        "turnover_count": 0,
+        "mean_pressure_around_turnover": 0.0,
+        "mean_nearest_dist_around_turnover_m": 0.0,
+        "mean_closing_speed_around_turnover_mps": 0.0
+      }
+    },
+    "SNMOT-068": {
+      "frames_evaluated": 150,
+      "abstention_rate_pct": 5.333333333333334,
+      "classification_metrics": {
+        "accuracy_pct": 58.666666666666664,
+        "balanced_accuracy_pct": 36.94183864915572,
+        "macro_f1": 0.3293062837170428
+      },
+      "stratification": {
+        "high_confidence_carrier_acc": 40.0,
+        "med_confidence_carrier_acc": 100.0,
+        "low_confidence_carrier_acc": 0.0,
+        "ball_only_fallback_acc": 62.01550387596899,
+        "high_confidence_count": 10,
+        "ball_only_count": 129
+      },
+      "continuous_signal_distributions": {
+        "mean_pressure_index": 0.07863424378559522,
+        "p95_pressure_index": 0.4179606595945113,
+        "mean_nearest_defender_dist_m": 6.8471972248744235,
+        "mean_closing_speed_mps": 0.0,
+        "mean_density_r2": 0.05333333333333334,
+        "mean_density_r5": 0.18666666666666668,
+        "mean_coverage_ratio": 0.07666666666666666,
+        "mean_free_space_radius_m": 10.977950630938048
+      },
+      "transition_boundary_diagnostic": {
+        "turnover_count": 1,
+        "mean_pressure_around_turnover": 0.19241988958487724,
+        "mean_nearest_dist_around_turnover_m": 3.4611909885201784,
+        "mean_closing_speed_around_turnover_mps": 0.0
+      }
+    },
+    "SNMOT-069": {
+      "frames_evaluated": 150,
+      "abstention_rate_pct": 68.0,
+      "classification_metrics": {
+        "accuracy_pct": 0.0,
+        "balanced_accuracy_pct": 0.0,
+        "macro_f1": 0.0
+      },
+      "stratification": {
+        "high_confidence_carrier_acc": 0.0,
+        "med_confidence_carrier_acc": 0.0,
+        "low_confidence_carrier_acc": 0.0,
+        "ball_only_fallback_acc": 0.0,
+        "high_confidence_count": 28,
+        "ball_only_count": 20
+      },
+      "continuous_signal_distributions": {
+        "mean_pressure_index": 0.01876559588793153,
+        "p95_pressure_index": 0.10083367007113109,
+        "mean_nearest_defender_dist_m": 6.227735732719501,
+        "mean_closing_speed_mps": 0.0,
+        "mean_density_r2": 0.0,
+        "mean_density_r5": 0.0,
+        "mean_coverage_ratio": 0.04666666666666667,
+        "mean_free_space_radius_m": 13.30402890832577
+      },
+      "transition_boundary_diagnostic": {
+        "turnover_count": 0,
+        "mean_pressure_around_turnover": 0.0,
+        "mean_nearest_dist_around_turnover_m": 0.0,
+        "mean_closing_speed_around_turnover_mps": 0.0
+      }
+    },
+    "SNMOT-070": {
+      "frames_evaluated": 150,
+      "abstention_rate_pct": 38.0,
+      "classification_metrics": {
+        "accuracy_pct": 41.02564102564102,
+        "balanced_accuracy_pct": 50.0,
+        "macro_f1": 0.2909090909090909
+      },
+      "stratification": {
+        "high_confidence_carrier_acc": 8.16326530612245,
+        "med_confidence_carrier_acc": 0.0,
+        "low_confidence_carrier_acc": 0.0,
+        "ball_only_fallback_acc": 64.86486486486487,
+        "high_confidence_count": 49,
+        "ball_only_count": 44
+      },
+      "continuous_signal_distributions": {
+        "mean_pressure_index": 0.023368000678543784,
+        "p95_pressure_index": 0.14709448360758579,
+        "mean_nearest_defender_dist_m": 9.940552728747516,
+        "mean_closing_speed_mps": 0.0,
+        "mean_density_r2": 0.0,
+        "mean_density_r5": 0.06666666666666667,
+        "mean_coverage_ratio": 0.020833333333333332,
+        "mean_free_space_radius_m": 13.111139685399072
+      },
+      "transition_boundary_diagnostic": {
+        "turnover_count": 0,
+        "mean_pressure_around_turnover": 0.0,
+        "mean_nearest_dist_around_turnover_m": 0.0,
+        "mean_closing_speed_around_turnover_mps": 0.0
+      }
+    },
+    "SNMOT-071": {
+      "frames_evaluated": 150,
+      "abstention_rate_pct": 0.0,
+      "classification_metrics": {
+        "accuracy_pct": 21.333333333333336,
+        "balanced_accuracy_pct": 50.0,
+        "macro_f1": 0.17582417582417584
+      },
+      "stratification": {
+        "high_confidence_carrier_acc": 0.0,
+        "med_confidence_carrier_acc": 0.0,
+        "low_confidence_carrier_acc": 0.0,
+        "ball_only_fallback_acc": 22.22222222222222,
+        "high_confidence_count": 6,
+        "ball_only_count": 144
+      },
+      "continuous_signal_distributions": {
+        "mean_pressure_index": 0.001347576819477249,
+        "p95_pressure_index": 0.0,
+        "mean_nearest_defender_dist_m": 8.892034580551014,
+        "mean_closing_speed_mps": 0.0,
+        "mean_density_r2": 0.0,
+        "mean_density_r5": 0.0,
+        "mean_coverage_ratio": 0.0,
+        "mean_free_space_radius_m": 14.755681383222038
+      },
+      "transition_boundary_diagnostic": {
+        "turnover_count": 0,
+        "mean_pressure_around_turnover": 0.0,
+        "mean_nearest_dist_around_turnover_m": 0.0,
+        "mean_closing_speed_around_turnover_mps": 0.0
+      }
+    }
+  }
+}
