@@ -1,7 +1,9 @@
 {
   "version": "v1.0",
   "experiment": "EXP-24",
-  "description": "Authoritative Ground Truth Tactical Transition Events (SoccerNet Tracking 2023)",
+  "description": "Ground Truth Tactical Transition Events (SoccerNet Tracking 2023)",
+  "annotation_type": "PHYSICS_DERIVED_DIAGNOSTIC_GT",
+  "annotation_limitations": "Labels derived from pitch-plane kinematic criteria; not independent coaching human annotations. Diagnostic baseline only.",
   "total_events": 20,
   "splits": {
     "TRANSITION_TRAIN": {

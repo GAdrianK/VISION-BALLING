@@ -1,0 +1,198 @@
+{
+  "experiment": "EXP-25",
+  "description": "Tactical Event Fusion, Confidence Propagation & Evidence Cards Benchmark",
+  "status": "COMPLETED",
+  "timestamp": "2026-10-03 12:01:09",
+  "hardware": {
+    "platform": "Linux-7.0.0-34-generic-x86_64-with-glibc2.39",
+    "python": "3.12.3"
+  },
+  "dataset": {
+    "split_dev": [
+      "SNMOT-062",
+      "SNMOT-064",
+      "SNMOT-067",
+      "SNMOT-068"
+    ],
+    "split_holdout": [
+      "SNMOT-065",
+      "SNMOT-066",
+      "SNMOT-069",
+      "SNMOT-070",
+      "SNMOT-071"
+    ],
+    "total_sequences": 9,
+    "frames_per_sequence": 350,
+    "total_frames_evaluated": 3150
+  },
+  "event_fusion_totals": {
+    "total_events_emitted": 82,
+    "event_family_distribution": {
+      "PRESSURE_EPISODE": 26,
+      "BALL_TRANSFER": 25,
+      "POSSESSION_CHANGE": 20,
+      "POST_LOSS_ENGAGEMENT": 7,
+      "DEFENSIVE_RECOVERY": 4
+    },
+    "semantic_level_distribution": {
+      "LEVEL_1_PHYSICAL_FACT": 71,
+      "LEVEL_3_TACTICAL_CANDIDATE": 11
+    },
+    "quality_level_distribution": {
+      "HIGH": 61,
+      "MEDIUM": 17,
+      "LOW": 4
+    },
+    "contradiction_rate": {
+      "conflicts_detected": 0,
+      "conflict_pct": 0.0
+    }
+  },
+  "event_relation_graph": {
+    "total_nodes": 82,
+    "total_edges": 23,
+    "edges_per_node": 0.28,
+    "relation_distribution": {
+      "CAUSES": 12,
+      "SUPPORTS": 11
+    }
+  },
+  "confidence_propagation_audit": {
+    "mean_confidence_by_level": {
+      "LEVEL_1_PHYSICAL_FACT": 0.705,
+      "LEVEL_3_TACTICAL_CANDIDATE": 0.541
+    },
+    "max_confidence_by_level": {
+      "LEVEL_1_PHYSICAL_FACT": 0.987,
+      "LEVEL_3_TACTICAL_CANDIDATE": 0.795
+    },
+    "level3_ceiling_threshold": 0.85,
+    "level3_max_observed_confidence": 0.795,
+    "level3_ceiling_respected": true
+  },
+  "runtime_performance": {
+    "target_budget_ms_frame": 1.0,
+    "mean_fusion_latency_ms": 0.054,
+    "p95_fusion_latency_ms": 0.0854,
+    "target_budget_met": true
+  },
+  "per_sequence_summary": {
+    "SNMOT-062": {
+      "sequence_id": "SNMOT-062",
+      "frames_evaluated": 350,
+      "total_events": 10,
+      "graph_node_count": 10,
+      "graph_edge_count": 2,
+      "latency_ms": {
+        "mean": 0.0559779400282423,
+        "median": 0.05160200043974328,
+        "p95": 0.07638699989911402,
+        "max": 0.15927100048429566
+      }
+    },
+    "SNMOT-064": {
+      "sequence_id": "SNMOT-064",
+      "frames_evaluated": 350,
+      "total_events": 0,
+      "graph_node_count": 0,
+      "graph_edge_count": 0,
+      "latency_ms": {
+        "mean": 0.052774931394066825,
+        "median": 0.050459999783925014,
+        "p95": 0.06829999947512988,
+        "max": 0.09589099954609992
+      }
+    },
+    "SNMOT-067": {
+      "sequence_id": "SNMOT-067",
+      "frames_evaluated": 350,
+      "total_events": 0,
+      "graph_node_count": 0,
+      "graph_edge_count": 0,
+      "latency_ms": {
+        "mean": 0.06344023427768011,
+        "median": 0.06039400022928021,
+        "p95": 0.08772699952714902,
+        "max": 0.12061699999321718
+      }
+    },
+    "SNMOT-068": {
+      "sequence_id": "SNMOT-068",
+      "frames_evaluated": 350,
+      "total_events": 16,
+      "graph_node_count": 16,
+      "graph_edge_count": 3,
+      "latency_ms": {
+        "mean": 0.05395994859749668,
+        "median": 0.04967399991073762,
+        "p95": 0.07533904990850715,
+        "max": 0.13979400046082446
+      }
+    },
+    "SNMOT-065": {
+      "sequence_id": "SNMOT-065",
+      "frames_evaluated": 350,
+      "total_events": 5,
+      "graph_node_count": 5,
+      "graph_edge_count": 2,
+      "latency_ms": {
+        "mean": 0.05129497718371567,
+        "median": 0.04831100022784085,
+        "p95": 0.06893700015098148,
+        "max": 0.14514499980577966
+      }
+    },
+    "SNMOT-066": {
+      "sequence_id": "SNMOT-066",
+      "frames_evaluated": 350,
+      "total_events": 5,
+      "graph_node_count": 5,
+      "graph_edge_count": 2,
+      "latency_ms": {
+        "mean": 0.05021513997365089,
+        "median": 0.04755500003739144,
+        "p95": 0.06405649987755169,
+        "max": 0.1404349995937082
+      }
+    },
+    "SNMOT-069": {
+      "sequence_id": "SNMOT-069",
+      "frames_evaluated": 350,
+      "total_events": 24,
+      "graph_node_count": 24,
+      "graph_edge_count": 9,
+      "latency_ms": {
+        "mean": 0.054901074301077255,
+        "median": 0.050334999741608044,
+        "p95": 0.08180359959624185,
+        "max": 0.20124000002397224
+      }
+    },
+    "SNMOT-070": {
+      "sequence_id": "SNMOT-070",
+      "frames_evaluated": 350,
+      "total_events": 15,
+      "graph_node_count": 15,
+      "graph_edge_count": 4,
+      "latency_ms": {
+        "mean": 0.05265855144118957,
+        "median": 0.049307999688608106,
+        "p95": 0.07203359996310611,
+        "max": 0.1546220000818721
+      }
+    },
+    "SNMOT-071": {
+      "sequence_id": "SNMOT-071",
+      "frames_evaluated": 350,
+      "total_events": 7,
+      "graph_node_count": 7,
+      "graph_edge_count": 1,
+      "latency_ms": {
+        "mean": 0.05084401432083853,
+        "median": 0.048380999942310154,
+        "p95": 0.06562149997080269,
+        "max": 0.11761200039472897
+      }
+    }
+  }
+}
