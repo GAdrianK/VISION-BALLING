@@ -1,0 +1,615 @@
+{
+  "experiment": "EXP-24",
+  "title": "Tactical Transitions & Counter-Press Candidates",
+  "timestamp": "2026-10-03T09:40:00Z",
+  "platform": "Linux-7.0.0-34-generic-x86_64-with-glibc2.39",
+  "python_version": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "causal_window_evaluation_dev": {
+    "0.5s_window": {
+      "f1": 0.3333333333333333,
+      "matched": 1
+    },
+    "1.0s_window": {
+      "f1": 0.3333333333333333,
+      "matched": 1
+    },
+    "2.0s_window": {
+      "f1": 0.0,
+      "matched": 1
+    }
+  },
+  "synthetic_scenarios": {
+    "1_multi_player_close": true,
+    "2_one_player_close": true,
+    "3_team_retreats": true,
+    "4_no_reaction": true,
+    "5_rapid_forward_expansion": true,
+    "6_slow_buildup": true,
+    "7_false_flicker_suppression": true,
+    "8_camera_cut_abstention": true,
+    "9_unknown_ball_fallback": true,
+    "10_partial_visibility_abstention": true
+  },
+  "monotonicity_checks": {
+    "pressure_monotonic": true,
+    "closing_speed_monotonic": true,
+    "density_monotonic": true,
+    "centroid_approach_monotonic": true,
+    "all_monotonic": true
+  },
+  "splits": {
+    "TRANSITION_TRAIN": {
+      "sequences": [
+        "SNMOT-060",
+        "SNMOT-061",
+        "SNMOT-063"
+      ],
+      "gt_event_count": 30
+    },
+    "TRANSITION_DEV": {
+      "sequences": [
+        "SNMOT-062",
+        "SNMOT-064",
+        "SNMOT-067",
+        "SNMOT-068"
+      ],
+      "gt_event_count": 22
+    },
+    "TRANSITION_HOLDOUT": {
+      "sequences": [
+        "SNMOT-065",
+        "SNMOT-066",
+        "SNMOT-069",
+        "SNMOT-070",
+        "SNMOT-071"
+      ],
+      "gt_event_count": 17
+    }
+  },
+  "dev_evaluation": {
+    "SNMOT-062": {
+      "gt_event_count": 1,
+      "detected_confirmed_events": 1,
+      "matched_events": 1,
+      "y_true": [
+        "COUNTERPRESS_CANDIDATE"
+      ],
+      "y_pred": [
+        "NEUTRAL_TRANSITION"
+      ],
+      "macro_f1": 0.0,
+      "accuracy_pct": 0.0,
+      "per_class_metrics": {
+        "COUNTERPRESS_CANDIDATE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        "DEFENSIVE_RECOVERY_CANDIDATE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        "NEUTRAL_TRANSITION": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        }
+      },
+      "temporal_localization": {
+        "mean_onset_error_frames": 0.0,
+        "median_onset_error_frames": 0.0,
+        "mean_confirmation_delay_frames": 25.0,
+        "mean_confirmation_delay_ms": 1000.0
+      },
+      "continuous_profiles": {
+        "p_t_minus_1s": 0.0,
+        "p_t0": 0.6933121573261322,
+        "p_t_plus_05s": 0.1658160096270046,
+        "p_t_plus_1s": 0.0
+      },
+      "stratification": {
+        "high_conf_count": 1,
+        "med_conf_count": 0,
+        "low_conf_count": 0
+      },
+      "latency_ms": {
+        "mean": 0.018867371415711074,
+        "p95": 0.02515450000828423
+      }
+    },
+    "SNMOT-064": {
+      "gt_event_count": 0,
+      "detected_confirmed_events": 0,
+      "matched_events": 0,
+      "y_true": [],
+      "y_pred": [],
+      "macro_f1": 0.0,
+      "accuracy_pct": 0.0,
+      "per_class_metrics": {
+        "COUNTERPRESS_CANDIDATE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        "DEFENSIVE_RECOVERY_CANDIDATE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        "NEUTRAL_TRANSITION": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        }
+      },
+      "temporal_localization": {
+        "mean_onset_error_frames": 0.0,
+        "median_onset_error_frames": 0.0,
+        "mean_confirmation_delay_frames": 25.0,
+        "mean_confirmation_delay_ms": 1000.0
+      },
+      "continuous_profiles": {
+        "p_t_minus_1s": 0.0,
+        "p_t0": 0.0,
+        "p_t_plus_05s": 0.0,
+        "p_t_plus_1s": 0.0
+      },
+      "stratification": {
+        "high_conf_count": 0,
+        "med_conf_count": 0,
+        "low_conf_count": 0
+      },
+      "latency_ms": {
+        "mean": 0.016788248590923364,
+        "p95": 0.0239469998405184
+      }
+    },
+    "SNMOT-067": {
+      "gt_event_count": 0,
+      "detected_confirmed_events": 0,
+      "matched_events": 0,
+      "y_true": [],
+      "y_pred": [],
+      "macro_f1": 0.0,
+      "accuracy_pct": 0.0,
+      "per_class_metrics": {
+        "COUNTERPRESS_CANDIDATE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        "DEFENSIVE_RECOVERY_CANDIDATE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        "NEUTRAL_TRANSITION": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        }
+      },
+      "temporal_localization": {
+        "mean_onset_error_frames": 0.0,
+        "median_onset_error_frames": 0.0,
+        "mean_confirmation_delay_frames": 25.0,
+        "mean_confirmation_delay_ms": 1000.0
+      },
+      "continuous_profiles": {
+        "p_t_minus_1s": 0.0,
+        "p_t0": 0.0,
+        "p_t_plus_05s": 0.0,
+        "p_t_plus_1s": 0.0
+      },
+      "stratification": {
+        "high_conf_count": 0,
+        "med_conf_count": 0,
+        "low_conf_count": 0
+      },
+      "latency_ms": {
+        "mean": 0.018019377135455476,
+        "p95": 0.026283049987796406
+      }
+    },
+    "SNMOT-068": {
+      "gt_event_count": 2,
+      "detected_confirmed_events": 2,
+      "matched_events": 2,
+      "y_true": [
+        "COUNTERPRESS_CANDIDATE",
+        "NEUTRAL_TRANSITION"
+      ],
+      "y_pred": [
+        "COUNTERPRESS_CANDIDATE",
+        "NEUTRAL_TRANSITION"
+      ],
+      "macro_f1": 0.6666666666666666,
+      "accuracy_pct": 100.0,
+      "per_class_metrics": {
+        "COUNTERPRESS_CANDIDATE": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "DEFENSIVE_RECOVERY_CANDIDATE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        "NEUTRAL_TRANSITION": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        }
+      },
+      "temporal_localization": {
+        "mean_onset_error_frames": 0.0,
+        "median_onset_error_frames": 0.0,
+        "mean_confirmation_delay_frames": 25.0,
+        "mean_confirmation_delay_ms": 1000.0
+      },
+      "continuous_profiles": {
+        "p_t_minus_1s": 0.0,
+        "p_t0": 0.5956929252428216,
+        "p_t_plus_05s": 0.26319853406345856,
+        "p_t_plus_1s": 0.0
+      },
+      "stratification": {
+        "high_conf_count": 0,
+        "med_conf_count": 2,
+        "low_conf_count": 0
+      },
+      "latency_ms": {
+        "mean": 0.019593828588507937,
+        "p95": 0.02626005007186905
+      }
+    }
+  },
+  "holdout_evaluation": {
+    "SNMOT-065": {
+      "gt_event_count": 1,
+      "detected_confirmed_events": 1,
+      "matched_events": 1,
+      "y_true": [
+        "DEFENSIVE_RECOVERY_CANDIDATE"
+      ],
+      "y_pred": [
+        "DEFENSIVE_RECOVERY_CANDIDATE"
+      ],
+      "macro_f1": 0.3333333333333333,
+      "accuracy_pct": 100.0,
+      "per_class_metrics": {
+        "COUNTERPRESS_CANDIDATE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        "DEFENSIVE_RECOVERY_CANDIDATE": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "NEUTRAL_TRANSITION": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        }
+      },
+      "temporal_localization": {
+        "mean_onset_error_frames": 0.0,
+        "median_onset_error_frames": 0.0,
+        "mean_confirmation_delay_frames": 25.0,
+        "mean_confirmation_delay_ms": 1000.0
+      },
+      "continuous_profiles": {
+        "p_t_minus_1s": 0.0,
+        "p_t0": 0.6219222839785449,
+        "p_t_plus_05s": 0.5379442368888779,
+        "p_t_plus_1s": 0.0
+      },
+      "stratification": {
+        "high_conf_count": 1,
+        "med_conf_count": 0,
+        "low_conf_count": 0
+      },
+      "latency_ms": {
+        "mean": 0.017718422858316835,
+        "p95": 0.024025000016081325
+      }
+    },
+    "SNMOT-066": {
+      "gt_event_count": 1,
+      "detected_confirmed_events": 1,
+      "matched_events": 1,
+      "y_true": [
+        "NEUTRAL_TRANSITION"
+      ],
+      "y_pred": [
+        "DEFENSIVE_RECOVERY_CANDIDATE"
+      ],
+      "macro_f1": 0.0,
+      "accuracy_pct": 0.0,
+      "per_class_metrics": {
+        "COUNTERPRESS_CANDIDATE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        "DEFENSIVE_RECOVERY_CANDIDATE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        "NEUTRAL_TRANSITION": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        }
+      },
+      "temporal_localization": {
+        "mean_onset_error_frames": 0.0,
+        "median_onset_error_frames": 0.0,
+        "mean_confirmation_delay_frames": 25.0,
+        "mean_confirmation_delay_ms": 1000.0
+      },
+      "continuous_profiles": {
+        "p_t_minus_1s": 0.0,
+        "p_t0": 0.28716582983140637,
+        "p_t_plus_05s": 0.0,
+        "p_t_plus_1s": 0.0
+      },
+      "stratification": {
+        "high_conf_count": 1,
+        "med_conf_count": 0,
+        "low_conf_count": 0
+      },
+      "latency_ms": {
+        "mean": 0.017678722857194122,
+        "p95": 0.024407500109191464
+      }
+    },
+    "SNMOT-069": {
+      "gt_event_count": 6,
+      "detected_confirmed_events": 6,
+      "matched_events": 6,
+      "y_true": [
+        "NEUTRAL_TRANSITION",
+        "NEUTRAL_TRANSITION",
+        "NEUTRAL_TRANSITION",
+        "COUNTERPRESS_CANDIDATE",
+        "COUNTERPRESS_CANDIDATE",
+        "COUNTERPRESS_CANDIDATE"
+      ],
+      "y_pred": [
+        "NEUTRAL_TRANSITION",
+        "NEUTRAL_TRANSITION",
+        "NEUTRAL_TRANSITION",
+        "NEUTRAL_TRANSITION",
+        "NEUTRAL_TRANSITION",
+        "NEUTRAL_TRANSITION"
+      ],
+      "macro_f1": 0.2222222222222222,
+      "accuracy_pct": 50.0,
+      "per_class_metrics": {
+        "COUNTERPRESS_CANDIDATE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        "DEFENSIVE_RECOVERY_CANDIDATE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        "NEUTRAL_TRANSITION": {
+          "precision": 0.5,
+          "recall": 1.0,
+          "f1": 0.6666666666666666
+        }
+      },
+      "temporal_localization": {
+        "mean_onset_error_frames": 0.0,
+        "median_onset_error_frames": 0.0,
+        "mean_confirmation_delay_frames": 25.0,
+        "mean_confirmation_delay_ms": 1000.0
+      },
+      "continuous_profiles": {
+        "p_t_minus_1s": 0.15532857906636718,
+        "p_t0": 0.5572205164193514,
+        "p_t_plus_05s": 0.37226254434933,
+        "p_t_plus_1s": 0.12336455945607905
+      },
+      "stratification": {
+        "high_conf_count": 6,
+        "med_conf_count": 0,
+        "low_conf_count": 0
+      },
+      "latency_ms": {
+        "mean": 0.02196413429633789,
+        "p95": 0.029357000175878056
+      }
+    },
+    "SNMOT-070": {
+      "gt_event_count": 5,
+      "detected_confirmed_events": 5,
+      "matched_events": 5,
+      "y_true": [
+        "DEFENSIVE_RECOVERY_CANDIDATE",
+        "COUNTERPRESS_CANDIDATE",
+        "COUNTERPRESS_CANDIDATE",
+        "COUNTERPRESS_CANDIDATE",
+        "COUNTERPRESS_CANDIDATE"
+      ],
+      "y_pred": [
+        "DEFENSIVE_RECOVERY_CANDIDATE",
+        "COUNTERPRESS_CANDIDATE",
+        "COUNTERPRESS_CANDIDATE",
+        "NEUTRAL_TRANSITION",
+        "NEUTRAL_TRANSITION"
+      ],
+      "macro_f1": 0.5555555555555555,
+      "accuracy_pct": 60.0,
+      "per_class_metrics": {
+        "COUNTERPRESS_CANDIDATE": {
+          "precision": 1.0,
+          "recall": 0.5,
+          "f1": 0.6666666666666666
+        },
+        "DEFENSIVE_RECOVERY_CANDIDATE": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "NEUTRAL_TRANSITION": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        }
+      },
+      "temporal_localization": {
+        "mean_onset_error_frames": 0.0,
+        "median_onset_error_frames": 0.0,
+        "mean_confirmation_delay_frames": 25.0,
+        "mean_confirmation_delay_ms": 1000.0
+      },
+      "continuous_profiles": {
+        "p_t_minus_1s": 0.1842595032507531,
+        "p_t0": 0.20192287059548386,
+        "p_t_plus_05s": 0.3140094640182506,
+        "p_t_plus_1s": 0.32008125133987936
+      },
+      "stratification": {
+        "high_conf_count": 4,
+        "med_conf_count": 1,
+        "low_conf_count": 0
+      },
+      "latency_ms": {
+        "mean": 0.021504057154483495,
+        "p95": 0.028670000051533865
+      }
+    },
+    "SNMOT-071": {
+      "gt_event_count": 1,
+      "detected_confirmed_events": 1,
+      "matched_events": 1,
+      "y_true": [
+        "DEFENSIVE_RECOVERY_CANDIDATE"
+      ],
+      "y_pred": [
+        "DEFENSIVE_RECOVERY_CANDIDATE"
+      ],
+      "macro_f1": 0.3333333333333333,
+      "accuracy_pct": 100.0,
+      "per_class_metrics": {
+        "COUNTERPRESS_CANDIDATE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        "DEFENSIVE_RECOVERY_CANDIDATE": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "NEUTRAL_TRANSITION": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        }
+      },
+      "temporal_localization": {
+        "mean_onset_error_frames": 0.0,
+        "median_onset_error_frames": 0.0,
+        "mean_confirmation_delay_frames": 25.0,
+        "mean_confirmation_delay_ms": 1000.0
+      },
+      "continuous_profiles": {
+        "p_t_minus_1s": 0.0,
+        "p_t0": 0.3967401022687027,
+        "p_t_plus_05s": 0.0,
+        "p_t_plus_1s": 0.0
+      },
+      "stratification": {
+        "high_conf_count": 1,
+        "med_conf_count": 0,
+        "low_conf_count": 0
+      },
+      "latency_ms": {
+        "mean": 0.01744266288889256,
+        "p95": 0.024401000086982094
+      }
+    }
+  },
+  "performance_summary": {
+    "pooled_dev": {
+      "accuracy_pct": 66.66666666666666,
+      "macro_f1": 0.4444444444444444,
+      "per_class": {
+        "COUNTERPRESS_CANDIDATE": {
+          "precision": 1.0,
+          "recall": 0.5,
+          "f1": 0.6666666666666666
+        },
+        "DEFENSIVE_RECOVERY_CANDIDATE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        "NEUTRAL_TRANSITION": {
+          "precision": 0.5,
+          "recall": 1.0,
+          "f1": 0.6666666666666666
+        }
+      }
+    },
+    "pooled_holdout": {
+      "accuracy_pct": 57.14285714285714,
+      "macro_f1": 0.6005291005291005,
+      "per_class": {
+        "COUNTERPRESS_CANDIDATE": {
+          "precision": 1.0,
+          "recall": 0.2857142857142857,
+          "f1": 0.4444444444444444
+        },
+        "DEFENSIVE_RECOVERY_CANDIDATE": {
+          "precision": 0.75,
+          "recall": 1.0,
+          "f1": 0.8571428571428571
+        },
+        "NEUTRAL_TRANSITION": {
+          "precision": 0.375,
+          "recall": 0.75,
+          "f1": 0.5
+        }
+      }
+    },
+    "mean_runtime_overhead_ms": 0.01926160001104498,
+    "budget_ms": 0.5,
+    "budget_compliant": true
+  },
+  "event_support_status": {
+    "total_available_events": 69,
+    "minimum_target_met": false,
+    "classification_status": "DIAGNOSTIC_BASELINE",
+    "continuous_signals_status": "LOCKED"
+  },
+  "failure_taxonomy": {
+    "false_possession_change": "Suppressed via confidence gating threshold >= 0.40",
+    "carrier_misassignment": "Absorbed by continuous ball-only fallback",
+    "ball_occlusion": "Propagated via temporal kalman ground projection",
+    "camera_cut": "Detected via sudden frame jump and low visible count -> AMBIGUOUS",
+    "partial_visibility": "Enforced min_visible_outfield >= 6 threshold -> NOT_VISIBLE",
+    "set_piece": "Distinguished by static initial ball velocity and slow restart",
+    "dense_penalty_box": "High density suppresses counterpress classification margin",
+    "tracking_id_switch": "Filtered via centroid and multi-scale aggregation",
+    "team_attribution_error": "Constrained by team permutation symmetry",
+    "closing_speed_unavailable": "Explicitly marked NOT_AVAILABLE without fabricating zero",
+    "calibration_failure": "Homography fallback to propagation prevents pipeline abort"
+  },
+  "decision_gate": {
+    "status": "EXP-24 COMPLETE \u2014 TACTICAL TRANSITION SIGNALS LOCKED",
+    "discrete_semantics_verdict": "TRANSITION SEMANTICS NOT RELIABLE ENOUGH (DIAGNOSTIC BASELINE ONLY)",
+    "continuous_primitives_verdict": "CONTINUOUS ENGAGEMENT PRIMITIVES FULLY OPERATIONAL AND CAUSAL"
+  }
+}

@@ -366,3 +366,66 @@ def test_upstream_components_immutability() -> None:
     assert hasattr(b_eng, "process_frame")
     assert hasattr(p_eng, "process_frame")
 
+
+def test_player_metric_observation_velocity_integration() -> None:
+    """Verifies that PlayerMetricObservation velocity_x_mps and velocity_y_mps correctly produce closing speeds."""
+    from app.video_analysis.metric_trajectories import PlayerMetricObservation
+
+    engine = DefensivePressureEngine()
+
+    # Target carrier at (0, 0) stationary
+    carrier = PlayerMetricObservation(
+        track_id=1,
+        frame_index=1,
+        timestamp=0.04,
+        team_label="TEAM_0",
+        role="OUTFIELD_PLAYER",
+        pitch_x_m=0.0,
+        pitch_y_m=0.0,
+        velocity_x_mps=0.0,
+        velocity_y_mps=0.0,
+        speed_mps=0.0,
+        position_valid=True,
+    )
+
+    # Defender at (4, 0) moving towards carrier with vx=-3.0 m/s
+    defender_closing = PlayerMetricObservation(
+        track_id=2,
+        frame_index=1,
+        timestamp=0.04,
+        team_label="TEAM_1",
+        role="OUTFIELD_PLAYER",
+        pitch_x_m=4.0,
+        pitch_y_m=0.0,
+        velocity_x_mps=-3.0,
+        velocity_y_mps=0.0,
+        speed_mps=3.0,
+        position_valid=True,
+    )
+
+    poss = _make_poss_state(1, "TEAM_0")
+    st = engine.process_frame(1, 0.04, [carrier, defender_closing], None, poss)
+
+    assert st.nearest_defender_closing_speed_mps is not None
+    # Closing speed: ux=-1.0, dvx = -3.0 - 0.0 = -3.0 -> ux * dvx = 3.0 m/s
+    assert pytest.approx(st.nearest_defender_closing_speed_mps, abs=1e-3) == 3.0
+    assert pytest.approx(st.mean_closing_speed_mps, abs=1e-3) == 3.0
+    assert st.number_closing_positive == 1
+
+    # Defender at (4, 0) retreating away with vx=+2.0 m/s
+    defender_retreating = PlayerMetricObservation(
+        track_id=3,
+        frame_index=1,
+        timestamp=0.04,
+        team_label="TEAM_1",
+        role="OUTFIELD_PLAYER",
+        pitch_x_m=4.0,
+        pitch_y_m=0.0,
+        velocity_x_mps=2.0,
+        velocity_y_mps=0.0,
+        speed_mps=2.0,
+        position_valid=True,
+    )
+    st_ret = engine.process_frame(1, 0.04, [carrier, defender_retreating], None, poss)
+    assert pytest.approx(st_ret.nearest_defender_closing_speed_mps, abs=1e-3) == -2.0
+    assert st_ret.number_closing_positive == 0

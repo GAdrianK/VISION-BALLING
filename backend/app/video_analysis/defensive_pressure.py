@@ -283,10 +283,18 @@ class PressureTargetResolver:
                         py = matched_p["pitch_y"]
 
                     if px is not None and py is not None:
-                        vx = float(matched_p.get("vx_mps", 0.0) if isinstance(matched_p, dict) else (getattr(matched_p, "vx_mps", 0.0) or 0.0))
-                        vy = float(matched_p.get("vy_mps", 0.0) if isinstance(matched_p, dict) else (getattr(matched_p, "vy_mps", 0.0) or 0.0))
-                        speed = float(matched_p.get("speed_mps", 0.0) if isinstance(matched_p, dict) else (getattr(matched_p, "speed_mps", 0.0) or 0.0))
-                        bbox = list(matched_p.get("bbox", [])) if isinstance(matched_p, dict) else getattr(matched_p, "bbox", None)
+                        if isinstance(matched_p, dict):
+                            vx = float(matched_p.get("velocity_x_mps") if matched_p.get("velocity_x_mps") is not None else (matched_p.get("vx_mps", matched_p.get("vx", 0.0)) or 0.0))
+                            vy = float(matched_p.get("velocity_y_mps") if matched_p.get("velocity_y_mps") is not None else (matched_p.get("vy_mps", matched_p.get("vy", 0.0)) or 0.0))
+                            spd = matched_p.get("speed_mps", matched_p.get("speed"))
+                            speed = float(spd if spd is not None else np.hypot(vx, vy))
+                            bbox = list(matched_p.get("bbox", []))
+                        else:
+                            vx = float(getattr(matched_p, "velocity_x_mps", None) if getattr(matched_p, "velocity_x_mps", None) is not None else (getattr(matched_p, "vx_mps", None) if getattr(matched_p, "vx_mps", None) is not None else (getattr(matched_p, "vx", 0.0) or 0.0)))
+                            vy = float(getattr(matched_p, "velocity_y_mps", None) if getattr(matched_p, "velocity_y_mps", None) is not None else (getattr(matched_p, "vy_mps", None) if getattr(matched_p, "vy_mps", None) is not None else (getattr(matched_p, "vy", 0.0) or 0.0)))
+                            spd = getattr(matched_p, "speed_mps", getattr(matched_p, "speed", None))
+                            speed = float(spd if spd is not None else np.hypot(vx, vy))
+                            bbox = getattr(matched_p, "bbox", None)
 
                         return PressureTarget(
                             target_type=PressureTargetType.CARRIER,
@@ -309,10 +317,15 @@ class PressureTargetResolver:
 
             if bx is not None and by is not None:
                 b_conf = float(ball_observation.get("confidence", 0.8) if isinstance(ball_observation, dict) else (getattr(ball_observation, "confidence", 0.8) or 0.8))
-                b_vx = float(ball_observation.get("vx_mps", 0.0) if isinstance(ball_observation, dict) else (getattr(ball_observation, "vx_mps", 0.0) or 0.0))
-                b_vy = float(ball_observation.get("vy_mps", 0.0) if isinstance(ball_observation, dict) else (getattr(ball_observation, "vy_mps", 0.0) or 0.0))
+                if isinstance(ball_observation, dict):
+                    b_vx = float(ball_observation.get("velocity_x_mps") if ball_observation.get("velocity_x_mps") is not None else (ball_observation.get("vx_mps", ball_observation.get("vx", 0.0)) or 0.0))
+                    b_vy = float(ball_observation.get("velocity_y_mps") if ball_observation.get("velocity_y_mps") is not None else (ball_observation.get("vy_mps", ball_observation.get("vy", 0.0)) or 0.0))
+                    b_box = list(ball_observation.get("bbox", []))
+                else:
+                    b_vx = float(getattr(ball_observation, "velocity_x_mps", None) if getattr(ball_observation, "velocity_x_mps", None) is not None else (getattr(ball_observation, "vx_mps", None) if getattr(ball_observation, "vx_mps", None) is not None else (getattr(ball_observation, "vx", 0.0) or 0.0)))
+                    b_vy = float(getattr(ball_observation, "velocity_y_mps", None) if getattr(ball_observation, "velocity_y_mps", None) is not None else (getattr(ball_observation, "vy_mps", None) if getattr(ball_observation, "vy_mps", None) is not None else (getattr(ball_observation, "vy", 0.0) or 0.0)))
+                    b_box = getattr(ball_observation, "bbox", None)
                 b_speed = float(np.hypot(b_vx, b_vy))
-                b_box = list(ball_observation.get("bbox", [])) if isinstance(ball_observation, dict) else getattr(ball_observation, "bbox", None)
 
                 holding_team = possession_state_v2.possession_team if (possession_state_v2 and possession_state_v2.possession_team in ("TEAM_0", "TEAM_1")) else "UNKNOWN"
 
@@ -415,26 +428,35 @@ class IndividualPressureCalculator:
 
     def _parse_player(self, p: Any) -> Dict[str, Any]:
         if isinstance(p, dict):
+            vx = float(p.get("velocity_x_mps") if p.get("velocity_x_mps") is not None else (p.get("vx_mps", p.get("vx", 0.0)) or 0.0))
+            vy = float(p.get("velocity_y_mps") if p.get("velocity_y_mps") is not None else (p.get("vy_mps", p.get("vy", 0.0)) or 0.0))
+            spd = p.get("speed_mps", p.get("speed"))
+            speed = float(spd if spd is not None else np.hypot(vx, vy))
             return {
                 "track_id": int(p.get("track_id", 0)),
                 "team_label": str(p.get("team_label", "UNKNOWN")),
                 "role": str(p.get("role", "OUTFIELD_PLAYER")),
                 "pitch_x": p.get("pitch_x_m", p.get("pitch_x")),
                 "pitch_y": p.get("pitch_y_m", p.get("pitch_y")),
-                "vx": float(p.get("vx_mps", 0.0)),
-                "vy": float(p.get("vy_mps", 0.0)),
-                "speed_mps": float(p.get("speed_mps", 0.0)),
+                "vx": vx,
+                "vy": vy,
+                "speed_mps": speed,
             }
+
+        vx = float(getattr(p, "velocity_x_mps", None) if getattr(p, "velocity_x_mps", None) is not None else (getattr(p, "vx_mps", None) if getattr(p, "vx_mps", None) is not None else (getattr(p, "vx", 0.0) or 0.0)))
+        vy = float(getattr(p, "velocity_y_mps", None) if getattr(p, "velocity_y_mps", None) is not None else (getattr(p, "vy_mps", None) if getattr(p, "vy_mps", None) is not None else (getattr(p, "vy", 0.0) or 0.0)))
+        spd = getattr(p, "speed_mps", getattr(p, "speed", None))
+        speed = float(spd if spd is not None else np.hypot(vx, vy))
 
         return {
             "track_id": int(getattr(p, "track_id", 0)),
             "team_label": str(getattr(p, "team_label", "UNKNOWN")),
             "role": str(getattr(p, "role", "OUTFIELD_PLAYER")),
-            "pitch_x": getattr(p, "pitch_x_m", None),
-            "pitch_y": getattr(p, "pitch_y_m", None),
-            "vx": float(getattr(p, "vx_mps", 0.0) or 0.0),
-            "vy": float(getattr(p, "vy_mps", 0.0) or 0.0),
-            "speed_mps": float(getattr(p, "speed_mps", 0.0) or 0.0),
+            "pitch_x": getattr(p, "pitch_x_m", getattr(p, "pitch_x", None)),
+            "pitch_y": getattr(p, "pitch_y_m", getattr(p, "pitch_y", None)),
+            "vx": vx,
+            "vy": vy,
+            "speed_mps": speed,
         }
 
 

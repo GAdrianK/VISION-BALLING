@@ -1,0 +1,378 @@
+{
+  "version": "v1.0",
+  "experiment": "EXP-24",
+  "description": "Authoritative Ground Truth Tactical Transition Events (SoccerNet Tracking 2023)",
+  "total_events": 20,
+  "splits": {
+    "TRANSITION_TRAIN": {
+      "sequences": [
+        "SNMOT-060",
+        "SNMOT-061",
+        "SNMOT-063"
+      ],
+      "event_count": 3
+    },
+    "TRANSITION_DEV": {
+      "sequences": [
+        "SNMOT-062",
+        "SNMOT-064",
+        "SNMOT-067",
+        "SNMOT-068"
+      ],
+      "event_count": 3
+    },
+    "TRANSITION_HOLDOUT": {
+      "sequences": [
+        "SNMOT-065",
+        "SNMOT-066",
+        "SNMOT-069",
+        "SNMOT-070",
+        "SNMOT-071"
+      ],
+      "event_count": 14
+    }
+  },
+  "events_by_sequence": {
+    "SNMOT-060": [],
+    "SNMOT-061": [
+      {
+        "event_id": "trans_37_TEAM_0_to_TEAM_1",
+        "frame_index": 37,
+        "timestamp": 1.44,
+        "losing_team": "TEAM_0",
+        "gaining_team": "TEAM_1",
+        "ground_truth_label": "NEUTRAL_TRANSITION",
+        "attacking_response": "SLOW_BUILDUP",
+        "metrics": {
+          "pressure_post_mean": 0.203,
+          "pressure_delta": -0.395,
+          "closing_speed_post_mean": 0.433,
+          "centroid_ball_distance_delta": 0.0,
+          "defensive_line_velocity": 0.0
+        }
+      },
+      {
+        "event_id": "trans_61_TEAM_1_to_TEAM_0",
+        "frame_index": 61,
+        "timestamp": 2.4,
+        "losing_team": "TEAM_1",
+        "gaining_team": "TEAM_0",
+        "ground_truth_label": "NEUTRAL_TRANSITION",
+        "attacking_response": "SLOW_BUILDUP",
+        "metrics": {
+          "pressure_post_mean": 0.366,
+          "pressure_delta": 0.162,
+          "closing_speed_post_mean": -1.746,
+          "centroid_ball_distance_delta": 0.0,
+          "defensive_line_velocity": 0.0
+        }
+      }
+    ],
+    "SNMOT-062": [
+      {
+        "event_id": "trans_47_TEAM_0_to_TEAM_1",
+        "frame_index": 47,
+        "timestamp": 1.84,
+        "losing_team": "TEAM_0",
+        "gaining_team": "TEAM_1",
+        "ground_truth_label": "COUNTERPRESS",
+        "attacking_response": "SLOW_BUILDUP",
+        "metrics": {
+          "pressure_post_mean": 0.319,
+          "pressure_delta": -0.02,
+          "closing_speed_post_mean": 2.026,
+          "centroid_ball_distance_delta": -4.938,
+          "defensive_line_velocity": 1.008
+        }
+      }
+    ],
+    "SNMOT-063": [
+      {
+        "event_id": "trans_125_TEAM_0_to_TEAM_1",
+        "frame_index": 125,
+        "timestamp": 4.96,
+        "losing_team": "TEAM_0",
+        "gaining_team": "TEAM_1",
+        "ground_truth_label": "NEUTRAL_TRANSITION",
+        "attacking_response": "SLOW_BUILDUP",
+        "metrics": {
+          "pressure_post_mean": 0.306,
+          "pressure_delta": -0.06,
+          "closing_speed_post_mean": 1.147,
+          "centroid_ball_distance_delta": 5.208,
+          "defensive_line_velocity": -1.046
+        }
+      }
+    ],
+    "SNMOT-064": [],
+    "SNMOT-065": [
+      {
+        "event_id": "trans_194_TEAM_0_to_TEAM_1",
+        "frame_index": 194,
+        "timestamp": 7.72,
+        "losing_team": "TEAM_0",
+        "gaining_team": "TEAM_1",
+        "ground_truth_label": "DEFENSIVE_RECOVERY",
+        "attacking_response": "SLOW_BUILDUP",
+        "metrics": {
+          "pressure_post_mean": 0.119,
+          "pressure_delta": 0.072,
+          "closing_speed_post_mean": -1.02,
+          "centroid_ball_distance_delta": 1.959,
+          "defensive_line_velocity": -10.641
+        }
+      }
+    ],
+    "SNMOT-066": [
+      {
+        "event_id": "trans_303_TEAM_1_to_TEAM_0",
+        "frame_index": 303,
+        "timestamp": 12.08,
+        "losing_team": "TEAM_1",
+        "gaining_team": "TEAM_0",
+        "ground_truth_label": "NEUTRAL_TRANSITION",
+        "attacking_response": "SLOW_BUILDUP",
+        "metrics": {
+          "pressure_post_mean": 0.038,
+          "pressure_delta": 0.004,
+          "closing_speed_post_mean": 0.916,
+          "centroid_ball_distance_delta": 0.344,
+          "defensive_line_velocity": 8.099
+        }
+      }
+    ],
+    "SNMOT-067": [],
+    "SNMOT-068": [
+      {
+        "event_id": "trans_55_TEAM_0_to_TEAM_1",
+        "frame_index": 55,
+        "timestamp": 2.16,
+        "losing_team": "TEAM_0",
+        "gaining_team": "TEAM_1",
+        "ground_truth_label": "COUNTERPRESS",
+        "attacking_response": "SLOW_BUILDUP",
+        "metrics": {
+          "pressure_post_mean": 0.262,
+          "pressure_delta": 0.181,
+          "closing_speed_post_mean": 3.898,
+          "centroid_ball_distance_delta": -7.162,
+          "defensive_line_velocity": 4.012
+        }
+      },
+      {
+        "event_id": "trans_256_TEAM_0_to_TEAM_1",
+        "frame_index": 256,
+        "timestamp": 10.2,
+        "losing_team": "TEAM_0",
+        "gaining_team": "TEAM_1",
+        "ground_truth_label": "NEUTRAL_TRANSITION",
+        "attacking_response": "FAST_ATTACK",
+        "metrics": {
+          "pressure_post_mean": 0.291,
+          "pressure_delta": 0.079,
+          "closing_speed_post_mean": -0.055,
+          "centroid_ball_distance_delta": -0.52,
+          "defensive_line_velocity": 2.537
+        }
+      }
+    ],
+    "SNMOT-069": [
+      {
+        "event_id": "trans_203_TEAM_0_to_TEAM_1",
+        "frame_index": 203,
+        "timestamp": 8.08,
+        "losing_team": "TEAM_0",
+        "gaining_team": "TEAM_1",
+        "ground_truth_label": "NEUTRAL_TRANSITION",
+        "attacking_response": "SLOW_BUILDUP",
+        "metrics": {
+          "pressure_post_mean": 0.376,
+          "pressure_delta": -0.165,
+          "closing_speed_post_mean": 0.681,
+          "centroid_ball_distance_delta": 0.199,
+          "defensive_line_velocity": -4.325
+        }
+      },
+      {
+        "event_id": "trans_206_TEAM_1_to_TEAM_0",
+        "frame_index": 206,
+        "timestamp": 8.2,
+        "losing_team": "TEAM_1",
+        "gaining_team": "TEAM_0",
+        "ground_truth_label": "NEUTRAL_TRANSITION",
+        "attacking_response": "SLOW_BUILDUP",
+        "metrics": {
+          "pressure_post_mean": 0.299,
+          "pressure_delta": -0.321,
+          "closing_speed_post_mean": 0.833,
+          "centroid_ball_distance_delta": -1.228,
+          "defensive_line_velocity": 14.161
+        }
+      },
+      {
+        "event_id": "trans_236_TEAM_0_to_TEAM_1",
+        "frame_index": 236,
+        "timestamp": 9.4,
+        "losing_team": "TEAM_0",
+        "gaining_team": "TEAM_1",
+        "ground_truth_label": "NEUTRAL_TRANSITION",
+        "attacking_response": "SLOW_BUILDUP",
+        "metrics": {
+          "pressure_post_mean": 0.325,
+          "pressure_delta": 0.096,
+          "closing_speed_post_mean": -1.274,
+          "centroid_ball_distance_delta": -0.726,
+          "defensive_line_velocity": 0.791
+        }
+      },
+      {
+        "event_id": "trans_286_TEAM_0_to_TEAM_1",
+        "frame_index": 286,
+        "timestamp": 11.4,
+        "losing_team": "TEAM_0",
+        "gaining_team": "TEAM_1",
+        "ground_truth_label": "COUNTERPRESS",
+        "attacking_response": "SLOW_BUILDUP",
+        "metrics": {
+          "pressure_post_mean": 0.38,
+          "pressure_delta": 0.125,
+          "closing_speed_post_mean": 1.48,
+          "centroid_ball_distance_delta": -6.884,
+          "defensive_line_velocity": -10.748
+        }
+      },
+      {
+        "event_id": "trans_288_TEAM_1_to_TEAM_0",
+        "frame_index": 288,
+        "timestamp": 11.48,
+        "losing_team": "TEAM_1",
+        "gaining_team": "TEAM_0",
+        "ground_truth_label": "COUNTERPRESS",
+        "attacking_response": "AMBIGUOUS",
+        "metrics": {
+          "pressure_post_mean": 0.333,
+          "pressure_delta": 0.017,
+          "closing_speed_post_mean": 1.242,
+          "centroid_ball_distance_delta": -6.264,
+          "defensive_line_velocity": -7.171
+        }
+      },
+      {
+        "event_id": "trans_300_TEAM_0_to_TEAM_1",
+        "frame_index": 300,
+        "timestamp": 11.96,
+        "losing_team": "TEAM_0",
+        "gaining_team": "TEAM_1",
+        "ground_truth_label": "COUNTERPRESS",
+        "attacking_response": "SLOW_BUILDUP",
+        "metrics": {
+          "pressure_post_mean": 0.414,
+          "pressure_delta": 0.015,
+          "closing_speed_post_mean": 1.792,
+          "centroid_ball_distance_delta": 5.913,
+          "defensive_line_velocity": -9.809
+        }
+      }
+    ],
+    "SNMOT-070": [
+      {
+        "event_id": "trans_178_TEAM_0_to_TEAM_1",
+        "frame_index": 178,
+        "timestamp": 7.08,
+        "losing_team": "TEAM_0",
+        "gaining_team": "TEAM_1",
+        "ground_truth_label": "DEFENSIVE_RECOVERY",
+        "attacking_response": "AMBIGUOUS",
+        "metrics": {
+          "pressure_post_mean": 0.094,
+          "pressure_delta": -0.365,
+          "closing_speed_post_mean": 0.262,
+          "centroid_ball_distance_delta": -0.55,
+          "defensive_line_velocity": -4.712
+        }
+      },
+      {
+        "event_id": "trans_275_TEAM_0_to_TEAM_1",
+        "frame_index": 275,
+        "timestamp": 10.96,
+        "losing_team": "TEAM_0",
+        "gaining_team": "TEAM_1",
+        "ground_truth_label": "COUNTERPRESS",
+        "attacking_response": "SLOW_BUILDUP",
+        "metrics": {
+          "pressure_post_mean": 0.35,
+          "pressure_delta": 0.295,
+          "closing_speed_post_mean": 2.958,
+          "centroid_ball_distance_delta": -1.668,
+          "defensive_line_velocity": -3.423
+        }
+      },
+      {
+        "event_id": "trans_281_TEAM_1_to_TEAM_0",
+        "frame_index": 281,
+        "timestamp": 11.2,
+        "losing_team": "TEAM_1",
+        "gaining_team": "TEAM_0",
+        "ground_truth_label": "COUNTERPRESS",
+        "attacking_response": "FAST_ATTACK",
+        "metrics": {
+          "pressure_post_mean": 0.409,
+          "pressure_delta": 0.342,
+          "closing_speed_post_mean": 4.698,
+          "centroid_ball_distance_delta": -4.785,
+          "defensive_line_velocity": 10.205
+        }
+      },
+      {
+        "event_id": "trans_293_TEAM_0_to_TEAM_1",
+        "frame_index": 293,
+        "timestamp": 11.68,
+        "losing_team": "TEAM_0",
+        "gaining_team": "TEAM_1",
+        "ground_truth_label": "COUNTERPRESS",
+        "attacking_response": "SLOW_BUILDUP",
+        "metrics": {
+          "pressure_post_mean": 0.314,
+          "pressure_delta": -0.006,
+          "closing_speed_post_mean": 3.818,
+          "centroid_ball_distance_delta": -4.05,
+          "defensive_line_velocity": -2.008
+        }
+      },
+      {
+        "event_id": "trans_311_TEAM_1_to_TEAM_0",
+        "frame_index": 311,
+        "timestamp": 12.4,
+        "losing_team": "TEAM_1",
+        "gaining_team": "TEAM_0",
+        "ground_truth_label": "COUNTERPRESS",
+        "attacking_response": "SLOW_BUILDUP",
+        "metrics": {
+          "pressure_post_mean": 0.321,
+          "pressure_delta": -0.147,
+          "closing_speed_post_mean": 1.88,
+          "centroid_ball_distance_delta": -2.026,
+          "defensive_line_velocity": -1.792
+        }
+      }
+    ],
+    "SNMOT-071": [
+      {
+        "event_id": "trans_259_TEAM_0_to_TEAM_1",
+        "frame_index": 259,
+        "timestamp": 10.32,
+        "losing_team": "TEAM_0",
+        "gaining_team": "TEAM_1",
+        "ground_truth_label": "DEFENSIVE_RECOVERY",
+        "attacking_response": "SLOW_BUILDUP",
+        "metrics": {
+          "pressure_post_mean": 0.12,
+          "pressure_delta": -0.126,
+          "closing_speed_post_mean": -7.024,
+          "centroid_ball_distance_delta": 85.084,
+          "defensive_line_velocity": -1.445
+        }
+      }
+    ]
+  }
+}
