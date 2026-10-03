@@ -9,6 +9,12 @@ def test_config_loading():
     assert settings.HOST == "0.0.0.0"
     assert settings.PORT == 8000
     assert settings.VIDEO_RETAIN_SOURCE is True
+    assert settings.VIDEO_MODE == "QUALITY"
+    assert settings.VIDEO_DETECTOR == "rfdetr"
+    assert settings.VIDEO_DEVICE == "cuda"
+    assert settings.VIDEO_TRACKER == "botsort"
+    assert settings.VIDEO_FRAME_SAMPLE_RATE == 1
+    assert settings.VIDEO_MODEL == "rf-detr-small"
 
 
 @pytest.mark.parametrize(

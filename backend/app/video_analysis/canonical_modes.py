@@ -91,9 +91,9 @@ def check_environment_preflight(mode: str) -> None:
             ) from exc
 
         # Check checkpoint path
-        ckpt = LOCKED_RFDETR_CHECKPOINT_PATH
+        ckpt = Path(settings.VIDEO_MODEL_PATH) if settings.VIDEO_MODEL_PATH else LOCKED_RFDETR_CHECKPOINT_PATH
         if not ckpt.is_file():
-            ckpt = Path(settings.VIDEO_MODEL_PATH)
+            ckpt = LOCKED_RFDETR_CHECKPOINT_PATH
         if not ckpt.is_file():
             raise RuntimeError(
                 f"QUALITY mode unavailable: RF-DETR checkpoint not configured or missing at {ckpt}."

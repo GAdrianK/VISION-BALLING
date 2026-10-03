@@ -14,41 +14,48 @@ Le module `backend/app/video_analysis/` fournit un pipeline local versionné `0.
 - `service.py` : orchestration, progression et réutilisation d'un résultat par clé d'analyse reproductible.
 - `reproducibility.py` : configuration canonique, checksum modèle, clé d'analyse et commit Git.
 
-## Détecteurs disponibles
+## Détecteurs & Modes Canoniques (RC2)
 
-### HOG par défaut
+La plateforme supporte deux modes opérationnels canoniques validés :
 
-`VIDEO_DETECTOR=hog` utilise OpenCV HOG sur CPU. Il fonctionne sans poids externe et détecte des personnes candidates. Il ne détecte pas le ballon et aucune précision football n'est revendiquée.
+### 1. Mode QUALITY (Défaut de Production RC2)
 
-### YOLO facultatif
+`VIDEO_MODE=QUALITY`
+- **Détecteur** : RF-DETR Small @ 960px (`rfdetr`) sur GPU CUDA.
+- **Poids** : Checkpoint verrouillé EXP-04 (`checkpoint_best_total.pth`). Empreinte SHA-256 obligatoire : `c1a1d88b74edc5ddefa7da4581e2848c4c58c3938d88ad4a1b615f071752ffff`.
+- **Tracking joueurs** : BoT-SORT avec compensation de mouvement global (GMC).
+- **Tracking ballon** : BallTrackManager V2 (Kalman 2D + découplage observations/prédictions).
+- **Attribution d'équipe & rôle** : Clustering non supervisé K-Means Lab/HSV.
+- **Chaîne tactique** : Hauteur de bloc, compacité métrique, PressureIndex continu (EXP-23), Possession V2 (EXP-22), transitions causales (EXP-25) et rapport ancré (EXP-26).
 
-`VIDEO_DETECTOR=yolo` charge un poids présent localement à `VIDEO_MODEL_PATH`. Les dépendances sont isolées dans `backend/requirements-video.txt`. Le dépôt ne contient ni ne télécharge de poids.
+### 2. Mode LOW_LATENCY (Cadence Élevée)
 
-Deux profils de classes sont présents :
+`VIDEO_MODE=LOW_LATENCY`
+- **Détecteur** : YOLO11n @ 640px (`yolo11n.pt`) sur CUDA ou CPU.
+- **Tracking joueurs** : ByteTrack cinématique rapide sans GMC.
+- **Cadence** : ~24 FPS pour prévisualisation et exploitation rapide.
 
-- `coco` : classes usuelles, dont `person` et `sports ball` ;
-- `h250` : mapping local `0 = ball`, `1 = person`.
+> **Note historique sur HOG** : OpenCV HOG était une baseline minimale sur CPU pour les premiers tests unitaires (Sprint 2). Il est formellement déprécié, incompatible avec OpenCV 5+, et ne doit jamais être utilisé en production.
 
-Le profil H250 est vérifié par des tests de mapping, pas validé sur les vidéos golden ni sur le terrain.
+## Configuration Principale (RC2)
 
-## Configuration principale
-
-| Variable | Défaut | Effet |
+| Variable | Défaut RC2 | Effet |
 |---|---|---|
-| `VIDEO_DETECTOR` | `hog` | sélectionne HOG ou YOLO |
-| `VIDEO_MODEL_PATH` | `yolo11n.pt` | chemin du poids YOLO local |
-| `VIDEO_MODEL_PROFILE` | `coco` | sélectionne le profil de classes |
-| `VIDEO_DEVICE` | `cpu` | périphérique transmis au détecteur |
-| `VIDEO_FRAME_SAMPLE_RATE` | `10` | exécute une inférence toutes les N frames source ; ce n'est pas une valeur FPS |
-| `VIDEO_TRACKING_ENABLED` | `true` | active les trackers configurés |
-| `VIDEO_TRACKER` | `iou` | tracker de personnes |
-| `VIDEO_BALL_TRACK_MAX_MISSING_SECONDS` | `0.2` | durée maximale d'extrapolation du ballon |
-| `VIDEO_BALL_TRACK_MAX_DISTANCE_RATIO` | `0.15` | filtre de déplacement relatif |
-| `VIDEO_BALL_TRAJECTORY_SECONDS` | `0.5` | durée approximative de l'historique de trajectoire affiché |
-| `VIDEO_PRESERVE_AUDIO` | `true` | demande la conservation de l'audio lors de l'encodage |
-| `VIDEO_KEEP_TEMPORARY_FILES` | `false` | conserve les frames et intermédiaires de diagnostic |
-| `VIDEO_RETAIN_SOURCE` | `true` | conserve la vidéo source pour une réanalyse reproductible |
-| `VIDEO_GIT_SHA` | vide | injecte le commit du build quand `.git` n'est pas disponible |
+| `VIDEO_MODE` | `QUALITY` | Sélectionne le mode canonique (`QUALITY` ou `LOW_LATENCY`) |
+| `VIDEO_DETECTOR` | `rfdetr` | Détecteur d'objets (`rfdetr` en Quality, `yolo11n` en Low Latency) |
+| `VIDEO_MODEL_PATH` | chemin checkpoint | Chemin absolu vers le checkpoint RF-DETR (`checkpoint_best_total.pth`) |
+| `VIDEO_MODEL_PROFILE` | `football` | Profil de classes (`football` ou `coco`) |
+| `VIDEO_DEVICE` | `cuda` | Périphérique d'inférence (`cuda` requis en production) |
+| `VIDEO_FRAME_SAMPLE_RATE` | `1` | Fréquence d'échantillonnage d'inférence (1 = chaque frame) |
+| `VIDEO_TRACKING_ENABLED` | `true` | Active les trackers multi-objets |
+| `VIDEO_TRACKER` | `botsort` | Tracker de joueurs (`botsort` en Quality, `bytetrack` en Low Latency) |
+| `VIDEO_BALL_TRACK_MAX_MISSING_SECONDS` | `0.2` | Durée maximale d'extrapolation du ballon |
+| `VIDEO_BALL_TRACK_MAX_DISTANCE_RATIO` | `0.15` | Filtre de déplacement relatif du ballon |
+| `VIDEO_BALL_TRAJECTORY_SECONDS` | `0.5` | Historique visuel de trajectoire affiché |
+| `VIDEO_PRESERVE_AUDIO` | `true` | Conservation de la piste audio lors de la normalisation |
+| `VIDEO_KEEP_TEMPORARY_FILES` | `false` | Conserve les frames et intermédiaires de diagnostic |
+| `VIDEO_RETAIN_SOURCE` | `true` | Conserve la vidéo source pour réanalyse |
+| `VIDEO_GIT_SHA` | vide | Injecte le commit Git du build si `.git` absent |
 
 Les autres contraintes d'entrée sont centralisées dans `backend/app/core/config.py`.
 
