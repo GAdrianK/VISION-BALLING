@@ -15,6 +15,7 @@ from fastapi.responses import FileResponse
 
 from app.core.config import settings
 from app.video_analysis.backends import diagnose_video_backend
+from app.video_analysis.canonical_modes import check_environment_preflight
 from app.video_analysis.schemas import (
     AnalysisCreated,
     AnalysisJob,
@@ -45,10 +46,26 @@ async def create_analysis(
     background_tasks: BackgroundTasks,
     video: UploadFile = File(...),
     match_id: str | None = Form(default=None),
+    mode: str = Form(default="QUALITY"),
     service: VideoAnalysisService = Depends(get_video_analysis_service),
 ) -> AnalysisCreated:
+    mode_upper = mode.strip().upper()
+    if mode_upper not in ("QUALITY", "LOW_LATENCY"):
+        raise HTTPException(
+            status_code=422,
+            detail=f"Mode inconnu '{mode}'. Modes autorisés : 'QUALITY', 'LOW_LATENCY'.",
+        )
     try:
-        created = await service.create(video, match_id)
+        check_environment_preflight(mode_upper)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500, detail=f"Erreur de prévol environnement : {exc}"
+        ) from exc
+
+    try:
+        created = await service.create(video, match_id=match_id, mode=mode_upper)
     except VideoValidationError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     if not created.reused:
@@ -183,37 +200,65 @@ def query_video_analysis(
         raise HTTPException(status_code=500, detail=f"Erreur d'interrogation vidéo : {exc}") from exc
 
 
+def _resolve_evidence_dir(analysis_id: str, service: VideoAnalysisService) -> Path:
+    try:
+        session_dir = service.storage.analysis_dir(analysis_id)
+        if (session_dir / "tactical_events.json").is_file():
+            return session_dir
+    except Exception:
+        pass
+    return Path("docs/experiments/exp25_outputs")
+
+
 @router.get("/{analysis_id}/timeline")
-def get_video_analysis_timeline(analysis_id: str) -> list:
+def get_video_analysis_timeline(
+    analysis_id: str,
+    service: VideoAnalysisService = Depends(get_video_analysis_service),
+) -> list:
     """Renvoie la chronologie ordonnée des événements tactiques de la vidéo."""
-    store = MatchEvidenceRegistry.get_or_load(analysis_id)
+    ev_dir = _resolve_evidence_dir(analysis_id, service)
+    store = MatchEvidenceRegistry.get_or_load(analysis_id, evidence_dir=ev_dir)
     if not store.is_loaded or not store.timeline:
         raise HTTPException(status_code=404, detail="Chronologie introuvable pour cette analyse.")
     return [e.model_dump() if hasattr(e, "model_dump") else e.__dict__ for e in store.timeline]
 
 
 @router.get("/{analysis_id}/events")
-def get_video_analysis_events(analysis_id: str) -> list:
+def get_video_analysis_events(
+    analysis_id: str,
+    service: VideoAnalysisService = Depends(get_video_analysis_service),
+) -> list:
     """Renvoie l'index complet des événements probants de la vidéo."""
-    store = MatchEvidenceRegistry.get_or_load(analysis_id)
+    ev_dir = _resolve_evidence_dir(analysis_id, service)
+    store = MatchEvidenceRegistry.get_or_load(analysis_id, evidence_dir=ev_dir)
     if not store.is_loaded or not store.events_by_id:
         raise HTTPException(status_code=404, detail="Événements introuvables pour cette analyse.")
     return [e.model_dump() if hasattr(e, "model_dump") else e.__dict__ for e in store.events_by_id.values()]
 
 
 @router.get("/{analysis_id}/summary")
-def get_video_analysis_summary(analysis_id: str) -> dict:
+def get_video_analysis_summary(
+    analysis_id: str,
+    service: VideoAnalysisService = Depends(get_video_analysis_service),
+) -> dict:
     """Renvoie les agrégats tactiques et bandes de fiabilité par équipe."""
-    store = MatchEvidenceRegistry.get_or_load(analysis_id)
+    ev_dir = _resolve_evidence_dir(analysis_id, service)
+    store = MatchEvidenceRegistry.get_or_load(analysis_id, evidence_dir=ev_dir)
     if not store.is_loaded or not store.team_summaries:
         raise HTTPException(status_code=404, detail="Résumé tactique introuvable pour cette analyse.")
     return store.team_summaries
 
 
+@router.get("/{analysis_id}/report", response_model=MatchReportResponse)
 @router.post("/{analysis_id}/report", response_model=MatchReportResponse)
-def generate_video_analysis_report(analysis_id: str) -> MatchReportResponse:
+def generate_video_analysis_report(
+    analysis_id: str,
+    service: VideoAnalysisService = Depends(get_video_analysis_service),
+) -> MatchReportResponse:
     """Génère le rapport d'intelligence tactique 100% ancré pour la vidéo."""
     try:
-        return _report_generator.generate_report(analysis_id)
+        ev_dir = _resolve_evidence_dir(analysis_id, service)
+        generator = MatchReportGenerator(evidence_dir=ev_dir)
+        return generator.generate_report(analysis_id)
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Erreur de génération du rapport : {exc}") from exc

@@ -811,6 +811,12 @@ class MatchTacticalTimeline:
     def events(self) -> List[TacticalEvidenceEvent]:
         return self._events
 
+    def __len__(self) -> int:
+        return len(self._events)
+
+    def __iter__(self):
+        return iter(self._events)
+
     def to_jsonl(self, filepath: Union[str, Path]) -> None:
         """Exports timeline to versioned JSONL format."""
         path = Path(filepath)

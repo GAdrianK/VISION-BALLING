@@ -60,6 +60,9 @@ class PipelineMetadata(BaseModel):
     version: str = PIPELINE_VERSION
     pipeline_version: str = PIPELINE_VERSION
     detector: str
+    mode: str = "QUALITY"
+    evidence_origin: str = "REAL_VIDEO_PIPELINE"
+    checkpoint_sha256: str | None = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     frame_sample_rate: int = Field(default=1, ge=1)
     device: str
@@ -152,6 +155,9 @@ class AnalysisJob(BaseModel):
     analysis_id: str
     match_id: str
     status: JobStatus = JobStatus.QUEUED
+    mode: str = "QUALITY"
+    analysis_source: str = "REAL_UPLOAD"
+    evidence_origin: str = "REAL_VIDEO_PIPELINE"
     progress_percent: float = Field(default=0, ge=0, le=100)
     current_step: str = "queued"
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

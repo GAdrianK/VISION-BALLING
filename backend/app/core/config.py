@@ -43,17 +43,18 @@ class Settings(BaseSettings):
     VIDEO_MIN_WIDTH: int = 320
     VIDEO_MIN_HEIGHT: int = 240
     VIDEO_MIN_FREE_DISK_MB: int = 256
-    VIDEO_FRAME_SAMPLE_RATE: int = Field(default=10, ge=1)
-    VIDEO_DETECTOR: str = "hog"
-    VIDEO_MODEL_PATH: str = "yolo11n.pt"
-    VIDEO_MODEL_PROFILE: str = "coco"
-    VIDEO_CONFIDENCE_THRESHOLD: float = 0.45
-    VIDEO_PERSON_CONFIDENCE_THRESHOLD: float = 0.45
+    VIDEO_FRAME_SAMPLE_RATE: int = Field(default=1, ge=1)
+    VIDEO_MODE: str = "QUALITY"
+    VIDEO_DETECTOR: str = "rfdetr"
+    VIDEO_MODEL_PATH: str = "/media/adriano/Windows/runs/detect/exp04_rfdetr_small_h250_960/checkpoint_best_total.pth"
+    VIDEO_MODEL_PROFILE: str = "football"
+    VIDEO_CONFIDENCE_THRESHOLD: float = 0.35
+    VIDEO_PERSON_CONFIDENCE_THRESHOLD: float = 0.35
     VIDEO_BALL_CONFIDENCE_THRESHOLD: float = 0.25
-    VIDEO_MODEL: str = "opencv-hog"
-    VIDEO_DEVICE: str = "cpu"
+    VIDEO_MODEL: str = "rf-detr-small"
+    VIDEO_DEVICE: str = "cuda"
     VIDEO_TRACKING_ENABLED: bool = True
-    VIDEO_TRACKER: str = "iou"
+    VIDEO_TRACKER: str = "botsort"
     VIDEO_BALL_TRACK_MAX_MISSING_SECONDS: float = Field(
         default=0.2, ge=0, allow_inf_nan=False
     )

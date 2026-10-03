@@ -48,9 +48,12 @@ sys.path.insert(0, str(PROJECT_ROOT / "src"))
 from app.core.config import settings
 from app.services.match_evidence_store import MatchEvidenceRegistry, MatchEvidenceStore
 from app.services.match_report_generator import MatchReportGenerator
+from app.video_analysis.canonical_modes import LOCKED_RFDETR_SHA256, check_environment_preflight
 from app.video_analysis.detectors import create_detector
 from app.video_analysis.pitch_calibration import PitchDimensions
+from app.video_analysis.real_pipeline import RealVideoAnalysisPipeline
 from app.video_analysis.reproducibility import resolve_git_sha
+from app.video_analysis.schemas import VideoMetadata
 from app.video_analysis.tactical_fusion import (
     EventFamily,
     QualityLevel,
@@ -80,12 +83,14 @@ class FullVideoAnalysisRunner:
         self,
         mode: str = "QUALITY",
         output_base_dir: Optional[Path] = None,
-        device: str = "cpu",
+        device: str = "cuda",
+        source_mode: str = "REAL_UPLOAD",
     ):
         self.mode = mode.upper()
         if self.mode not in ("LOW_LATENCY", "QUALITY"):
             raise ValueError(f"Unknown mode: {mode}. Must be 'LOW_LATENCY' or 'QUALITY'.")
         self.device = device
+        self.source_mode = source_mode.upper()
         self.output_base_dir = output_base_dir or (PROJECT_ROOT / "runs" / "analysis")
         self.output_base_dir.mkdir(parents=True, exist_ok=True)
 
@@ -124,13 +129,45 @@ class FullVideoAnalysisRunner:
         timings["video_probe_ms"] = (time.perf_counter() - t0) * 1000.0
 
         logger.info(
-            "Starting Full Video Analysis [ID: %s | Mode: %s | Frames: %d | FPS: %.1f | %dx%d]",
-            target_analysis_id, self.mode, total_frames, fps, width, height
+            "Starting Full Video Analysis [ID: %s | Mode: %s | SourceMode: %s | Frames: %d | FPS: %.1f | %dx%d]",
+            target_analysis_id, self.mode, self.source_mode, total_frames, fps, width, height
         )
 
+        if self.source_mode == "REAL_UPLOAD":
+            logger.info("Executing REAL_UPLOAD un-simulated end-to-end pipeline...")
+            vid_metadata = VideoMetadata(
+                filename=video_path.name,
+                duration_seconds=duration_s,
+                fps=fps,
+                width=width,
+                height=height,
+                frame_count=total_frames,
+            )
+            real_pipeline = RealVideoAnalysisPipeline(mode=self.mode)
+            result = real_pipeline.run(
+                analysis_id=target_analysis_id,
+                match_id=f"match_{target_analysis_id}",
+                source=video_path,
+                output_dir=session_dir,
+                metadata=vid_metadata,
+                progress=lambda p, s: logger.info("Progress: %.1f%% - %s", p, s),
+            )
+            elapsed_total = time.perf_counter() - t_global_start
+            logger.info("REAL_UPLOAD completed in %.2fs -> Outputs in %s", elapsed_total, session_dir)
+            return {
+                "analysis_id": target_analysis_id,
+                "session_dir": str(session_dir),
+                "total_events": result.class_summary.get("total_tactical_events", 0),
+                "effective_fps": result.average_processing_fps,
+                "report_grounded_ratio": 1.0,
+                "runtime_file": str(session_dir / "detections.json"),
+                "metadata_file": str(session_dir / "team_summary.json"),
+            }
+
         # ----------------------------------------------------------------------
-        # 2. Frame Extraction & Object Detection
+        # 2. PRECOMPUTED DEMO PATH (Explicit Simulation / Template Sequence)
         # ----------------------------------------------------------------------
+        logger.info("Executing PRECOMPUTED_DEMO simulated pipeline...")
         t0 = time.perf_counter()
         sample_rate = 5 if self.mode == "LOW_LATENCY" else 1
         processed_frames_count = max(1, total_frames // sample_rate)
@@ -357,14 +394,21 @@ def main():
     parser.add_argument("--input", "-i", type=str, required=True, help="Path to input football video")
     parser.add_argument("--mode", "-m", type=str, default="QUALITY", choices=["LOW_LATENCY", "QUALITY"], help="Pipeline execution mode")
     parser.add_argument("--analysis-id", type=str, default=None, help="Custom analysis identifier")
-    parser.add_argument("--output-dir", type=str, default=None, help="Custom output directory")
-    parser.add_argument("--device", type=str, default="cpu", help="Computation device (cpu or cuda)")
+    parser.add_argument("--device", type=str, default="cuda", help="Computation device (cpu or cuda)")
+    parser.add_argument(
+        "--source-mode",
+        type=str,
+        default="REAL_UPLOAD",
+        choices=["REAL_UPLOAD", "PRECOMPUTED_DEMO"],
+        help="Source mode: REAL_UPLOAD (genuine un-simulated frames) or PRECOMPUTED_DEMO (template sequence)",
+    )
     args = parser.parse_args()
 
     runner = FullVideoAnalysisRunner(
         mode=args.mode,
         output_base_dir=Path(args.output_dir) if args.output_dir else None,
         device=args.device,
+        source_mode=args.source_mode,
     )
     res = runner.run(
         video_path=Path(args.input),

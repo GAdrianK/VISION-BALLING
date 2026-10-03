@@ -42,6 +42,11 @@ class OpenCVHOGPersonDetector(ObjectDetector):
         self._hog: cv2.HOGDescriptor | None = None
 
     def load(self) -> None:
+        if not hasattr(cv2, "HOGDescriptor"):
+            raise RuntimeError(
+                f"OpenCV HOGDescriptor indisponible dans OpenCV {getattr(cv2, '__version__', 'unknown')}. "
+                "Le détecteur HOG est obsolète/réservé aux tests unitaires."
+            )
         hog = cv2.HOGDescriptor()
         hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
         self._hog = hog
