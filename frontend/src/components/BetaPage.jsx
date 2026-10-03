@@ -575,7 +575,15 @@ export default function BetaPage({ onNavigate }) {
                     className="beta-checkbox"
                   />
                   <span>
-                    Je confirme être autorisé à transmettre cette vidéo pour son analyse. <span className="beta-required">*</span>
+                    Je confirme disposer des droits et autorisations nécessaires pour transmettre cette vidéo à VISION-BALLING et demander son analyse, notamment lorsque des sportifs identifiables ou mineurs y apparaissent.{" "}
+                    <button
+                      type="button"
+                      className="beta-inline-link"
+                      onClick={() => onNavigate("/beta-terms")}
+                    >
+                      (Voir conditions BETA)
+                    </button>{" "}
+                    <span className="beta-required">*</span>
                   </span>
                 </label>
 
@@ -620,7 +628,7 @@ export default function BetaPage({ onNavigate }) {
 
               {/* Privacy statement below form */}
               <p className="beta-privacy-footer-note">
-                Les vidéos reçues dans le cadre de la BETA ne sont pas rendues publiques. Elles sont utilisées uniquement pour réaliser l&apos;analyse demandée et sont supprimées de l&apos;espace de travail selon la politique de conservation applicable.
+                Les vidéos reçues dans le cadre de la BETA ne sont pas rendues publiques, ne sont pas utilisées pour des démonstrations publiques, ni intégrées à des jeux de données d&apos;entraînement de modèles sans accord exprès. Elles sont utilisées uniquement pour réaliser l&apos;analyse demandée et sont supprimées selon la politique de conservation applicable.
               </p>
             </form>
           </div>

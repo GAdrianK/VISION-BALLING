@@ -18,6 +18,11 @@ class Settings(BaseSettings):
     ENABLE_DOCS: bool | None = Field(default=None)
     MAX_CONCURRENT_ANALYSES: int = Field(default=1, ge=1)
 
+    BETA_DATABASE_URL: str = Field(default="")
+    BETA_REQUEST_RETENTION_DAYS: int = Field(default=180, ge=1)
+    VIDEO_RETENTION_DAYS: int = Field(default=14, ge=1)
+    ANALYSIS_RESULT_RETENTION_DAYS: int = Field(default=30, ge=1)
+
     OPENAI_API_KEY: str = "mock-local-only"
     GEMINI_API_KEY: str = ""
     GOOGLE_API_KEY: str = ""
@@ -153,6 +158,11 @@ class Settings(BaseSettings):
                 raise ValueError(
                     "Production security violation: ALLOWED_ORIGINS cannot be '*' or empty in production mode. "
                     "Specify explicit allowed origin(s), e.g. 'https://app.vision-balling.com'."
+                )
+            if self.PUBLIC_UPLOAD_ENABLED:
+                raise ValueError(
+                    "Production security violation: PUBLIC_UPLOAD_ENABLED must be False in production mode. "
+                    "Direct GPU public uploads are disabled during the public beta pilot."
                 )
         return self
 

@@ -632,6 +632,23 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--muted);
 }
 
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px;
+}
+
+.footer-link {
+  color: var(--muted);
+  text-decoration: underline;
+  transition: color var(--transition-fast);
+}
+
+.footer-link:hover {
+  color: var(--text);
+}
+
 /* ==============================================================================
    PUBLIC BETA PILOTE INTAKE & PHYSICAL STAMP STYLING
    ============================================================================== */

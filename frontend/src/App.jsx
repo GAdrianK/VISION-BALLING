@@ -7,6 +7,10 @@ import ProjectPage from "./components/ProjectPage";
 import ContactPage from "./components/ContactPage";
 import BetaPage from "./components/BetaPage";
 import PrivacyPage from "./components/PrivacyPage";
+import LegalPage from "./components/LegalPage";
+import BetaTermsPage from "./components/BetaTermsPage";
+import CookiesPage from "./components/CookiesPage";
+import LicensesPage from "./components/LicensesPage";
 
 export default function App() {
   const [currentPath, setCurrentPath] = useState(() => {
@@ -75,7 +79,15 @@ export default function App() {
 
         {currentPath === "/beta" && <BetaPage onNavigate={navigate} />}
 
+        {currentPath === "/legal" && <LegalPage onNavigate={navigate} />}
+
         {currentPath === "/privacy" && <PrivacyPage onNavigate={navigate} />}
+
+        {currentPath === "/cookies" && <CookiesPage onNavigate={navigate} />}
+
+        {currentPath === "/beta-terms" && <BetaTermsPage onNavigate={navigate} />}
+
+        {currentPath === "/licenses" && <LicensesPage onNavigate={navigate} />}
 
         {currentPath === "/contact" && <ContactPage />}
 
@@ -83,7 +95,11 @@ export default function App() {
           currentPath !== "/demo" &&
           currentPath !== "/project" &&
           currentPath !== "/beta" &&
+          currentPath !== "/legal" &&
           currentPath !== "/privacy" &&
+          currentPath !== "/cookies" &&
+          currentPath !== "/beta-terms" &&
+          currentPath !== "/licenses" &&
           currentPath !== "/contact" && (
             <AnalysisWorkspace
               initialSequenceId={selectedDemoSeq}
@@ -95,29 +111,68 @@ export default function App() {
       {/* Minimal technical footer */}
       <footer className="site-footer">
         <div>
-          <span>VISION-BALLING · v0.9.0-rc2 · INTELLIGENCE TACTIQUE ANCRÉE</span>
+          <span>VISION-BALLING · v0.9.0-rc2 · INSTRUMENT D&apos;ANALYSE TACTIQUE</span>
         </div>
-        <div style={{ display: "flex", gap: "20px" }}>
+        <nav className="footer-links" aria-label="Informations légales et conformité">
+          <a
+            href="/legal"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate("/legal");
+            }}
+            className="footer-link"
+          >
+            MENTIONS LÉGALES
+          </a>
           <a
             href="/privacy"
             onClick={(e) => {
               e.preventDefault();
               navigate("/privacy");
             }}
-            style={{ textDecoration: "underline" }}
+            className="footer-link"
           >
             CONFIDENTIALITÉ
+          </a>
+          <a
+            href="/cookies"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate("/cookies");
+            }}
+            className="footer-link"
+          >
+            COOKIES
+          </a>
+          <a
+            href="/beta-terms"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate("/beta-terms");
+            }}
+            className="footer-link"
+          >
+            CONDITIONS BETA
+          </a>
+          <a
+            href="/licenses"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate("/licenses");
+            }}
+            className="footer-link"
+          >
+            LICENCES
           </a>
           <a
             href="https://github.com/GAdrianK/football-intelligence-rag"
             target="_blank"
             rel="noreferrer"
-            style={{ textDecoration: "underline" }}
+            className="footer-link"
           >
             GITHUB
           </a>
-          <span>2026 · TOUS DROITS RÉSERVÉS</span>
-        </div>
+        </nav>
       </footer>
     </div>
   );

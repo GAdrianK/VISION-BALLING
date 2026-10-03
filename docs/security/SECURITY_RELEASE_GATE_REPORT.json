@@ -1,7 +1,7 @@
 {
   "version": "v0.9.0-rc2",
-  "generated_at": "2026-10-03T20:02:41.270368+00:00",
-  "git_commit": "fd0a49f0f5ae3c749b619cff7126631448b89162",
+  "generated_at": "2026-10-03T20:26:45.214425+00:00",
+  "git_commit": "13dcb7b646c45beeae64dff4c987ac81dc37d87a",
   "git_branch": "feat/public-beta-intake",
   "gate_status": "PASSED",
   "checks": [

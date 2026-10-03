@@ -161,7 +161,11 @@ class BetaAnalysisRequestCreate(BaseModel):
     @classmethod
     def validate_video_authorization(cls, v: bool) -> bool:
         if not v:
-            raise ValueError("Vous devez confirmer être autorisé à transmettre cette vidéo.")
+            raise ValueError(
+                "Vous devez confirmer disposer des droits et autorisations nécessaires pour "
+                "transmettre cette vidéo à VISION-BALLING et demander son analyse, "
+                "notamment lorsque des sportifs identifiables ou mineurs y apparaissent."
+            )
         return v
 
     @field_validator("temporary_storage_consent")
