@@ -185,28 +185,33 @@ class SmokeTestRunner:
                 self.log_pass(f"Asset {path} clean (no localhost leakage)")
 
     def check_beta_intake_form(self) -> None:
-        url = f"{self.api_url}/api/beta/requests"
+        url = f"{self.api_url}/api/beta-requests"
         payload = {
-            "applicant_name": "Smoke Test Auditor",
-            "applicant_email": "smoke-test-verify@vision-balling.test",
-            "club_name": "Smoke Test Football Club",
-            "role": "Chief Technology Auditor",
-            "match_category": "professional",
+            "name": "Smoke Test Auditor",
+            "club": "Smoke Test FC",
+            "role": "Analyste vidéo",
+            "email": "smoke-test-verify@vision-balling.test",
+            "phone": "+33600000000",
+            "team_category": "Senior",
+            "competition_level": "Régional 1",
+            "opponent": "Test Adversaire",
+            "video_type": "Match complet",
             "video_url": "https://drive.google.com/file/d/1234567890abcdef/view",
-            "tactical_focus": "System end-to-end smoke verification",
-            "agreed_to_terms": True,
-            "data_processing_consent": True,
-            "website_honeypot": "",  # Anti-spam honeypot must remain empty
+            "analysis_objectives": ["Bloc / compacité", "Pressing", "Transitions"],
+            "message": "Automated post-deployment smoke verification",
+            "video_authorization_confirmed": True,
+            "temporary_storage_consent": True,
+            "honeypot": "",
         }
         status, _, body = fetch(url, method="POST", data=payload)
         if status == 201:
             try:
                 data = json.loads(body)
-                req_id = data.get("request_id")
+                req_id = data.get("id")
                 if req_id:
                     self.log_pass(f"BETA intake submission test passed (request_id: {req_id})")
                 else:
-                    self.log_fail(f"BETA intake returned 201 but no request_id: {body}")
+                    self.log_fail(f"BETA intake returned 201 but no id field: {body}")
             except Exception as e:
                 self.log_fail(f"BETA intake returned 201 but invalid JSON: {e}")
         else:
