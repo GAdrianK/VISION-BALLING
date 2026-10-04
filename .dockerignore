@@ -8,6 +8,10 @@ weights/
 *.pth
 *.pt
 .venv*
+.env*
+*.env
+credentials*
+secrets*
 frontend/node_modules/
 frontend/dist/
 .ruff_cache/

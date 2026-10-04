@@ -580,8 +580,7 @@ class RealVideoAnalysisPipeline:
         with open(output_dir / "event_graph.json", "w", encoding="utf-8") as f:
             json.dump(graph_data, f, indent=2, ensure_ascii=False)
 
-        # Register in session store for Q&A
-        MatchEvidenceRegistry.clear()
+        # Register in session store for Q&A (isolated per analysis_id)
         MatchEvidenceRegistry.get_or_load(analysis_id, evidence_dir=output_dir)
 
         # ----------------------------------------------------------------------

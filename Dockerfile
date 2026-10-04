@@ -27,6 +27,12 @@ RUN pip install --no-cache-dir -r /app/backend/requirements.txt
 COPY backend /app/backend
 COPY knowledge_base /app/knowledge_base
 
+# Run as non-root user
+RUN groupadd -r appuser && useradd -r -g appuser -d /app -s /sbin/nologin appuser \
+    && chown -R appuser:appuser /app
+
+USER appuser
+
 EXPOSE 8000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \

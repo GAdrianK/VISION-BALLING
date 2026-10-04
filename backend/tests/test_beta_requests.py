@@ -24,9 +24,9 @@ def client(temp_beta_service: BetaService):
 
 
 def test_redact_url_for_logging():
-    url_with_token = "https://drive.google.com/file/d/12345/view?usp=sharing&token=secret123"
+    url_with_token = "https://drive.google.com/file/d/12345/view?usp=sharing&auth_token=token_sample_abc123"
     redacted = redact_url_for_logging(url_with_token)
-    assert "token=secret123" not in redacted
+    assert "token_sample_abc123" not in redacted
     assert redacted == "https://drive.google.com/file/d/12345/view?..."
 
     url_clean = "https://wetransfer.com/downloads/abc"
@@ -262,10 +262,10 @@ def test_beta_submission_triggers_email_notification(
     from unittest.mock import MagicMock, patch
     from app.core.config import settings
 
-    monkeypatch.setattr(settings, "SMTP_HOST", "smtp.test.net")
+    monkeypatch.setattr(settings, "SMTP_HOST", "mail.test.example")
     monkeypatch.setattr(settings, "SMTP_PORT", 587)
-    monkeypatch.setattr(settings, "SMTP_USERNAME", "bot@vision-balling.fr")
-    monkeypatch.setattr(settings, "SMTP_PASSWORD", "mock-secret-pw")
+    monkeypatch.setattr(settings, "SMTP_USERNAME", "test-bot@example.invalid")
+    monkeypatch.setattr(settings, "SMTP_PASSWORD", "DUMMY-MOCK-TEST-AUTH-PASS")
     monkeypatch.setattr(settings, "BETA_NOTIFICATION_EMAIL", "contact@vision-balling.fr")
 
     payload = {
@@ -317,10 +317,10 @@ def test_beta_submission_succeeds_when_smtp_fails(
     import smtplib
     from app.core.config import settings
 
-    monkeypatch.setattr(settings, "SMTP_HOST", "smtp.test.net")
+    monkeypatch.setattr(settings, "SMTP_HOST", "mail.test.example")
     monkeypatch.setattr(settings, "SMTP_PORT", 587)
-    monkeypatch.setattr(settings, "SMTP_USERNAME", "bot@vision-balling.fr")
-    monkeypatch.setattr(settings, "SMTP_PASSWORD", "super_secret_password_do_not_log")
+    monkeypatch.setattr(settings, "SMTP_USERNAME", "test-bot@example.invalid")
+    monkeypatch.setattr(settings, "SMTP_PASSWORD", "DUMMY-DO-NOT-LOG-SECRET-XYZ")
     monkeypatch.setattr(settings, "BETA_NOTIFICATION_EMAIL", "contact@vision-balling.fr")
 
     payload = {
@@ -332,7 +332,7 @@ def test_beta_submission_succeeds_when_smtp_fails(
         "competition_level": "International",
         "opponent": "Espagne",
         "video_type": "Match complet",
-        "video_url": "https://wetransfer.com/downloads/fff123?token=secret_dl_token",
+        "video_url": "https://wetransfer.com/downloads/fff123?auth_token=token_sample_abc123",
         "analysis_objectives": ["Bloc / compacité"],
         "video_authorization_confirmed": True,
         "temporary_storage_consent": True,
@@ -355,5 +355,46 @@ def test_beta_submission_succeeds_when_smtp_fails(
     assert stored["club"] == "Équipe de France"
 
     # 3. Secrets and private video tokens must NOT be leaked into logs
-    assert "super_secret_password_do_not_log" not in caplog.text
-    assert "secret_dl_token" not in caplog.text
+    assert "DUMMY-DO-NOT-LOG-SECRET-XYZ" not in caplog.text
+    assert "token_sample_abc123" not in caplog.text
+
+
+def test_beta_crlf_injection_neutralized(client: TestClient, temp_beta_service: BetaService):
+    """
+    Vérifie que les tentatives d'injection CRLF (\r\n) dans les champs texte
+    (susceptibles d'affecter les en-têtes SMTP ou les logs) sont neutralisées.
+    """
+    payload = {
+        "name": "Jean-Pierre\r\nAttacker",
+        "club": "FC Test\r\nBcc: evil@attacker.invalid\r\n",
+        "role": "Entraîneur",
+        "email": "coach@test.invalid",
+        "phone": "+33 6 12 34 56 78",
+        "team_category": "Séniors\nInjection",
+        "competition_level": "Régional 1\rInjection",
+        "opponent": "Adversaire\r\nTest",
+        "video_type": "Match complet",
+        "video_url": "https://example.invalid/match.mp4",
+        "analysis_objectives": ["Bloc / compacité"],
+        "message": "Message multi-lignes\nAutorisé ici\r\nNormalisé",
+        "video_authorization_confirmed": True,
+        "temporary_storage_consent": True,
+    }
+
+    res = client.post("/api/beta-requests", json=payload)
+    assert res.status_code == 201
+    data = res.json()
+
+    stored = temp_beta_service.get_request(data["id"])
+    assert stored is not None
+    # Vérification qu'aucun CRLF ne subsiste dans les champs mono-lignes
+    assert "\r" not in stored["name"]
+    assert "\n" not in stored["name"]
+    assert stored["name"] == "Jean-Pierre Attacker"
+
+    assert "\r" not in stored["club"]
+    assert "\n" not in stored["club"]
+    assert stored["club"] == "FC Test Bcc: evil@attacker.invalid"
+
+    assert "\r" not in stored["opponent"]
+    assert "\n" not in stored["opponent"]

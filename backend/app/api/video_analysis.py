@@ -90,7 +90,11 @@ def verify_analysis_access(
     if not settings.REQUIRE_ANALYSIS_TOKEN:
         return job
 
-    if job.access_token_hash:
+    valid_hashes = list(job.access_token_hashes)
+    if job.access_token_hash and job.access_token_hash not in valid_hashes:
+        valid_hashes.append(job.access_token_hash)
+
+    if valid_hashes:
         provided = None
         if authorization and authorization.lower().startswith("bearer "):
             provided = authorization[7:].strip()
@@ -107,7 +111,8 @@ def verify_analysis_access(
             )
 
         candidate_hash = hashlib.sha256(provided.encode("utf-8")).hexdigest()
-        if not hmac.compare_digest(candidate_hash, job.access_token_hash):
+        matched = any(hmac.compare_digest(candidate_hash, h) for h in valid_hashes)
+        if not matched:
             raise HTTPException(
                 status_code=403,
                 detail="Accès interdit : token d'autorisation invalide pour cette analyse.",

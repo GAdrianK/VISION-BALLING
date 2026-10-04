@@ -170,6 +170,7 @@ class AnalysisJob(BaseModel):
     warnings: list[str] = Field(default_factory=list)
     result_available: bool = False
     access_token_hash: str | None = None
+    access_token_hashes: list[str] = Field(default_factory=list)
 
 
 class AnalysisCreated(BaseModel):

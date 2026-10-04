@@ -454,3 +454,82 @@ def test_create_endpoint_rejects_when_public_upload_disabled(sample_video: Path,
     finally:
         app.dependency_overrides.clear()
 
+
+def test_video_analysis_multitenant_token_preservation_on_reuse(
+    sample_video: Path,
+    video_settings: Settings,
+    tmp_path: Path,
+):
+    """
+    Vérifie que la réutilisation / déduplication d'une analyse vidéo n'écrase pas
+    le token du premier propriétaire (multi-tenant job preservation).
+    """
+    service = VideoAnalysisService(
+        video_settings,
+        detector=FakeDetector(),
+    )
+    app.dependency_overrides[get_video_analysis_service] = lambda: service
+    app.dependency_overrides[get_analysis_settings] = lambda: video_settings
+
+    try:
+        with TestClient(app) as api:
+            # 1. Premier upload
+            with sample_video.open("rb") as f1:
+                r1 = api.post(
+                    "/api/video-analysis",
+                    files={"video": ("sample.avi", f1, "video/x-msvideo")},
+                    data={"match_id": "match_user_1"},
+                )
+            assert r1.status_code == 202
+            d1 = r1.json()
+            analysis_id = d1["analysis_id"]
+            token_user_1 = d1["access_token"]
+            assert token_user_1 is not None
+
+            # Attendre que le traitement soit terminé
+            import time
+            for _ in range(50):
+                check = api.get(
+                    f"/api/video-analysis/{analysis_id}",
+                    headers={"Authorization": f"Bearer {token_user_1}"},
+                )
+                if check.status_code == 200 and check.json()["status"] == "completed":
+                    break
+                time.sleep(0.1)
+
+            # 2. Deuxième upload par un autre utilisateur (même contenu vidéo)
+            with sample_video.open("rb") as f2:
+                r2 = api.post(
+                    "/api/video-analysis",
+                    files={"video": ("sample.avi", f2, "video/x-msvideo")},
+                    data={"match_id": "match_user_2"},
+                )
+            assert r2.status_code in (200, 202)
+            d2 = r2.json()
+            assert d2["reused"] is True
+            assert d2["analysis_id"] == analysis_id
+            token_user_2 = d2["access_token"]
+            assert token_user_2 is not None
+            assert token_user_2 != token_user_1
+
+            # 3. Les DEUX utilisateurs doivent toujours avoir accès sans être invalidés
+            s1 = api.get(
+                f"/api/video-analysis/{analysis_id}",
+                headers={"Authorization": f"Bearer {token_user_1}"},
+            )
+            assert s1.status_code == 200, "Le token du premier utilisateur ne doit pas être écrasé"
+
+            s2 = api.get(
+                f"/api/video-analysis/{analysis_id}",
+                headers={"Authorization": f"Bearer {token_user_2}"},
+            )
+            assert s2.status_code == 200, "Le token du second utilisateur doit être valide"
+
+            # 4. Token inconnu -> 403
+            bad = api.get(
+                f"/api/video-analysis/{analysis_id}",
+                headers={"Authorization": "Bearer bad-token-xyz"},
+            )
+            assert bad.status_code == 403
+    finally:
+        app.dependency_overrides.clear()

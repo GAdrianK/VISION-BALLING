@@ -17,13 +17,21 @@ router = APIRouter(prefix="/api/beta-requests", tags=["beta-requests"])
 
 
 def get_client_ip(request: Request) -> str:
-    """Extracts client IP safely, considering X-Forwarded-For if available."""
+    """Extracts client IP safely, prioritizing trusted reverse proxy headers."""
+    cf_ip = request.headers.get("cf-connecting-ip")
+    if cf_ip and cf_ip.strip():
+        return cf_ip.strip()
+
+    real_ip = request.headers.get("x-real-ip")
+    if real_ip and real_ip.strip():
+        return real_ip.strip()
+
     forwarded_for = request.headers.get("x-forwarded-for")
     if forwarded_for:
-        # First IP in the list is the client IP
-        ip = forwarded_for.split(",")[0].strip()
-        if ip:
-            return ip
+        parts = [p.strip() for p in forwarded_for.split(",") if p.strip()]
+        if parts:
+            return parts[-1] if len(parts) > 1 else parts[0]
+
     if request.client and request.client.host:
         return request.client.host
     return "127.0.0.1"

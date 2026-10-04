@@ -151,7 +151,12 @@ class VideoAnalysisService:
         completed = self.storage.find_completed_by_analysis_key(analysis_key)
         if completed:
             temporary.unlink(missing_ok=True)
-            completed.access_token_hash = token_hash
+            if completed.access_token_hash and completed.access_token_hash not in completed.access_token_hashes:
+                completed.access_token_hashes.append(completed.access_token_hash)
+            if token_hash not in completed.access_token_hashes:
+                completed.access_token_hashes.append(token_hash)
+            if not completed.access_token_hash:
+                completed.access_token_hash = token_hash
             self.storage.save_job(completed)
             return AnalysisCreated(
                 analysis_id=completed.analysis_id,
@@ -174,6 +179,7 @@ class VideoAnalysisService:
             analysis_key=analysis_key,
             pipeline=pipeline_metadata,
             access_token_hash=token_hash,
+            access_token_hashes=[token_hash],
         )
         self.storage.create_job(job)
         source = directory / f"source.{extension}"
@@ -288,8 +294,11 @@ class VideoAnalysisService:
                 source.unlink(missing_ok=True)
             logger.info("video_job_completed analysis_id=%s", analysis_id)
         except VideoValidationError as exc:
+            source.unlink(missing_ok=True)
             self._fail(job, "invalid_video", str(exc))
         except Exception as exc:
+            if not self.settings.VIDEO_RETAIN_SOURCE:
+                source.unlink(missing_ok=True)
             logger.exception("video_job_failed analysis_id=%s", analysis_id)
             self._fail(job, "processing_failed", str(exc))
 

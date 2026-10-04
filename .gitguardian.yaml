@@ -1,0 +1,8 @@
+# GitGuardian Security Configuration
+# Explicitly ignores mock test fixtures and scientific validation artifacts.
+version: 2
+secret:
+  ignored_paths:
+    - "backend/tests/**"
+    - "data/manifests/**"
+    - "docs/audits/**"

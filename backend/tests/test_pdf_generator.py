@@ -47,3 +47,25 @@ def test_export_pdf_endpoint(sample_pdf_request):
     assert isinstance(content, bytes)
     assert len(content) > 0
     assert content.startswith(b"%PDF")
+
+
+def test_pdf_generator_xml_escaping():
+    """
+    Vérifie que les balises HTML/XML malveillantes (tentatives de LFI/SSRF ou XSS)
+    sont neutralisées via html.escape et ne provoquent pas d'erreur ReportLab.
+    """
+    payload = {
+        "title": "<img src=\"/etc/passwd\"/> <script>alert(1)</script> Titre Malveillant",
+        "coach": "<font color=\"red\">Coach <b>Injected</b></font>",
+        "date": "01/01/2026",
+        "blocks": [
+            {
+                "title": "Block <img src=\"http://169.254.169.254/latest/meta-data/\"/>",
+                "content": "Ligne 1 &amp; Ligne 2\n<script src=\"evil.js\"></script>\n<unclosed tag"
+            }
+        ]
+    }
+    response = client.post("/api/export-pdf", json=payload)
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "application/pdf"
+    assert response.content.startswith(b"%PDF")

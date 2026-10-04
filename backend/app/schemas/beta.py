@@ -51,9 +51,18 @@ def sanitize_text(value: str) -> str:
     """Strips whitespace and removes null bytes or control characters."""
     if not value:
         return ""
-    # Strip null bytes and control chars except space
+    # Strip null bytes and control chars except space, newline and carriage return
     cleaned = re.sub(r"[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]", "", value)
     return cleaned.strip()
+
+
+def sanitize_single_line(value: str) -> str:
+    """Strips whitespace, converts newlines/CRLF/tabs to spaces, and removes control characters."""
+    if not value:
+        return ""
+    cleaned = re.sub(r"[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]", "", value)
+    cleaned = re.sub(r"[\r\n\t]+", " ", cleaned)
+    return re.sub(r"\s+", " ", cleaned).strip()
 
 
 EMAIL_REGEX = re.compile(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$")
@@ -79,7 +88,7 @@ class BetaAnalysisRequestCreate(BaseModel):
     @field_validator("name", "club", "team_category", "competition_level")
     @classmethod
     def validate_text_fields(cls, v: str) -> str:
-        cleaned = sanitize_text(v)
+        cleaned = sanitize_single_line(v)
         if len(cleaned) < 2:
             raise ValueError("Ce champ doit contenir au moins 2 caractères.")
         return cleaned
@@ -87,7 +96,7 @@ class BetaAnalysisRequestCreate(BaseModel):
     @field_validator("email")
     @classmethod
     def validate_email(cls, v: str) -> str:
-        cleaned = sanitize_text(v).lower()
+        cleaned = sanitize_single_line(v).lower()
         if not EMAIL_REGEX.match(cleaned):
             raise ValueError("Format d'adresse email invalide.")
         return cleaned
@@ -95,7 +104,7 @@ class BetaAnalysisRequestCreate(BaseModel):
     @field_validator("role")
     @classmethod
     def validate_role(cls, v: str) -> str:
-        cleaned = sanitize_text(v)
+        cleaned = sanitize_single_line(v)
         if cleaned not in ALLOWED_ROLES:
             raise ValueError(f"Rôle non valide. Valeurs autorisées: {', '.join(ALLOWED_ROLES)}")
         return cleaned
@@ -103,7 +112,7 @@ class BetaAnalysisRequestCreate(BaseModel):
     @field_validator("video_type")
     @classmethod
     def validate_video_type(cls, v: str) -> str:
-        cleaned = sanitize_text(v)
+        cleaned = sanitize_single_line(v)
         if cleaned not in ALLOWED_VIDEO_TYPES:
             raise ValueError(f"Type de vidéo non valide. Valeurs autorisées: {', '.join(ALLOWED_VIDEO_TYPES)}")
         return cleaned
@@ -115,16 +124,24 @@ class BetaAnalysisRequestCreate(BaseModel):
             raise ValueError("Au moins un objectif d'analyse doit être sélectionné.")
         cleaned_list = []
         for obj in v:
-            cleaned_obj = sanitize_text(obj)
+            cleaned_obj = sanitize_single_line(obj)
             if cleaned_obj not in ALLOWED_OBJECTIVES:
                 raise ValueError(f"Objectif '{cleaned_obj}' non reconnu.")
             if cleaned_obj not in cleaned_list:
                 cleaned_list.append(cleaned_obj)
         return cleaned_list
 
-    @field_validator("phone", "opponent", "message")
+    @field_validator("phone", "opponent")
     @classmethod
-    def validate_optional_text(cls, v: Optional[str]) -> Optional[str]:
+    def validate_optional_single_line(cls, v: Optional[str]) -> Optional[str]:
+        if v is None:
+            return None
+        cleaned = sanitize_single_line(v)
+        return cleaned if cleaned else None
+
+    @field_validator("message")
+    @classmethod
+    def validate_optional_message(cls, v: Optional[str]) -> Optional[str]:
         if v is None:
             return None
         cleaned = sanitize_text(v)

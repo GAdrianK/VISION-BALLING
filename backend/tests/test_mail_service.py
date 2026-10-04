@@ -63,10 +63,10 @@ def test_mail_service_unconfigured_skips_safely(sample_beta_request: BetaAnalysi
 
 def test_mail_service_success_smtp_587(sample_beta_request: BetaAnalysisRequestCreate):
     cfg = Settings(
-        SMTP_HOST="smtp.mail.ovh.net",
+        SMTP_HOST="mail.test.example",
         SMTP_PORT=587,
-        SMTP_USERNAME="contact@vision-balling.fr",
-        SMTP_PASSWORD="mock-smtp-password",
+        SMTP_USERNAME="test-sender@example.invalid",
+        SMTP_PASSWORD="DUMMY-MOCK-TEST-AUTH-PASS",
         SMTP_USE_TLS=True,
         BETA_NOTIFICATION_EMAIL="contact@vision-balling.fr",
     )
@@ -84,15 +84,15 @@ def test_mail_service_success_smtp_587(sample_beta_request: BetaAnalysisRequestC
         )
 
         assert success is True
-        mock_smtp_cls.assert_called_once_with("smtp.mail.ovh.net", 587, timeout=10.0)
+        mock_smtp_cls.assert_called_once_with("mail.test.example", 587, timeout=10.0)
         mock_server.starttls.assert_called_once()
-        mock_server.login.assert_called_once_with("contact@vision-balling.fr", "mock-smtp-password")
+        mock_server.login.assert_called_once_with("test-sender@example.invalid", "DUMMY-MOCK-TEST-AUTH-PASS")
         mock_server.send_message.assert_called_once()
 
         sent_msg = mock_server.send_message.call_args[0][0]
         assert sent_msg["Subject"] == "[VISION-BALLING] Nouvelle demande BETA — AS Monaco"
         assert sent_msg["To"] == "contact@vision-balling.fr"
-        assert sent_msg["From"] == "contact@vision-balling.fr"
+        assert sent_msg["From"] == "test-sender@example.invalid"
         content = sent_msg.get_content()
         assert "Thierry Henry" in content
         assert "AS Monaco" in content
@@ -100,10 +100,10 @@ def test_mail_service_success_smtp_587(sample_beta_request: BetaAnalysisRequestC
 
 def test_mail_service_success_ssl_465(sample_beta_request: BetaAnalysisRequestCreate):
     cfg = Settings(
-        SMTP_HOST="ssl0.ovh.net",
+        SMTP_HOST="ssl.test.example",
         SMTP_PORT=465,
-        SMTP_USERNAME="contact@vision-balling.fr",
-        SMTP_PASSWORD="mock-smtp-password",
+        SMTP_USERNAME="test-sender@example.invalid",
+        SMTP_PASSWORD="DUMMY-MOCK-TEST-AUTH-PASS",
         BETA_NOTIFICATION_EMAIL="contact@vision-balling.fr",
     )
     service = MailService(settings_override=cfg)
@@ -120,16 +120,16 @@ def test_mail_service_success_ssl_465(sample_beta_request: BetaAnalysisRequestCr
 
         assert success is True
         mock_ssl_cls.assert_called_once()
-        mock_server.login.assert_called_once_with("contact@vision-balling.fr", "mock-smtp-password")
+        mock_server.login.assert_called_once_with("test-sender@example.invalid", "DUMMY-MOCK-TEST-AUTH-PASS")
         mock_server.send_message.assert_called_once()
 
 
 def test_mail_service_failure_returns_false_and_does_not_raise(sample_beta_request: BetaAnalysisRequestCreate):
     cfg = Settings(
-        SMTP_HOST="smtp.mail.ovh.net",
+        SMTP_HOST="mail.test.example",
         SMTP_PORT=587,
-        SMTP_USERNAME="contact@vision-balling.fr",
-        SMTP_PASSWORD="secret_password_12345",
+        SMTP_USERNAME="test-sender@example.invalid",
+        SMTP_PASSWORD="DUMMY-MOCK-FAIL-AUTH-PASS",
     )
     service = MailService(settings_override=cfg)
 
@@ -146,11 +146,11 @@ def test_mail_service_secrets_never_logged(
     sample_beta_request: BetaAnalysisRequestCreate,
     caplog: pytest.LogCaptureFixture,
 ):
-    secret_pass = "ultra_classified_password_xyz987"
+    secret_pass = "DUMMY-CLASSIFIED-SECRET-XYZ-987"
     cfg = Settings(
-        SMTP_HOST="smtp.mail.ovh.net",
+        SMTP_HOST="mail.test.example",
         SMTP_PORT=587,
-        SMTP_USERNAME="contact@vision-balling.fr",
+        SMTP_USERNAME="test-sender@example.invalid",
         SMTP_PASSWORD=secret_pass,
     )
     service = MailService(settings_override=cfg)

@@ -5,6 +5,11 @@ from datetime import datetime
 from app.schemas.pdf import PDFExportRequest
 from app.services.pdf_generator import generate_pdf_report
 
+import logging
+from app.core.config import settings
+
+logger = logging.getLogger(__name__)
+
 router = APIRouter()
 
 @router.post("/api/export-pdf", summary="Exporter un plan d'entraînement tactique en PDF de terrain")
@@ -28,7 +33,13 @@ def export_pdf(request: PDFExportRequest):
             }
         )
     except Exception as e:
+        logger.exception("Erreur lors de la génération du PDF: %s", e)
+        error_detail = (
+            "Erreur lors de la génération du document PDF."
+            if settings.APP_ENV == "production"
+            else f"Erreur lors de la génération du PDF : {str(e)}"
+        )
         raise HTTPException(
             status_code=500,
-            detail=f"Erreur lors de la génération du PDF : {str(e)}"
+            detail=error_detail
         )

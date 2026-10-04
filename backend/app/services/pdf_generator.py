@@ -1,3 +1,4 @@
+import html
 import io
 from datetime import datetime
 from typing import List
@@ -93,7 +94,10 @@ def generate_pdf_report(request: PDFExportRequest) -> bytes:
     
     # --- HEADER SECTION ---
     # Date automatique si non fournie
-    date_str = request.date if request.date else datetime.now().strftime("%d/%m/%Y")
+    raw_date = request.date if request.date else datetime.now().strftime("%d/%m/%Y")
+    safe_date_str = html.escape(raw_date, quote=True)
+    safe_title = html.escape(request.title, quote=True)
+    safe_coach = html.escape(request.coach, quote=True)
     
     header_data = [
         [
@@ -101,7 +105,7 @@ def generate_pdf_report(request: PDFExportRequest) -> bytes:
             Paragraph("FICHE DE TERRAIN", ParagraphStyle("Badge", parent=style_subtitle, alignment=2))
         ],
         [
-            Paragraph(request.title, style_main_title),
+            Paragraph(safe_title, style_main_title),
             Paragraph("⚽ TACTIQUE", ParagraphStyle("SoccerBall", fontName="Helvetica-Bold", fontSize=12, textColor=color_primary, alignment=2))
         ]
     ]
@@ -119,7 +123,7 @@ def generate_pdf_report(request: PDFExportRequest) -> bytes:
     story.append(Spacer(1, 8))
     
     # Barre métadonnées
-    meta_text = f"<b>Entraîneur :</b> {request.coach} &nbsp;&nbsp;|&nbsp;&nbsp; <b>Date de séance :</b> {date_str}"
+    meta_text = f"<b>Entraîneur :</b> {safe_coach} &nbsp;&nbsp;|&nbsp;&nbsp; <b>Date de séance :</b> {safe_date_str}"
     meta_table_data = [[Paragraph(meta_text, style_meta)]]
     meta_table = Table(meta_table_data, colWidths=[content_width])
     meta_table.setStyle(TableStyle([
@@ -136,11 +140,13 @@ def generate_pdf_report(request: PDFExportRequest) -> bytes:
     
     # --- BLOCKS / CARDS ---
     for i, block in enumerate(request.blocks):
-        # Remplacement des sauts de ligne pour ReportLab Paragraph
-        formatted_content = block.content.replace("\n", "<br/>")
+        # Échappement HTML strict contre l'injection de balises ReportLab (<img src="..."> LFI/SSRF)
+        # Remplacement des sauts de ligne par <br/> APRÈS échappement
+        safe_block_content = html.escape(block.content, quote=True).replace("\n", "<br/>")
+        safe_block_title = html.escape(block.title.upper(), quote=True)
         
         # En-tête de carte (Card Header)
-        title_p = Paragraph(f"{block.title.upper()}", style_card_title)
+        title_p = Paragraph(safe_block_title, style_card_title)
         card_header_table = Table([[title_p]], colWidths=[content_width])
         card_header_table.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, -1), color_primary),
@@ -152,7 +158,7 @@ def generate_pdf_report(request: PDFExportRequest) -> bytes:
         ]))
         
         # Corps de carte (Card Body)
-        content_p = Paragraph(formatted_content, style_card_content)
+        content_p = Paragraph(safe_block_content, style_card_content)
         card_body_table = Table([[content_p]], colWidths=[content_width])
         card_body_table.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, -1), color_light_bg),
