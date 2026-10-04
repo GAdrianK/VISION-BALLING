@@ -86,6 +86,7 @@ frontend-vanilla/
 # Vidéos et poids de modèles locaux
 /runs/
 *.mp4
+!frontend/public/demo_videos/*.mp4
 *.mov
 *.mkv
 *.avi

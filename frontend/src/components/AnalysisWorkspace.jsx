@@ -57,6 +57,7 @@ export default function AnalysisWorkspace({
 
   const [currentTime, setCurrentTime] = useState(0);
   const [selectedEventId, setSelectedEventId] = useState(null);
+  const [videoLoadError, setVideoLoadError] = useState(false);
   const videoRef = useRef(null);
   const pollTimerRef = useRef(null);
 
@@ -65,6 +66,10 @@ export default function AnalysisWorkspace({
       if (pollTimerRef.current) clearInterval(pollTimerRef.current);
     };
   }, []);
+
+  useEffect(() => {
+    setVideoLoadError(false);
+  }, [activeAnalysis?.id, activeAnalysis?.videoUrl]);
 
   const handleSeek = (seconds, eventId = null) => {
     setCurrentTime(seconds);
@@ -80,6 +85,7 @@ export default function AnalysisWorkspace({
       if (pollTimerRef.current) clearInterval(pollTimerRef.current);
       setJobState(null);
       setJobError(null);
+      setVideoLoadError(false);
       setActiveAnalysis({
         ...DEMO_SEQUENCES[seqId],
         analysis_source: "PRECOMPUTED_DEMO",
@@ -589,17 +595,74 @@ export default function AnalysisWorkspace({
                   ref={videoRef}
                   controls
                   playsInline
+                  preload="metadata"
+                  poster={
+                    activeAnalysis.posterUrl ||
+                    `/demo_videos/${activeAnalysis.id}_poster.jpg`
+                  }
                   onTimeUpdate={(e) => setCurrentTime(e.target.currentTime)}
+                  onError={() => setVideoLoadError(true)}
+                  onLoadedData={() => setVideoLoadError(false)}
                 >
                   <source
                     src={
                       activeAnalysis.videoUrl ||
-                      `/runs/analysis/demo_session_01/${activeAnalysis.id}.mp4`
+                      activeAnalysis.video_url ||
+                      `/demo_videos/${activeAnalysis.id}.mp4`
                     }
                     type="video/mp4"
                   />
                   Votre navigateur ne supporte pas la lecture vidéo.
                 </video>
+
+                {videoLoadError && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      background: "rgba(17, 17, 17, 0.88)",
+                      color: "#FFFFFF",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: "24px",
+                      textAlign: "center",
+                      gap: "10px",
+                      zIndex: 5,
+                    }}
+                  >
+                    <div style={{ fontFamily: "var(--font-mono)", fontSize: "11px", letterSpacing: "0.08em", color: "#A3A3A0" }}>
+                      MEDIA FEED ERROR
+                    </div>
+                    <div style={{ fontSize: "13px", fontWeight: 500, maxWidth: "360px", lineHeight: "1.4" }}>
+                      Flux vidéo temporairement indisponible pour la séquence {activeAnalysis.id}
+                    </div>
+                    <div style={{ fontSize: "11px", color: "#A3A3A0", maxWidth: "340px", lineHeight: "1.4" }}>
+                      Le fichier vidéo n&apos;a pas pu être chargé par le navigateur. Les données tactiques et métriques restent pleinement consultables.
+                    </div>
+                    <button
+                      type="button"
+                      className="btn-secondary"
+                      style={{
+                        marginTop: "4px",
+                        padding: "6px 14px",
+                        fontSize: "11px",
+                        background: "transparent",
+                        color: "#FFFFFF",
+                        borderColor: "rgba(255, 255, 255, 0.3)",
+                      }}
+                      onClick={() => {
+                        setVideoLoadError(false);
+                        if (videoRef.current) {
+                          videoRef.current.load();
+                        }
+                      }}
+                    >
+                      ↺ Réessayer la lecture
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Monospaced Metadata Strip */}

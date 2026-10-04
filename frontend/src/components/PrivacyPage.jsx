@@ -26,7 +26,7 @@ export default function PrivacyPage({ onNavigate }) {
             <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "4px" }}>
               <li><strong>Entité / Nom :</strong> {LEGAL_CONFIG.LEGAL_NAME}</li>
               <li><strong>Adresse professionnelle :</strong> {LEGAL_CONFIG.LEGAL_ADDRESS}</li>
-              <li><strong>Courriel de contact DPO / Protection des données :</strong> {LEGAL_CONFIG.DPO_CONTACT_EMAIL}</li>
+              <li><strong>Courriel de contact DPO / Protection des données :</strong> <a href={`mailto:${LEGAL_CONFIG.DPO_CONTACT_EMAIL}`} style={{ textDecoration: "underline" }}>{LEGAL_CONFIG.DPO_CONTACT_EMAIL}</a></li>
             </ul>
           </div>
         </section>

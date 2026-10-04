@@ -12,6 +12,8 @@ export const DEMO_SEQUENCES = {
     mode: 'QUALITY',
     throughputFps: 11.4,
     strict25Fps: false,
+    videoUrl: "/demo_videos/SNMOT-068.mp4",
+    posterUrl: "/demo_videos/SNMOT-068_poster.jpg",
     summary: {
     "TEAM_0": {
         "team_id": "TEAM_0",
@@ -803,6 +805,8 @@ export const DEMO_SEQUENCES = {
     mode: 'QUALITY',
     throughputFps: 11.4,
     strict25Fps: false,
+    videoUrl: "/demo_videos/SNMOT-069.mp4",
+    posterUrl: "/demo_videos/SNMOT-069_poster.jpg",
     summary: {
     "TEAM_0": {
         "team_id": "TEAM_0",

@@ -28,7 +28,7 @@ export default function LegalPage({ onNavigate }) {
               <li><strong>Nom commercial :</strong> {LEGAL_CONFIG.BUSINESS_NAME}</li>
               <li><strong>Forme juridique :</strong> {LEGAL_CONFIG.LEGAL_STATUS}</li>
               <li><strong>Adresse professionnelle :</strong> {LEGAL_CONFIG.LEGAL_ADDRESS}</li>
-              <li><strong>Courriel :</strong> {LEGAL_CONFIG.LEGAL_EMAIL}</li>
+              <li><strong>Courriel :</strong> <a href={`mailto:${LEGAL_CONFIG.LEGAL_EMAIL}`} style={{ textDecoration: "underline" }}>{LEGAL_CONFIG.LEGAL_EMAIL}</a></li>
               <li><strong>Téléphone :</strong> {LEGAL_CONFIG.LEGAL_PHONE}</li>
               <li><strong>Numéro SIREN :</strong> {LEGAL_CONFIG.SIREN}</li>
               <li><strong>Numéro SIRET :</strong> {LEGAL_CONFIG.SIRET}</li>

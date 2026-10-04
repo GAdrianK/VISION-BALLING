@@ -17,7 +17,8 @@ export const LEGAL_CONFIG = {
   BUSINESS_NAME: "[BUSINESS_NAME]",
   LEGAL_STATUS: "[LEGAL_STATUS]",
   LEGAL_ADDRESS: "[PROFESSIONAL_ADDRESS]",
-  LEGAL_EMAIL: "[EMAIL]",
+  // Professional Contact Email (canonical OVH mailbox: contact@vision-balling.fr, replaces [EMAIL])
+  LEGAL_EMAIL: "contact@vision-balling.fr",
   LEGAL_PHONE: "[PHONE]",
   SIREN: "[SIREN]",
   SIRET: "[SIRET]",
@@ -26,8 +27,8 @@ export const LEGAL_CONFIG = {
   VAT_NUMBER: "[VAT_NUMBER_IF_APPLICABLE]",
   PUBLICATION_DIRECTOR: "[NAME]",
 
-  // DPO / GDPR Privacy Contact
-  DPO_CONTACT_EMAIL: "[EMAIL]",
+  // DPO / GDPR Privacy Contact (canonical OVH mailbox: contact@vision-balling.fr)
+  DPO_CONTACT_EMAIL: "contact@vision-balling.fr",
 
   // Hosting Disclosures (replaces generic [HOST_NAME] with 4-tier separation)
   // 1. Frontend Static Hosting (Cloudflare Pages)

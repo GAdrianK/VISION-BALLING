@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { LEGAL_CONFIG } from "../config/legalConfig";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
@@ -48,10 +49,10 @@ export default function ContactPage() {
         <div>
           <span style={{ fontSize: "11px", color: "var(--muted)", display: "block" }}>COURRIEL DIRECT</span>
           <a
-            href="mailto:contact@vision-balling.ai"
+            href={`mailto:${LEGAL_CONFIG.LEGAL_EMAIL}`}
             style={{ fontSize: "13px", textDecoration: "underline", color: "var(--text)" }}
           >
-            contact@vision-balling.ai
+            {LEGAL_CONFIG.LEGAL_EMAIL}
           </a>
         </div>
       </div>
