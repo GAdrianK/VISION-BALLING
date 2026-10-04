@@ -46,6 +46,10 @@ class GroundedMatchAnswer(BaseModel):
     evidence_citations: List[str] = Field(default_factory=list)
     knowledge_citations: List[str] = Field(default_factory=list)
     limitations: List[str] = Field(default_factory=list)
+    observations_du_match: List[str] = Field(default_factory=list)
+    interpretations_tactiques: List[str] = Field(default_factory=list)
+    connaissances_generales: List[str] = Field(default_factory=list)
+    limites: List[str] = Field(default_factory=list)
     coverage_note: str = ""
     is_abstention: bool = False
     details: Dict[str, Any] = Field(default_factory=dict)

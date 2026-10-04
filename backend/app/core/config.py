@@ -34,6 +34,20 @@ class Settings(BaseSettings):
     SMTP_FROM_EMAIL: str = Field(default="")
     BETA_NOTIFICATION_EMAIL: str = Field(default="contact@vision-balling.fr")
 
+    # Operator & Session Security (Chapter 9)
+    OPERATOR_TOKEN_HASH: str = Field(default="")
+    SESSION_SECRET_KEY: str = Field(default="")
+    DELIVERY_OUTBOX_KEY: str = Field(default="")
+    SESSION_MAX_AGE_SECONDS: int = Field(default=28800, ge=300)  # 8 hours
+
+    # Cloud Storage (Cloudflare R2 / S3 compatible)
+    R2_ACCOUNT_ID: str = Field(default="")
+    R2_BUCKET_NAME: str = Field(default="")
+    R2_ACCESS_KEY_ID: str = Field(default="")
+    R2_SECRET_ACCESS_KEY: str = Field(default="")
+    R2_ENDPOINT_URL: str = Field(default="")
+    R2_PRESIGNED_EXPIRY_SECONDS: int = Field(default=300, ge=60, le=3600)  # 5 min
+
     @property
     def is_smtp_configured(self) -> bool:
         return bool(self.SMTP_HOST.strip())
@@ -185,6 +199,11 @@ class Settings(BaseSettings):
                 raise ValueError(
                     "Production security violation: ALLOWED_ORIGINS cannot be '*' or empty in production mode. "
                     "Specify explicit allowed origin(s), e.g. 'https://app.vision-balling.com'."
+                )
+            if not self.REQUIRE_ANALYSIS_TOKEN:
+                raise ValueError(
+                    "Production security violation: REQUIRE_ANALYSIS_TOKEN must be True in production mode. "
+                    "Unauthenticated access to video analyses is strictly forbidden."
                 )
             if self.PUBLIC_UPLOAD_ENABLED:
                 raise ValueError(

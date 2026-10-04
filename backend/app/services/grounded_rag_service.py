@@ -50,12 +50,14 @@ class GroundedTacticalRAGService:
         rag_engine: Optional[RAGEngine] = None,
         classifier: Optional[QueryClassifier] = None,
         evidence_dir: Union[str, Path] = Path("docs/experiments/exp25_outputs"),
+        evidence_resolver: Optional[Any] = None,
         openai_api_key: Optional[str] = None,
         openrouter_api_key: Optional[str] = None,
     ):
         self.rag_engine = rag_engine
         self.classifier = classifier or QueryClassifier()
         self.evidence_dir = Path(evidence_dir)
+        self.evidence_resolver = evidence_resolver
         self.api_key = openai_api_key or settings.OPENAI_API_KEY
         self.openrouter_key = openrouter_api_key or settings.openrouter_key
         self.use_openrouter = bool(
@@ -139,6 +141,8 @@ class GroundedTacticalRAGService:
                 )
 
             latencies["total_ms"] = (time.perf_counter() - t_total_start) * 1000.0
+            connais_gen = [r["text"][:300].strip() for r in kb_results] if kb_results else ["Concepts généraux documentés dans la base théorique."]
+
             return GroundedMatchAnswer(
                 answer=answer_text,
                 query=query_text,
@@ -150,6 +154,10 @@ class GroundedTacticalRAGService:
                 evidence_citations=[],
                 knowledge_citations=kb_citations,
                 limitations=[],
+                observations_du_match=[],
+                interpretations_tactiques=[],
+                connaissances_generales=connais_gen,
+                limites=[],
                 coverage_note="Requête théorique générale traitée par la Base de Connaissances.",
                 is_abstention=False,
                 details={"latencies": latencies, "kb_chunks_count": len(kb_results)},
@@ -159,9 +167,18 @@ class GroundedTacticalRAGService:
         # 3. Match Evidence Retrieval (Phase 5, 27, 28)
         # ----------------------------------------------------------------------
         t_ret_start = time.perf_counter()
-        store = MatchEvidenceRegistry.get_or_load(
-            analysis_id=analysis_id, evidence_dir=self.evidence_dir
-        )
+        if self.evidence_resolver:
+            try:
+                store = self.evidence_resolver.get_or_load_store(analysis_id)
+            except Exception as exc:
+                logger.warning("EvidenceResolver error for %s: %s", analysis_id, exc)
+                store = MatchEvidenceRegistry.get_or_load(
+                    analysis_id=analysis_id, evidence_dir=self.evidence_dir
+                )
+        else:
+            store = MatchEvidenceRegistry.get_or_load(
+                analysis_id=analysis_id, evidence_dir=self.evidence_dir
+            )
 
         if not store.is_loaded or len(store.events_by_id) == 0:
             latencies["evidence_retrieval_ms"] = (time.perf_counter() - t_ret_start) * 1000.0
@@ -393,6 +410,23 @@ class GroundedTacticalRAGService:
         if context_pack.has_conflict:
             coverage_note += " Note: Conflit détecté dans les signaux."
 
+        obs_match = [
+            evt.summary_text
+            for evt in retrieved_events
+            if evt.semantic_level == SemanticLevel.LEVEL_1_PHYSICAL_FACT and evt.summary_text
+        ]
+        interp_tact = [
+            evt.summary_text
+            for evt in retrieved_events
+            if evt.semantic_level in (SemanticLevel.LEVEL_2_STRUCTURAL_INFERENCE, SemanticLevel.LEVEL_3_TACTICAL_CANDIDATE) and evt.summary_text
+        ]
+        connais_gen = [
+            kb["text"].replace("\n", " ")[:250].strip()
+            for kb in knowledge_sources
+            if kb.get("text")
+        ]
+        limites_list = list(context_pack.limitations)
+
         return GroundedMatchAnswer(
             answer=answer_text,
             query=query_text,
@@ -404,6 +438,10 @@ class GroundedTacticalRAGService:
             evidence_citations=evidence_citations,
             knowledge_citations=knowledge_citations,
             limitations=context_pack.limitations,
+            observations_du_match=obs_match,
+            interpretations_tactiques=interp_tact,
+            connaissances_generales=connais_gen,
+            limites=limites_list,
             coverage_note=coverage_note,
             is_abstention=False,
             details={

@@ -89,11 +89,13 @@ from app.api.chat import router as chat_router
 from app.api.pdf import router as pdf_router
 from app.api.video_analysis import router as video_analysis_router
 from app.api.beta import router as beta_router
+from app.api.admin_publications import router as admin_publications_router
 
 app.include_router(chat_router)
 app.include_router(pdf_router)
 app.include_router(video_analysis_router)
 app.include_router(beta_router)
+app.include_router(admin_publications_router)
 
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 if not OPENROUTER_API_KEY or "mock-key" in OPENROUTER_API_KEY:

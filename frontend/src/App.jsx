@@ -11,6 +11,7 @@ import LegalPage from "./components/LegalPage";
 import BetaTermsPage from "./components/BetaTermsPage";
 import CookiesPage from "./components/CookiesPage";
 import LicensesPage from "./components/LicensesPage";
+import ClientMatchPortal from "./components/client_portal/ClientMatchPortal";
 
 export default function App() {
   const [currentPath, setCurrentPath] = useState(() => {
@@ -53,6 +54,9 @@ export default function App() {
     );
   }
 
+  const matchRoute = currentPath.match(/^\/match\/([a-zA-Z0-9_-]+)\/?$/);
+  const matchAnalysisId = matchRoute ? matchRoute[1] : null;
+
   return (
     <div className="app-shell" style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       {/* Top light minimal navigation */}
@@ -60,6 +64,8 @@ export default function App() {
 
       {/* Main analytical container */}
       <main className="main-shell" id="main-content">
+        {matchAnalysisId && <ClientMatchPortal analysisId={matchAnalysisId} />}
+
         {currentPath === "/analyse" && (
           <AnalysisWorkspace
             initialSequenceId={selectedDemoSeq}
@@ -91,7 +97,8 @@ export default function App() {
 
         {currentPath === "/contact" && <ContactPage />}
 
-        {currentPath !== "/analyse" &&
+        {!matchAnalysisId &&
+          currentPath !== "/analyse" &&
           currentPath !== "/demo" &&
           currentPath !== "/project" &&
           currentPath !== "/beta" &&
@@ -101,12 +108,48 @@ export default function App() {
           currentPath !== "/beta-terms" &&
           currentPath !== "/licenses" &&
           currentPath !== "/contact" && (
-            <AnalysisWorkspace
-              initialSequenceId={selectedDemoSeq}
-              onResetAnalysis={() => setSelectedDemoSeq(null)}
-            />
+            <div
+              style={{
+                maxWidth: "600px",
+                margin: "100px auto",
+                textAlign: "center",
+                padding: "40px",
+                background: "#FFFFFF",
+                border: "1px solid #E5E5E0",
+                borderRadius: "2px",
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: "monospace",
+                  fontSize: "12px",
+                  color: "#666",
+                  textTransform: "uppercase",
+                  marginBottom: "8px",
+                }}
+              >
+                404 · PAGE INTROUVABLE
+              </div>
+              <p style={{ fontSize: "14px", color: "#333", marginBottom: "20px" }}>
+                La ressource demandée n&apos;existe pas sur cette plateforme.
+              </p>
+              <button
+                onClick={() => navigate("/")}
+                style={{
+                  padding: "10px 20px",
+                  background: "#111",
+                  color: "#fff",
+                  border: "none",
+                  fontSize: "12px",
+                  cursor: "pointer",
+                }}
+              >
+                Retour à l&apos;accueil →
+              </button>
+            </div>
           )}
       </main>
+
 
       {/* Minimal technical footer */}
       <footer className="site-footer">

@@ -78,6 +78,50 @@ Enregistrement PostgreSQL : validé
 """
 
 
+def build_analysis_ready_body(
+    coach_name: str,
+    match_name: str,
+    access_url: str,
+    video_retention_days: int = 14,
+    analysis_retention_days: int = 30,
+) -> str:
+    """Builds canonical notification body informing coach their private analysis is ready."""
+    return f"""Bonjour {coach_name},
+
+Votre analyse tactique VISION-BALLING pour la rencontre « {match_name} » est prête et disponible dans votre espace privé.
+
+==================================================
+ACCÈS PRIVÉ À VOTRE ANALYSE
+==================================================
+
+Lien direct sécurisé (aucun mot de passe requis) :
+{access_url}
+
+Ce lien contient une capacité d'accès exclusive et confidentielle. Ne le partagez qu'avec le staff technique autorisé de votre club.
+
+==================================================
+FONCTIONNALITÉS DISPONIBLES
+==================================================
+- Vidéo annotée avec détections de joueurs, porteur et ballon
+- Chronologie tactique ordonnée des phases de jeu
+- Fiches de preuves mesurées (pressing, compacité, transitions, contrôle)
+- Assistant tactique ancré : posez vos questions sur la rencontre
+- Rapport d'analyse tactique imprimable / exportable
+
+==================================================
+POLITIQUE DE RÉTENTION DES DONNÉES
+==================================================
+- Vidéo de match (streaming) : conservée pendant {video_retention_days} jours
+- Métriques, chronologie et assistant : conservés pendant {analysis_retention_days} jours
+
+Pour toute question ou remarque méthodologique, vous pouvez répondre directement à ce courriel.
+
+--
+L'équipe VISION-BALLING
+contact@vision-balling.fr — https://vision-balling.fr
+"""
+
+
 class MailService:
     """Standard SMTP mail service for application notifications."""
 
@@ -198,6 +242,26 @@ class MailService:
         body = build_beta_notification_body(req, request_id, created_at_iso)
         recipient = self.beta_recipient
         return self.send_email(to_email=recipient, subject=subject, body=body)
+
+    def send_analysis_ready_notification(
+        self,
+        recipient_email: str,
+        coach_name: str,
+        match_name: str,
+        access_url: str,
+        video_retention_days: int = 14,
+        analysis_retention_days: int = 30,
+    ) -> bool:
+        """Constructs and delivers notification to coach informing their private analysis is ready."""
+        subject = f"[VISION-BALLING] Votre analyse tactique est prête — {match_name}"
+        body = build_analysis_ready_body(
+            coach_name=coach_name,
+            match_name=match_name,
+            access_url=access_url,
+            video_retention_days=video_retention_days,
+            analysis_retention_days=analysis_retention_days,
+        )
+        return self.send_email(to_email=recipient_email, subject=subject, body=body)
 
 
 _global_mail_service: Optional[MailService] = None
