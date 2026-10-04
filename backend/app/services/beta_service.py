@@ -17,6 +17,7 @@ from app.schemas.beta import (
     BetaAnalysisRequestCreate,
     BetaAnalysisRequestResponse,
 )
+from app.services.mail_service import MailService, get_mail_service
 
 logger = logging.getLogger(__name__)
 
@@ -61,12 +62,14 @@ class BetaService:
         self,
         db_target: Optional[Path | str] = None,
         db_path: Optional[Path | str] = None,
+        mail_service: Optional[MailService] = None,
     ) -> None:
         self.rate_limiter = InMemoryRateLimiter(max_requests=5, window_seconds=600)
         target = db_target if db_target is not None else db_path
         self.db_url = self._resolve_db_url(target)
         self.engine: Engine = self._create_engine(self.db_url)
         self._init_db()
+        self.mail_service = mail_service if mail_service is not None else get_mail_service()
 
     @staticmethod
     def _resolve_db_url(target: Optional[Path | str]) -> str:
@@ -192,6 +195,22 @@ class BetaService:
             redacted_video,
             client_ip,
         )
+
+        # Non-blocking notification delivery: email issues must NEVER fail request creation
+        try:
+            if self.mail_service:
+                self.mail_service.send_beta_request_notification(
+                    req=req,
+                    request_id=request_id,
+                    created_at_iso=now_iso,
+                )
+        except Exception as e:
+            logger.warning(
+                "Non-blocking notification delivery failed for beta request %s: %s: %s",
+                request_id,
+                type(e).__name__,
+                str(e),
+            )
 
         return BetaAnalysisRequestResponse(
             id=request_id,

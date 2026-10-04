@@ -252,3 +252,108 @@ def test_xss_protection_in_fields(client: TestClient, temp_beta_service: BetaSer
     # The fields should be stored as plain strings, never interpreted, and response never reflects them unescaped
     assert stored is not None
     assert "<script>" in stored["name"] or "Coach" in stored["name"]
+
+
+def test_beta_submission_triggers_email_notification(
+    client: TestClient,
+    temp_beta_service: BetaService,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    from unittest.mock import MagicMock, patch
+    from app.core.config import settings
+
+    monkeypatch.setattr(settings, "SMTP_HOST", "smtp.test.net")
+    monkeypatch.setattr(settings, "SMTP_PORT", 587)
+    monkeypatch.setattr(settings, "SMTP_USERNAME", "bot@vision-balling.fr")
+    monkeypatch.setattr(settings, "SMTP_PASSWORD", "mock-secret-pw")
+    monkeypatch.setattr(settings, "BETA_NOTIFICATION_EMAIL", "contact@vision-balling.fr")
+
+    payload = {
+        "name": "Zinédine Zidane",
+        "club": "Real Madrid Castilla",
+        "role": "Entraîneur",
+        "email": "zizou@madrid.es",
+        "team_category": "Réserve Pro",
+        "competition_level": "Primera Federación",
+        "opponent": "Barça Atlètic",
+        "video_type": "Match complet",
+        "video_url": "https://drive.google.com/file/d/zizou123/view",
+        "analysis_objectives": ["Transitions", "Pressing"],
+        "message": "Focus transitions rapides.",
+        "video_authorization_confirmed": True,
+        "temporary_storage_consent": True,
+    }
+
+    with patch("smtplib.SMTP") as mock_smtp_cls:
+        mock_server = MagicMock()
+        mock_smtp_cls.return_value.__enter__.return_value = mock_server
+
+        res = client.post("/api/beta-requests", json=payload)
+        assert res.status_code == 201
+        data = res.json()
+        assert data["id"].startswith("beta_")
+
+        # Verify DB persistence
+        stored = temp_beta_service.get_request(data["id"])
+        assert stored is not None
+        assert stored["club"] == "Real Madrid Castilla"
+
+        # Verify SMTP interaction
+        mock_server.send_message.assert_called_once()
+        msg = mock_server.send_message.call_args[0][0]
+        assert msg["To"] == "contact@vision-balling.fr"
+        assert msg["Subject"] == "[VISION-BALLING] Nouvelle demande BETA — Real Madrid Castilla"
+        assert "Zinédine Zidane" in msg.get_content()
+        assert "https://drive.google.com/file/d/zizou123/view" in msg.get_content()
+
+
+def test_beta_submission_succeeds_when_smtp_fails(
+    client: TestClient,
+    temp_beta_service: BetaService,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+):
+    from unittest.mock import patch
+    import smtplib
+    from app.core.config import settings
+
+    monkeypatch.setattr(settings, "SMTP_HOST", "smtp.test.net")
+    monkeypatch.setattr(settings, "SMTP_PORT", 587)
+    monkeypatch.setattr(settings, "SMTP_USERNAME", "bot@vision-balling.fr")
+    monkeypatch.setattr(settings, "SMTP_PASSWORD", "super_secret_password_do_not_log")
+    monkeypatch.setattr(settings, "BETA_NOTIFICATION_EMAIL", "contact@vision-balling.fr")
+
+    payload = {
+        "name": "Didier Deschamps",
+        "club": "Équipe de France",
+        "role": "Entraîneur",
+        "email": "didier@fff.fr",
+        "team_category": "Séniors",
+        "competition_level": "International",
+        "opponent": "Espagne",
+        "video_type": "Match complet",
+        "video_url": "https://wetransfer.com/downloads/fff123?token=secret_dl_token",
+        "analysis_objectives": ["Bloc / compacité"],
+        "video_authorization_confirmed": True,
+        "temporary_storage_consent": True,
+    }
+
+    # Simulate SMTP failure (timeout, network outage, auth error)
+    with patch("smtplib.SMTP", side_effect=smtplib.SMTPConnectError(421, b"Connection refused")):
+        with caplog.at_level(logging.WARNING):
+            res = client.post("/api/beta-requests", json=payload)
+
+    # 1. API request MUST still succeed (Fail-safe architecture)
+    assert res.status_code == 201
+    data = res.json()
+    assert data["status"] == "NEW"
+
+    # 2. Database request MUST be persisted
+    stored = temp_beta_service.get_request(data["id"])
+    assert stored is not None
+    assert stored["name"] == "Didier Deschamps"
+    assert stored["club"] == "Équipe de France"
+
+    # 3. Secrets and private video tokens must NOT be leaked into logs
+    assert "super_secret_password_do_not_log" not in caplog.text
+    assert "secret_dl_token" not in caplog.text

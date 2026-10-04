@@ -24,6 +24,24 @@ class Settings(BaseSettings):
     VIDEO_RETENTION_DAYS: int = Field(default=14, ge=1)
     ANALYSIS_RESULT_RETENTION_DAYS: int = Field(default=30, ge=1)
 
+    # SMTP & Email Notifications
+    SMTP_HOST: str = Field(default="")
+    SMTP_PORT: int = Field(default=587)
+    SMTP_USERNAME: str = Field(default="")
+    SMTP_PASSWORD: str = Field(default="")
+    SMTP_USE_TLS: bool = Field(default=True)
+    SMTP_TIMEOUT_SECONDS: float = Field(default=10.0, ge=1.0)
+    SMTP_FROM_EMAIL: str = Field(default="")
+    BETA_NOTIFICATION_EMAIL: str = Field(default="contact@vision-balling.fr")
+
+    @property
+    def is_smtp_configured(self) -> bool:
+        return bool(self.SMTP_HOST.strip())
+
+    @property
+    def effective_smtp_from_email(self) -> str:
+        return (self.SMTP_FROM_EMAIL or self.SMTP_USERNAME or self.BETA_NOTIFICATION_EMAIL).strip()
+
     @property
     def effective_database_url(self) -> str:
         url = (self.DATABASE_URL or self.BETA_DATABASE_URL or "").strip()
