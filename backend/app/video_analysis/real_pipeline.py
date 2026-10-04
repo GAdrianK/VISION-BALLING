@@ -609,6 +609,7 @@ class RealVideoAnalysisPipeline:
             "-i", str(source),
             "-map", "0:v",
             "-map", "1:a?",
+            "-shortest",
             "-c:v", "libx264",
             "-profile:v", "high",
             "-level", "4.1",
@@ -617,8 +618,15 @@ class RealVideoAnalysisPipeline:
             "-movflags", "+faststart",
             str(annotated_path),
         ]
-        res = subprocess.run(cmd, capture_output=True, text=True)
+        ffmpeg_timeout = max(30, int(metadata.duration_seconds * 4))
+        try:
+            res = subprocess.run(cmd, capture_output=True, text=True, timeout=ffmpeg_timeout)
+        except subprocess.TimeoutExpired as exc:
+            silent_path.unlink(missing_ok=True)
+            raise RuntimeError(f"Délai d'encodage FFmpeg dépassé ({ffmpeg_timeout}s).") from exc
+
         if res.returncode != 0:
+            silent_path.unlink(missing_ok=True)
             logger.error("ffmpeg_normalization_failed: %s", res.stderr)
             raise RuntimeError(f"Échec de l'encodage FFmpeg de la vidéo finale : {res.stderr}")
 
@@ -632,11 +640,14 @@ class RealVideoAnalysisPipeline:
                 "-of", "json",
                 str(annotated_path),
             ]
-            probe_res = subprocess.run(probe_cmd, capture_output=True, text=True)
-            if probe_res.returncode == 0:
-                logger.info("annotated_video_validated: %s", probe_res.stdout)
-            else:
-                logger.warning("ffprobe validation returned code %d", probe_res.returncode)
+            try:
+                probe_res = subprocess.run(probe_cmd, capture_output=True, text=True, timeout=30)
+                if probe_res.returncode == 0:
+                    logger.info("annotated_video_validated: %s", probe_res.stdout)
+                else:
+                    logger.warning("ffprobe validation returned code %d", probe_res.returncode)
+            except subprocess.TimeoutExpired:
+                logger.warning("ffprobe validation timed out after 30s")
 
         silent_path.unlink(missing_ok=True)
 

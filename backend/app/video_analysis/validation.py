@@ -103,6 +103,7 @@ class VideoValidator:
                 ValueError,
                 KeyError,
                 json.JSONDecodeError,
+                ArithmeticError,
             ):
                 pass
         return self._probe_opencv(path, filename)
@@ -132,16 +133,35 @@ class VideoValidator:
         if not streams:
             raise VideoValidationError("Aucun flux vidéo détecté.")
         stream = streams[0]
-        numerator, denominator = stream["avg_frame_rate"].split("/")
-        fps = float(numerator) / float(denominator)
-        duration = float(payload["format"]["duration"])
+
+        try:
+            numerator, denominator = stream["avg_frame_rate"].split("/")
+            denom_val = float(denominator)
+            if denom_val <= 0:
+                raise VideoValidationError("Framerate vidéo invalide (dénominateur nul).")
+            fps = float(numerator) / denom_val
+        except (ValueError, ArithmeticError) as exc:
+            raise VideoValidationError(f"Format de framerate invalide : {exc}") from exc
+
+        if fps <= 0 or fps > 120:
+            raise VideoValidationError(f"Framerate vidéo hors limites autorisées (0 < fps <= 120) : {fps}")
+
+        duration = float(payload.get("format", {}).get("duration") or 0)
+        width = int(stream.get("width") or 0)
+        height = int(stream.get("height") or 0)
+        if duration <= 0 or width <= 0 or height <= 0:
+            raise VideoValidationError("Dimensions ou durée vidéo invalides.")
+
         frame_count = int(stream.get("nb_frames") or round(duration * fps))
+        if frame_count <= 0:
+            raise VideoValidationError("Nombre de frames nul ou invalide.")
+
         return VideoMetadata(
             filename=filename,
             duration_seconds=duration,
             fps=fps,
-            width=int(stream["width"]),
-            height=int(stream["height"]),
+            width=width,
+            height=height,
             frame_count=frame_count,
             container=payload["format"].get("format_name"),
             codec=stream.get("codec_name"),

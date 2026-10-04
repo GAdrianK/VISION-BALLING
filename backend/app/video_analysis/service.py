@@ -301,6 +301,13 @@ class VideoAnalysisService:
                 source.unlink(missing_ok=True)
             logger.exception("video_job_failed analysis_id=%s", analysis_id)
             self._fail(job, "processing_failed", str(exc))
+        finally:
+            try:
+                import torch
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+            except Exception:
+                pass
 
     def _update(
         self, job: AnalysisJob, status: JobStatus, percent: float, current_step: str

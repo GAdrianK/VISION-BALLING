@@ -273,11 +273,19 @@ class RFDETRDetector(ObjectDetector):
         )
         min_thresh = min(eff_person_thresh, eff_ball_thresh)
 
-        dets = self._model.predict(
-            rgb_frame,
-            threshold=min_thresh,
-            include_source_image=False,
-        )
+        try:
+            import torch
+            inference_ctx = torch.inference_mode()
+        except Exception:
+            from contextlib import nullcontext
+            inference_ctx = nullcontext()
+
+        with inference_ctx:
+            dets = self._model.predict(
+                rgb_frame,
+                threshold=min_thresh,
+                include_source_image=False,
+            )
         t2 = time.perf_counter()
 
         detections: list[RawDetection] = []

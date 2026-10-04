@@ -106,6 +106,24 @@ During our multi-vector audit across Backend, Video Pipeline, Frontend, CI/CD, a
 - **Vulnerability:** `.env*`, `credentials*`, and `secrets*` were not explicitly ignored, risking inclusion of local developer credentials into Docker images.
 - **Resolution:** Added explicit ignore rules to `.dockerignore`.
 
+### [HIGH] SEC-VID-03: ZeroDivisionError & Missing FPS Bounds in Video Validation
+- **File:** `backend/app/video_analysis/validation.py` (lines 96–150)
+- **Vulnerability:** Malformed input videos with `avg_frame_rate="0/0"` caused `ZeroDivisionError`, which was not intercepted in `_probe` because `ArithmeticError` does not inherit from `ValueError`. Additionally, unconstrained or zero FPS values caused downstream division by zero in frame timing calculations (`pipeline.py:152`).
+- **Resolution:** Added `ArithmeticError` to the exception handler tuple in `_probe`. Implemented strict bounds validation (enforcing `0 < fps <= 120`, positive duration, positive width/height, and `frame_count > 0`) in `_probe_ffmpeg`.
+- **Verification:** Unit test `test_video_validation_zero_division_and_bounds` in `backend/tests/test_video_analysis.py`.
+
+### [HIGH] SEC-VID-04: Subprocess Deadlock via Unbounded FFmpeg Commands
+- **File:** `backend/app/video_analysis/real_pipeline.py` (lines 605–642)
+- **Vulnerability:** Normalization commands for FFmpeg and `ffprobe` lacked subprocess timeouts. A corrupt or malformed media stream could hang FFmpeg indefinitely, locking worker threads and inducing denial of service.
+- **Resolution:** Configured dynamic timeout `max(30, int(metadata.duration_seconds * 4))` and added `-shortest` flag to the FFmpeg command, plus a 30s timeout on `ffprobe`.
+- **Verification:** Verified via exception handling tests with simulated long-running commands.
+
+### [HIGH] SEC-GPU-01: CUDA VRAM Accumulation & Unreleased Model Activations
+- **File:** `backend/app/video_analysis/service.py` & `backend/app/video_analysis/detectors.py`
+- **Vulnerability:** PyTorch GPU memory cache was not purged upon pipeline completion (`torch.cuda.empty_cache()` was omitted from backend code). Furthermore, model prediction in `RFDETRDetector` was not encapsulated in an inference context, risking autograd graph retention.
+- **Resolution:** Added `torch.cuda.empty_cache()` inside the `finally` block of `VideoAnalysisService._process_internal`, and encapsulated `RFDETRDetector` predictions in `with torch.inference_mode():`.
+- **Verification:** Verified through sequential test executions without memory buildup.
+
 ### [LOW] SEC-DOC-02: Root User Execution in Docker Container
 - **File:** `Dockerfile`
 - **Vulnerability:** Container ran backend uvicorn processes as root.
@@ -125,14 +143,17 @@ During our multi-vector audit across Backend, Video Pipeline, Frontend, CI/CD, a
 
 The video processing pipeline, tactical feature extractors, and benchmarks (EXP-01 through EXP-26) were comprehensively audited:
 
-1. **Strict Temporal Causality:**
+1. **Temporal Causality & In-Match Lookahead:**
    - Evaluated Kalman tracking, defensive block calculation, pressing intensity, and tactical transition graphs.
-   - Verified that all frame-level metric calculations at time $t$ rely strictly on evidence from $\{t_k \le t\}$. Zero future lookahead or temporal leakage detected.
-2. **Dataset Isolation & Cross-Match Partitions:**
-   - Evaluated sequences from SNMOT-060, SNMOT-068, SNMOT-069.
-   - Golden evaluation test sets are strictly partitioned from training datasets with zero identity leakage.
-3. **Execution Robustness:**
-   - All 157 tactical and scientific evaluation tests passed without regression.
+   - Offline benchmark adapters (EXP-16 to EXP-25) utilize nearest-keyframe calibration matching (`abs(int(Path(k).stem) - curr_num)`), which can select a future keyframe in post-hoc evaluation.
+   - For real-time in-match inference, causality requires causal Kalman filtering (`LinearKalman2D`) without future lookahead.
+2. **Dataset Partitioning & Isolation:**
+   - The Golden Dataset (`data/manifests/golden_videos_v1.json`) is strictly isolated and contains zero overlap with training or dev sets.
+   - In EXP-22, sequences `SNMOT-061` and `062` (categorized as DEV in `DATASET_POLICY.md`) were included in `CONTROL_TRAIN` for supervised possession modeling. This is documented as an empirical deviation in research experiments.
+3. **EXP-26 RAG Benchmark Methodology:**
+   - The EXP-26 benchmark achieved 100% claim support by running with `force_offline_fallback=True`, validating the deterministic event template formatter rather than non-deterministic generative LLM output.
+4. **Geometric Modeling in `RealVideoAnalysisPipeline`:**
+   - In `real_pipeline.py:424`, 2D image coordinates are mapped to the pitch via linear scaling `(x/w)*105 - 52.5`. In broadcast camera angles, perspective distortion means metric distances are approximate. Integrating full homography from `pitch_calibration.py` is logged in the roadmap.
 
 ---
 
@@ -140,11 +161,12 @@ The video processing pipeline, tactical feature extractors, and benchmarks (EXP-
 
 | Test Category | Command | Result |
 |---|---|---|
-| Full Backend Suite | `pytest backend/tests -q` | **501 passed, 1 skipped, 0 failed** (23.72s) |
+| Full Backend Suite | `pytest backend/tests -q` | **502 passed, 1 skipped, 0 failed** (23.70s) |
 | Mail & Notification Service | `pytest backend/tests/test_mail_service.py` | **6 passed, 0 failed** |
 | Beta Intake & Rate Limiting | `pytest backend/tests/test_beta_requests.py` | **14 passed, 0 failed** |
 | PDF Export & XML Escaping | `pytest backend/tests/test_pdf_generator.py` | **3 passed, 0 failed** |
-| Video Analysis & Multi-Tenancy | `pytest backend/tests/test_video_analysis.py` | **19 passed, 0 failed** |
+| Video Analysis & Multi-Tenancy | `pytest backend/tests/test_video_analysis.py` | **20 passed, 0 failed** |
+| RF-DETR Adapter & Mode Mapping | `pytest backend/tests/test_exp04_rfdetr.py` | **10 passed, 0 failed** |
 | Code Quality & Linter | `ruff check backend` | **All checks passed!** |
 | Frontend Linter | `npm run lint` | **0 errors, clean** |
 | Frontend Production Build | `VITE_API_URL=... npm run build` | **Built in 1.37s, dist ready** |

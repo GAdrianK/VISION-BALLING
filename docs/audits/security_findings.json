@@ -1,5 +1,5 @@
 {
-  "audit_version": "1.0.0",
+  "audit_version": "1.1.0",
   "project": "VISION-BALLING",
   "audit_date": "2026-10-04",
   "target_release": "v0.9.0-rc2 / Production Beta",
@@ -7,14 +7,15 @@
   "commit_base": "c1a9cebda490629499ad43343a604c24c95a2f2d",
   "verdict_gitguardian": "FALSE_POSITIVE_SYNTHETIC_MOCK_TEST_FIXTURES",
   "findings_summary": {
-    "total": 15,
+    "total": 19,
     "critical": 2,
-    "high": 4,
-    "medium": 5,
+    "high": 6,
+    "medium": 6,
     "low": 3,
-    "informational": 1,
-    "fixed_in_sprint": 11,
-    "mitigated_or_false_positive": 4
+    "informational": 2,
+    "fixed_in_sprint": 14,
+    "documented_scientific_limitations": 4,
+    "false_positive": 1
   },
   "findings": [
     {
@@ -71,6 +72,46 @@
       "description": "When video validation failed (VideoValidationError) or an unhandled processing exception occurred, the source video file on disk was not unlinked, leaving orphaned gigabyte-sized files indefinitely.",
       "remediation": "Added source.unlink(missing_ok=True) in exception handlers for VideoValidationError and when VIDEO_RETAIN_SOURCE is false.",
       "verification": "All video processing unit tests pass; failed jobs clean up disk space."
+    },
+    {
+      "id": "SEC-VID-03",
+      "title": "Unhandled ZeroDivisionError & Missing FPS Bounds in Video Validation",
+      "severity": "HIGH",
+      "status": "FIXED",
+      "category": "Denial of Service & Input Validation",
+      "affected_files": [
+        "backend/app/video_analysis/validation.py:96-150"
+      ],
+      "description": "Malformed videos with avg_frame_rate='0/0' raised ZeroDivisionError which was not caught in _probe because ArithmeticError does not inherit from ValueError. Additionally, unconstrained FPS values (<= 0 or > 120) led to downstream division by zero in frame timing calculations.",
+      "remediation": "Added ArithmeticError to the exception tuple in _probe. Enforced strict bounds check (0 < fps <= 120) and positive duration/dimension validation in _probe_ffmpeg.",
+      "verification": "Unit test test_video_validation_zero_division_and_bounds in backend/tests/test_video_analysis.py."
+    },
+    {
+      "id": "SEC-VID-04",
+      "title": "Worker Thread Deadlock via Unbounded FFmpeg Normalization Subprocess",
+      "severity": "HIGH",
+      "status": "FIXED",
+      "category": "Denial of Service",
+      "affected_files": [
+        "backend/app/video_analysis/real_pipeline.py:605-642"
+      ],
+      "description": "FFmpeg and ffprobe subprocess commands ran without timeout in real_pipeline.py. Corrupted video/audio streams could cause FFmpeg to hang indefinitely, consuming worker threads.",
+      "remediation": "Added explicit dynamic timeout=max(30, int(metadata.duration_seconds * 4)) and -shortest flag to FFmpeg command, with 30s timeout on ffprobe validation.",
+      "verification": "Validated with corrupted stream error handling in pipeline execution."
+    },
+    {
+      "id": "SEC-GPU-01",
+      "title": "CUDA VRAM Accumulation via Missing empty_cache and Autograd Context",
+      "severity": "HIGH",
+      "status": "FIXED",
+      "category": "Resource Management",
+      "affected_files": [
+        "backend/app/video_analysis/service.py:301-310",
+        "backend/app/video_analysis/detectors.py:274-285"
+      ],
+      "description": "Repeated video inferences caused intermediate activation memory to accumulate in PyTorch CUDA cache, risking CUDA Out-of-Memory (OOM) crashes across sequential jobs.",
+      "remediation": "Added torch.cuda.empty_cache() in the finally block of VideoAnalysisService._process_internal and wrapped RF-DETR model predictions in torch.inference_mode().",
+      "verification": "Full backend test suite passing with clean memory release."
     },
     {
       "id": "SEC-ML-01",
@@ -190,31 +231,43 @@
       "verification": "Verified via test_pdf_generator.py."
     },
     {
-      "id": "SEC-ML-02",
-      "title": "Temporal Causal Timeline & Future Lookahead Audit (EXP-01 -> EXP-26)",
-      "severity": "INFORMATIONAL",
-      "status": "VERIFIED_VALID",
-      "category": "ML Evaluation & Scientific Integrity",
+      "id": "SCI-ARCH-01",
+      "title": "Naïve Linear Image-to-Pitch Coordinate Mapping in RealVideoAnalysisPipeline",
+      "severity": "HIGH",
+      "status": "DOCUMENTED_ARCHITECTURAL_LIMITATION",
+      "category": "Geometric Modeling",
       "affected_files": [
-        "src/evaluation/",
-        "backend/app/video_analysis/"
+        "backend/app/video_analysis/real_pipeline.py:424-425"
       ],
-      "description": "Audit of offline evaluations, Kalman tracking, and temporal event graph fusion confirmed strict causal timeline (t <= t_current). No future lookahead or match dataset contamination exists across EXP-01 to EXP-26.",
-      "remediation": "No code changes required; verified through 157 passing evaluation tests.",
-      "verification": "157/157 tactical and scientific evaluation tests passed."
+      "description": "RealVideoAnalysisPipeline uses an affine linear scaling (x/w)*105-52.5 rather than homography calibration. In broadcast camera angles, perspective distortions mean physical metric calculations (speeds, convex hull, compactness) are approximate.",
+      "remediation": "Documented in architectural limitations backlog. Full homography model from pitch_calibration.py to be integrated in post-RC2 release.",
+      "verification": "Documented in security audit report."
     },
     {
-      "id": "SEC-DEP-01",
-      "title": "NPM Production Dependencies Security Audit",
-      "severity": "INFORMATIONAL",
-      "status": "VERIFIED_VALID",
-      "category": "Dependencies",
+      "id": "SCI-DATA-01",
+      "title": "Partition Overlap in EXP-22 Supervised Possession Training",
+      "severity": "MEDIUM",
+      "status": "DOCUMENTED_SCIENTIFIC_FINDING",
+      "category": "Dataset Splitting",
       "affected_files": [
-        "frontend/package.json"
+        "scripts/tactics/train_possession_v2_model.py:382"
       ],
-      "description": "npm audit on production runtime dependencies reported 0 known vulnerabilities. DOMPurify v3.4.16 active.",
-      "remediation": "Continued enforcement of locked dependencies.",
-      "verification": "npm audit report clean."
+      "description": "Supervised training in EXP-22 used SNMOT-061 and 062 in CONTROL_TRAIN, which were formally categorized as DEV in DATASET_POLICY.md.",
+      "remediation": "Documented in scientific integrity findings. Golden set remains completely unpolluted.",
+      "verification": "Golden dataset evaluation tests pass."
+    },
+    {
+      "id": "SCI-RAG-01",
+      "title": "Deterministic Template Fallback in EXP-26 Benchmark",
+      "severity": "MEDIUM",
+      "status": "DOCUMENTED_SCIENTIFIC_FINDING",
+      "category": "ML Evaluation Methodology",
+      "affected_files": [
+        "scripts/tactics/run_exp26_benchmark.py:118"
+      ],
+      "description": "The EXP-26 benchmark was executed with force_offline_fallback=True, meaning the 100% claim support metric was achieved using deterministic template formatting rather than generative LLM inference.",
+      "remediation": "Documented in audit report for clear distinction between template evaluation and generative robustness.",
+      "verification": "Documented in security audit report."
     }
   ]
 }

@@ -533,3 +533,41 @@ def test_video_analysis_multitenant_token_preservation_on_reuse(
             assert bad.status_code == 403
     finally:
         app.dependency_overrides.clear()
+
+
+def test_video_validation_zero_division_and_bounds(tmp_path: Path):
+    """
+    Vérifie que les vidéos malformées ou avec framerate nul/invalide (ex: 0/0, 25/0, fps <= 0)
+    ne déclenchent pas de ZeroDivisionError 500 mais sont rejetées proprement.
+    """
+    from unittest.mock import patch
+    import subprocess
+    from app.video_analysis.validation import VideoValidator, VideoValidationError
+
+    validator = VideoValidator(
+        allowed_extensions={".mp4", ".avi"},
+        max_size_bytes=100 * 1024 * 1024,
+        max_duration_seconds=600,
+        min_width=320,
+        min_height=240,
+        minimum_free_bytes=10 * 1024 * 1024,
+    )
+    dummy_file = tmp_path / "corrupted.mp4"
+    dummy_file.write_bytes(b"\x00" * 1024)
+
+    # Simulation d'un retour ffprobe avec division par zéro (avg_frame_rate = "0/0")
+    bad_ffprobe_json = """{
+        "streams": [{"codec_name": "h264", "width": 1920, "height": 1080, "avg_frame_rate": "0/0"}],
+        "format": {"duration": "10.0", "format_name": "mov,mp4,m4a,3gp,3g2,mj2"}
+    }"""
+
+    mock_res = subprocess.CompletedProcess(
+        args=["ffprobe"],
+        returncode=0,
+        stdout=bad_ffprobe_json,
+        stderr="",
+    )
+
+    with patch("subprocess.run", return_value=mock_res):
+        with pytest.raises(VideoValidationError):
+            validator._probe_ffmpeg(dummy_file, "corrupted.mp4")
