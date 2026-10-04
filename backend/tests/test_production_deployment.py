@@ -163,3 +163,11 @@ def test_production_env_examples_contain_no_secrets():
     f_text = frontend_example.read_text(encoding="utf-8")
     assert "localhost" not in f_text
     assert "127.0.0.1" not in f_text
+
+
+def test_postgresql_drivers_declared():
+    """Ensure both psycopg v3 and psycopg2 are present in backend requirements for Railway."""
+    project_root = Path(__file__).resolve().parents[2]
+    reqs = (project_root / "backend" / "requirements.txt").read_text(encoding="utf-8")
+    assert "psycopg" in reqs
+    assert "psycopg2" in reqs
