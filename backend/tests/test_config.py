@@ -52,9 +52,28 @@ def test_production_security_validation():
         Settings(APP_ENV="staging_insecure")
     assert "APP_ENV must be one of" in str(exc.value)
 
-    # Production with explicit origin succeeds
+    # Production without DATABASE_URL must fail
+    with pytest.raises(ValidationError) as exc:
+        Settings(
+            APP_ENV="production",
+            ALLOWED_ORIGINS="https://app.vision-balling.com",
+            DATABASE_URL="",
+        )
+    assert "DATABASE_URL is mandatory in production mode" in str(exc.value)
+
+    # Production with SQLite DATABASE_URL must fail
+    with pytest.raises(ValidationError) as exc:
+        Settings(
+            APP_ENV="production",
+            ALLOWED_ORIGINS="https://app.vision-balling.com",
+            DATABASE_URL="sqlite:///tmp/test.db",
+        )
+    assert "SQLite cannot be used in production mode" in str(exc.value)
+
+    # Production with valid PostgreSQL DATABASE_URL and explicit origins succeeds
     prod_settings = Settings(
         APP_ENV="production",
+        DATABASE_URL="postgresql://user:secret@ep-host.railway.internal:5432/railway",
         ALLOWED_ORIGINS="https://app.vision-balling.com, https://admin.vision-balling.com",
     )
     assert prod_settings.cors_allowed_origins == [
@@ -63,6 +82,13 @@ def test_production_security_validation():
     ]
     assert prod_settings.is_docs_enabled is False
 
+    # Normalization of postgres:// to postgresql://
+    pg_legacy = Settings(
+        APP_ENV="development",
+        DATABASE_URL="postgres://user:secret@localhost:5432/db",
+    )
+    assert pg_legacy.effective_database_url.startswith("postgresql://")
+
 
 def test_docs_toggle_behavior():
     dev_settings = Settings(APP_ENV="development")
@@ -70,6 +96,7 @@ def test_docs_toggle_behavior():
 
     prod_settings = Settings(
         APP_ENV="production",
+        DATABASE_URL="postgresql://user:secret@ep-host.railway.internal:5432/railway",
         ALLOWED_ORIGINS="https://app.vision-balling.com",
         ENABLE_DOCS=True,
     )

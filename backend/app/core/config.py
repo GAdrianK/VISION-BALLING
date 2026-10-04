@@ -18,10 +18,19 @@ class Settings(BaseSettings):
     ENABLE_DOCS: bool | None = Field(default=None)
     MAX_CONCURRENT_ANALYSES: int = Field(default=1, ge=1)
 
+    DATABASE_URL: str = Field(default="")
     BETA_DATABASE_URL: str = Field(default="")
     BETA_REQUEST_RETENTION_DAYS: int = Field(default=180, ge=1)
     VIDEO_RETENTION_DAYS: int = Field(default=14, ge=1)
     ANALYSIS_RESULT_RETENTION_DAYS: int = Field(default=30, ge=1)
+
+    @property
+    def effective_database_url(self) -> str:
+        url = (self.DATABASE_URL or self.BETA_DATABASE_URL or "").strip()
+        if url.startswith("postgres://"):
+            # SQLAlchemy 1.4+ / 2.0+ requires postgresql:// instead of postgres://
+            return "postgresql://" + url[len("postgres://"):]
+        return url
 
     OPENAI_API_KEY: str = "mock-local-only"
     GEMINI_API_KEY: str = ""
@@ -163,6 +172,17 @@ class Settings(BaseSettings):
                 raise ValueError(
                     "Production security violation: PUBLIC_UPLOAD_ENABLED must be False in production mode. "
                     "Direct GPU public uploads are disabled during the public beta pilot."
+                )
+            db_url = self.effective_database_url
+            if not db_url:
+                raise ValueError(
+                    "Production database error: DATABASE_URL is mandatory in production mode. "
+                    "Set DATABASE_URL to a valid PostgreSQL connection string."
+                )
+            if db_url.startswith("sqlite"):
+                raise ValueError(
+                    "Production database error: SQLite cannot be used in production mode. "
+                    "DATABASE_URL must point to a production PostgreSQL database."
                 )
         return self
 

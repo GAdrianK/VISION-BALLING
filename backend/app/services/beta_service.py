@@ -71,16 +71,24 @@ class BetaService:
     @staticmethod
     def _resolve_db_url(target: Optional[Path | str]) -> str:
         if target:
-            target_str = str(target)
-            if target_str.startswith(("sqlite:", "postgresql:", "postgres:")):
+            target_str = str(target).strip()
+            if target_str.startswith("postgres://"):
+                target_str = "postgresql://" + target_str[len("postgres://"):]
+            if target_str.startswith(("sqlite:", "postgresql:")):
                 return target_str
             # Assume file path for SQLite
             path = Path(target_str).resolve()
             path.parent.mkdir(parents=True, exist_ok=True)
             return f"sqlite:///{path}"
 
-        if settings.BETA_DATABASE_URL and settings.BETA_DATABASE_URL.strip():
-            return settings.BETA_DATABASE_URL.strip()
+        if settings.effective_database_url:
+            return settings.effective_database_url
+
+        if settings.APP_ENV == "production":
+            raise RuntimeError(
+                "Production startup error: DATABASE_URL is mandatory in production mode. "
+                "SQLite fallback is forbidden in production."
+            )
 
         DEFAULT_BETA_DB_PATH.parent.mkdir(parents=True, exist_ok=True)
         return f"sqlite:///{DEFAULT_BETA_DB_PATH.resolve()}"
@@ -90,7 +98,7 @@ class BetaService:
         if db_url.startswith("sqlite"):
             # Ensure SQLite allows multithreaded fastapi requests
             return create_engine(db_url, connect_args={"check_same_thread": False})
-        return create_engine(db_url, pool_pre_ping=True)
+        return create_engine(db_url, pool_pre_ping=True, pool_size=5, max_overflow=10)
 
     def _init_db(self) -> None:
         with self.engine.begin() as conn:

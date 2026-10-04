@@ -1,16 +1,16 @@
 {
   "version": "v0.9.0-rc2",
-  "generated_at": "2026-10-03T20:31:33.177435+00:00",
-  "git_commit": "36b23a90cafc0bd410690073a5187ec8891323f6",
-  "git_branch": "feat/public-beta-intake",
+  "generated_at": "2026-10-04T15:41:38.345877+00:00",
+  "git_commit": "8b1388414e8037cc1d0f220d4566c04453ab8aa7",
+  "git_branch": "chore/production-deployment-preparation",
   "gate_status": "PASSED",
   "checks": [
     {
       "check": "secret_scan",
       "passed": true,
-      "gitleaks_found": "exit_1",
-      "trufflehog_found": "exit_1",
-      "details": "gitleaks: code 1; trufflehog: code 1; git secret grep clean"
+      "gitleaks_found": "not_installed",
+      "trufflehog_found": "not_installed",
+      "details": "gitleaks binary not found (skipped); trufflehog binary not found (skipped); git secret grep clean"
     },
     {
       "check": "static_analysis_bandit",

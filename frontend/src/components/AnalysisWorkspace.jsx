@@ -6,7 +6,7 @@ import EvidenceCards from "./EvidenceCards";
 import GroundedAIPanel from "./GroundedAIPanel";
 import { DEMO_SEQUENCES } from "../data/demoData";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+import { API_BASE } from "../config/api";
 
 export default function AnalysisWorkspace({
   initialSequenceId = null,

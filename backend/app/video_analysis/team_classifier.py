@@ -18,8 +18,15 @@ from typing import Any, Sequence
 
 import cv2
 import numpy as np
-from sklearn.cluster import KMeans
-from sklearn.mixture import GaussianMixture
+
+try:
+    from sklearn.cluster import KMeans
+    from sklearn.mixture import GaussianMixture
+    HAS_SKLEARN = True
+except ImportError:
+    KMeans = None  # type: ignore[assignment]
+    GaussianMixture = None  # type: ignore[assignment]
+    HAS_SKLEARN = False
 
 from app.video_analysis.reid_encoder import (
     EMBEDDING_DIM,

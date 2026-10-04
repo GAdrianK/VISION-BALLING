@@ -1,0 +1,17 @@
+.git
+.agents
+.github
+data/
+runs/
+weights/
+*.mp4
+*.pth
+*.pt
+.venv*
+frontend/node_modules/
+frontend/dist/
+.ruff_cache/
+.pytest_cache/
+__pycache__/
+*.pyc
+*.log

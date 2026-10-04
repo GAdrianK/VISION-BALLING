@@ -52,6 +52,30 @@ async def add_security_headers(request, call_next):
         response.headers["Content-Security-Policy"] = "default-src 'self'; frame-ancestors 'none';"
     return response
 
+
+@app.middleware("http")
+async def safe_production_logging_middleware(request, call_next):
+    import time
+    import uuid
+
+    start_time = time.perf_counter()
+    request_id = request.headers.get("X-Request-ID") or f"req_{uuid.uuid4().hex[:10]}"
+
+    response = await call_next(request)
+
+    duration_ms = round((time.perf_counter() - start_time) * 1000.0, 2)
+    # Log only method, clean URL path (no query parameters or tokens), status, and duration
+    logging.getLogger("uvicorn.access").info(
+        "request_id=%s method=%s path=%s status=%d duration_ms=%.2f",
+        request_id,
+        request.method,
+        request.url.path,
+        response.status_code,
+        duration_ms,
+    )
+    response.headers["X-Request-ID"] = request_id
+    return response
+
 from app.services.rag_engine import RAGEngine
 
 # Initialisation globale du moteur RAG
@@ -692,12 +716,28 @@ async def analyze_tactical_trends(request: AnalysisRequest):
         print(f"💥 ERREUR CRITIQUE BACKEND : {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/api/health")
-async def health_check():
-    return {
-        "status": "healthy",
-        "project": "Football IQ Assistant",
-        "version": "1.0.0",
-        "engine": "Qwen-2.5-72B-via-OpenRouter",
-        "database": "Connected"
-    }
+@app.get("/health", response_model=dict[str, str])
+@app.get("/api/health", response_model=dict[str, str])
+def health_check():
+    """Minimal health check endpoint.
+
+    Returns strictly: {"status": "ok"}.
+    In production mode, internally probes database readiness and returns 503 if unreachable.
+    Does not expose filesystem, GPU, dependencies, secrets, or model paths.
+    """
+    if settings.APP_ENV == "production":
+        try:
+            from sqlalchemy import text
+            from app.services.beta_service import get_beta_service
+
+            svc = get_beta_service()
+            with svc.engine.connect() as conn:
+                conn.execute(text("SELECT 1;"))
+        except Exception as exc:
+            logging.getLogger("uvicorn.error").error("Database healthcheck probe failed: %s", exc)
+            raise HTTPException(
+                status_code=503,
+                detail="Service Unavailable: database probe failed",
+            ) from exc
+
+    return {"status": "ok"}

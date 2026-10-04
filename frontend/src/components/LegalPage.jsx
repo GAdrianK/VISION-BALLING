@@ -1,4 +1,5 @@
 import PropTypes from "prop-types";
+import { LEGAL_CONFIG } from "../config/legalConfig";
 
 export default function LegalPage({ onNavigate }) {
   return (
@@ -23,17 +24,17 @@ export default function LegalPage({ onNavigate }) {
               Le site <strong>VISION-BALLING</strong> est édité par :
             </p>
             <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "6px", fontSize: "13px", color: "var(--text)" }}>
-              <li><strong>Nom légal / Raison sociale :</strong> [LEGAL_NAME]</li>
-              <li><strong>Nom commercial :</strong> [BUSINESS_NAME]</li>
-              <li><strong>Forme juridique :</strong> [LEGAL_STATUS]</li>
-              <li><strong>Adresse professionnelle :</strong> [PROFESSIONAL_ADDRESS]</li>
-              <li><strong>Courriel :</strong> [EMAIL]</li>
-              <li><strong>Téléphone :</strong> [PHONE]</li>
-              <li><strong>Numéro SIREN :</strong> [SIREN]</li>
-              <li><strong>Numéro SIRET :</strong> [SIRET]</li>
-              <li><strong>Immatriculation RNE :</strong> [RNE]</li>
-              <li><strong>Registre du Commerce et des Sociétés :</strong> [RCS_IF_APPLICABLE]</li>
-              <li><strong>Numéro de TVA intracommunautaire :</strong> [VAT_NUMBER_IF_APPLICABLE]</li>
+              <li><strong>Nom légal / Raison sociale :</strong> {LEGAL_CONFIG.LEGAL_NAME}</li>
+              <li><strong>Nom commercial :</strong> {LEGAL_CONFIG.BUSINESS_NAME}</li>
+              <li><strong>Forme juridique :</strong> {LEGAL_CONFIG.LEGAL_STATUS}</li>
+              <li><strong>Adresse professionnelle :</strong> {LEGAL_CONFIG.LEGAL_ADDRESS}</li>
+              <li><strong>Courriel :</strong> {LEGAL_CONFIG.LEGAL_EMAIL}</li>
+              <li><strong>Téléphone :</strong> {LEGAL_CONFIG.LEGAL_PHONE}</li>
+              <li><strong>Numéro SIREN :</strong> {LEGAL_CONFIG.SIREN}</li>
+              <li><strong>Numéro SIRET :</strong> {LEGAL_CONFIG.SIRET}</li>
+              <li><strong>Immatriculation RNE :</strong> {LEGAL_CONFIG.RNE}</li>
+              <li><strong>Registre du Commerce et des Sociétés :</strong> {LEGAL_CONFIG.RCS}</li>
+              <li><strong>Numéro de TVA intracommunautaire :</strong> {LEGAL_CONFIG.VAT_NUMBER}</li>
             </ul>
           </div>
         </section>
@@ -45,30 +46,50 @@ export default function LegalPage({ onNavigate }) {
           </h2>
           <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: "20px" }}>
             <p style={{ fontSize: "13.5px", color: "var(--text)" }}>
-              <strong>Directeur de la publication :</strong> [NAME]
+              <strong>Directeur de la publication :</strong> {LEGAL_CONFIG.PUBLICATION_DIRECTOR}
             </p>
           </div>
         </section>
 
-        {/* Hébergeur */}
+        {/* Hébergeurs & Architecture d'Infrastructure */}
         <section className="legal-section">
           <h2 style={{ fontSize: "15px", fontWeight: "600", marginBottom: "12px", color: "var(--text)" }}>
-            03. Hébergement du site
+            03. Hébergement du site & infrastructures techniques
           </h2>
           <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: "20px" }}>
-            <p style={{ marginBottom: "8px", fontSize: "13.5px" }}>
-              Le site et ses API d&apos;ingestion publique sont hébergés par :
+            <p style={{ marginBottom: "12px", fontSize: "13.5px" }}>
+              Conformément à l&apos;article 6-III-1-b de la LCEN, l&apos;infrastructure de VISION-BALLING s&apos;articule autour de prestataires spécialisés et d&apos;un environnement local sécurisé :
             </p>
-            <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "6px", fontSize: "13px", color: "var(--text)" }}>
-              <li><strong>Hébergeur :</strong> [HOST_NAME]</li>
-              <li><strong>Raison sociale :</strong> [HOST_LEGAL_ENTITY]</li>
-              <li><strong>Adresse de l&apos;hébergeur :</strong> [HOST_ADDRESS]</li>
-              <li><strong>Téléphone de l&apos;hébergeur :</strong> [HOST_PHONE]</li>
-              <li><strong>Site web :</strong> [HOST_URL]</li>
-            </ul>
-            <p style={{ marginTop: "12px", fontSize: "12px", color: "var(--muted)" }}>
-              Note d&apos;infrastructure : L&apos;exécution des modèles de vision par ordinateur sur les séquences vidéo de match (inférence GPU) est réalisée sur station de calcul locale et ne transite par aucun service d&apos;inférence mutualisé public.
-            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px", fontSize: "13px" }}>
+              <div style={{ padding: "12px", background: "var(--bg)", border: "1px solid var(--border)", borderRadius: "var(--radius)" }}>
+                <strong>A. Hébergement Frontend (Application Statique) :</strong>
+                <ul style={{ listStyle: "none", marginTop: "6px", display: "flex", flexDirection: "column", gap: "4px" }}>
+                  <li><strong>Prestataire :</strong> {LEGAL_CONFIG.FRONTEND_HOST_NAME}</li>
+                  <li><strong>Société :</strong> {LEGAL_CONFIG.FRONTEND_HOST_LEGAL_ENTITY}</li>
+                  <li><strong>Adresse :</strong> {LEGAL_CONFIG.FRONTEND_HOST_ADDRESS}</li>
+                  <li><strong>Téléphone :</strong> {LEGAL_CONFIG.FRONTEND_HOST_PHONE}</li>
+                  <li><strong>Site :</strong> {LEGAL_CONFIG.FRONTEND_HOST_URL}</li>
+                </ul>
+              </div>
+
+              <div style={{ padding: "12px", background: "var(--bg)", border: "1px solid var(--border)", borderRadius: "var(--radius)" }}>
+                <strong>B. Hébergement Backend API & Ingestion BETA :</strong>
+                <ul style={{ listStyle: "none", marginTop: "6px", display: "flex", flexDirection: "column", gap: "4px" }}>
+                  <li><strong>Prestataire API :</strong> {LEGAL_CONFIG.API_HOST_NAME}</li>
+                  <li><strong>Société :</strong> {LEGAL_CONFIG.API_HOST_LEGAL_ENTITY}</li>
+                  <li><strong>Adresse :</strong> {LEGAL_CONFIG.API_HOST_ADDRESS}</li>
+                  <li><strong>Site :</strong> {LEGAL_CONFIG.API_HOST_URL}</li>
+                  <li><strong>Base de données :</strong> {LEGAL_CONFIG.DATABASE_HOST_NAME} ({LEGAL_CONFIG.DATABASE_HOST_ADDRESS})</li>
+                </ul>
+              </div>
+
+              <div style={{ padding: "12px", background: "var(--bg)", border: "1px solid var(--border)", borderRadius: "var(--radius)" }}>
+                <strong>C. Inférence GPU & Traitement Vidéo :</strong>
+                <p style={{ marginTop: "4px", color: "var(--muted)", fontSize: "12.5px" }}>
+                  {LEGAL_CONFIG.LOCAL_GPU_PROCESSOR}. Les vidéos de match confiées ne transitent par aucun service mutualisé d&apos;inférence IA publique. L&apos;analyse tactique est opérée localement et manuellement par l&apos;équipe technique.
+                </p>
+              </div>
+            </div>
           </div>
         </section>
 

@@ -7,17 +7,37 @@ from typing import Any, Callable
 
 import cv2
 import numpy as np
-import torch
-import torch.nn.functional as F
+
+try:
+    import torch
+    import torch.nn.functional as F
+    HAS_TORCH = True
+except ImportError:
+    class _DummyTorch:
+        @staticmethod
+        def no_grad():
+            def decorator(fn):
+                return fn
+            return decorator
+
+    torch = _DummyTorch()  # type: ignore[assignment]
+    F = None  # type: ignore[assignment]
+    HAS_TORCH = False
 
 EXPECTED_PRTREID_MD5 = "9633825232bc89f23a94522c5561650e"
 EXPECTED_PRTREID_SHA256 = "1304562c4c930a4a54bbf2d44e221eb911fe31408f6875c5058b2d6ed621cf3b"
 DEFAULT_REID_CKPT_PATH = Path(
-    os.getenv("REID_CKPT_PATH", "/media/adriano/Windows/runs/reid/prtreid-soccernet-baseline.pth.tar")
+    os.getenv(
+        "REID_CKPT_PATH",
+        "/opt/models/reid/prtreid-soccernet-baseline.pth.tar"
+        if os.getenv("APP_ENV") == "production"
+        else "/media/adriano/Windows/runs/reid/prtreid-soccernet-baseline.pth.tar",
+    )
 )
 
 # Sports-specific appearance embedding specification
 EMBEDDING_DIM: int = 256
+EMBEDDING_DTYPE = np.float32
 INPUT_HEIGHT: int = 256
 INPUT_WIDTH: int = 128
 IMAGENET_MEAN: tuple[float, float, float] = (0.485, 0.456, 0.406)
@@ -95,10 +115,15 @@ class PlayerAppearanceEncoder:
     def __init__(
         self,
         checkpoint_path: Path | str = DEFAULT_REID_CKPT_PATH,
-        device: str | torch.device | None = None,
+        device: Any = None,
         batch_size: int = 32,
         verify_checksum: bool = True,
     ) -> None:
+        if not HAS_TORCH:
+            raise RuntimeError(
+                "PyTorch is required for PlayerAppearanceEncoder. "
+                "GPU dependencies are not installed in the public CPU deployment."
+            )
         self.checkpoint_path = Path(checkpoint_path)
         self.batch_size = max(1, batch_size)
         if device is None:

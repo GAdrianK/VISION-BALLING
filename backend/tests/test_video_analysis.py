@@ -6,7 +6,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 import pytest
-from app.api.video_analysis import get_video_analysis_service
+from app.api.video_analysis import get_analysis_settings, get_video_analysis_service
 from app.core.config import Settings
 from app.main import app
 from app.video_analysis.detectors import ObjectDetector, RawDetection
@@ -59,6 +59,7 @@ def sample_video(tmp_path: Path) -> Path:
 @pytest.fixture()
 def video_settings(tmp_path: Path) -> Settings:
     return Settings(
+        PUBLIC_UPLOAD_ENABLED=True,
         VIDEO_UPLOAD_DIR=str(tmp_path / "uploads"),
         VIDEO_RESULT_DIR=str(tmp_path / "results"),
         VIDEO_ALLOWED_EXTENSIONS="avi,mp4",
@@ -366,6 +367,7 @@ def test_processing_error_sets_failed_status(sample_video: Path, video_settings:
 def test_create_and_get_endpoints(sample_video: Path, video_settings: Settings):
     service = VideoAnalysisService(video_settings, detector=FakeDetector())
     app.dependency_overrides[get_video_analysis_service] = lambda: service
+    app.dependency_overrides[get_analysis_settings] = lambda: video_settings
     try:
         with TestClient(app) as api:
             with sample_video.open("rb") as source:
@@ -418,6 +420,7 @@ def test_create_and_get_endpoints(sample_video: Path, video_settings: Settings):
 def test_create_endpoint_rejects_invalid_extension(video_settings: Settings):
     service = VideoAnalysisService(video_settings, detector=FakeDetector())
     app.dependency_overrides[get_video_analysis_service] = lambda: service
+    app.dependency_overrides[get_analysis_settings] = lambda: video_settings
     try:
         with TestClient(app) as api:
             response = api.post(
@@ -427,3 +430,27 @@ def test_create_endpoint_rejects_invalid_extension(video_settings: Settings):
         assert response.status_code == 422
     finally:
         app.dependency_overrides.clear()
+
+
+def test_create_endpoint_rejects_when_public_upload_disabled(sample_video: Path, tmp_path: Path):
+    disabled_settings = Settings(
+        PUBLIC_UPLOAD_ENABLED=False,
+        VIDEO_UPLOAD_DIR=str(tmp_path / "uploads"),
+        VIDEO_RESULT_DIR=str(tmp_path / "results"),
+    )
+    service = VideoAnalysisService(disabled_settings, detector=FakeDetector())
+    app.dependency_overrides[get_video_analysis_service] = lambda: service
+    app.dependency_overrides[get_analysis_settings] = lambda: disabled_settings
+    try:
+        with TestClient(app) as api:
+            with sample_video.open("rb") as source:
+                response = api.post(
+                    "/api/video-analysis",
+                    files={"video": ("sample.avi", source, "video/x-msvideo")},
+                    data={"match_id": "match_integration"},
+                )
+            assert response.status_code == 403
+            assert "Public video upload and GPU analysis are disabled" in response.json()["detail"]
+    finally:
+        app.dependency_overrides.clear()
+

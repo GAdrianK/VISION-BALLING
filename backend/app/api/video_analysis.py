@@ -17,7 +17,7 @@ from fastapi import (
 )
 from fastapi.responses import FileResponse
 
-from app.core.config import settings
+from app.core.config import Settings, settings
 from app.video_analysis.backends import diagnose_video_backend
 from app.video_analysis.canonical_modes import check_environment_preflight
 from app.video_analysis.schemas import (
@@ -27,15 +27,24 @@ from app.video_analysis.schemas import (
     ArtifactInfo,
     ArtifactList,
 )
-from app.video_analysis.service import VideoAnalysisService
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from app.video_analysis.service import VideoAnalysisService
+
 from app.video_analysis.validation import VideoValidationError
 
 router = APIRouter(prefix="/api/video-analysis", tags=["video-analysis"])
 
-_service = VideoAnalysisService(settings)
+_service: Any = None
 
 
-def get_video_analysis_service() -> VideoAnalysisService:
+def get_video_analysis_service():
+    global _service
+    if _service is None:
+        from app.video_analysis.service import VideoAnalysisService
+
+        _service = VideoAnalysisService(settings)
     return _service
 
 
@@ -117,7 +126,26 @@ def video_backend_diagnostics() -> dict:
     return diagnose_video_backend().__dict__
 
 
-@router.post("", response_model=AnalysisCreated, status_code=202)
+def get_analysis_settings() -> Settings:
+    return settings
+
+
+def verify_public_upload_allowed(
+    current_settings: Settings = Depends(get_analysis_settings),
+) -> None:
+    if current_settings.APP_ENV == "production" or not current_settings.PUBLIC_UPLOAD_ENABLED:
+        raise HTTPException(
+            status_code=403,
+            detail="Public video upload and GPU analysis are disabled on this deployment. Submit a request via /beta.",
+        )
+
+
+@router.post(
+    "",
+    response_model=AnalysisCreated,
+    status_code=202,
+    dependencies=[Depends(verify_public_upload_allowed)],
+)
 async def create_analysis(
     background_tasks: BackgroundTasks,
     video: UploadFile = File(...),

@@ -2,7 +2,7 @@ import { useState } from "react";
 import PropTypes from "prop-types";
 import BetaStamp from "./BetaStamp";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+import { API_BASE } from "../config/api";
 
 const ROLES = [
   "Entraîneur",

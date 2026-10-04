@@ -1,4 +1,5 @@
 import PropTypes from "prop-types";
+import { LEGAL_CONFIG } from "../config/legalConfig";
 
 export default function PrivacyPage({ onNavigate }) {
   return (
@@ -23,9 +24,9 @@ export default function PrivacyPage({ onNavigate }) {
               Le responsable du traitement des données à caractère personnel collectées sur ce site est :
             </p>
             <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "4px" }}>
-              <li><strong>Entité / Nom :</strong> [LEGAL_NAME]</li>
-              <li><strong>Adresse professionnelle :</strong> [PROFESSIONAL_ADDRESS]</li>
-              <li><strong>Courriel de contact DPO / Protection des données :</strong> [EMAIL]</li>
+              <li><strong>Entité / Nom :</strong> {LEGAL_CONFIG.LEGAL_NAME}</li>
+              <li><strong>Adresse professionnelle :</strong> {LEGAL_CONFIG.LEGAL_ADDRESS}</li>
+              <li><strong>Courriel de contact DPO / Protection des données :</strong> {LEGAL_CONFIG.DPO_CONTACT_EMAIL}</li>
             </ul>
           </div>
         </section>
@@ -107,19 +108,25 @@ export default function PrivacyPage({ onNavigate }) {
           </h2>
           <div style={{ fontSize: "13.5px", color: "var(--text)", display: "flex", flexDirection: "column", gap: "10px" }}>
             <p>
-              Pour une transparence rigoureuse, nous distinguons clairement deux environnements d&apos;infrastructure :
+              Pour une transparence rigoureuse, nous distinguons clairement les composantes d&apos;hébergement et de traitement :
             </p>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
               <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: "16px" }}>
-                <strong style={{ display: "block", fontSize: "13px", marginBottom: "6px" }}>Infrastructure Web & API</strong>
+                <strong style={{ display: "block", fontSize: "13px", marginBottom: "6px" }}>Frontend Statique & Distribution</strong>
                 <p style={{ fontSize: "12.5px", color: "var(--muted)" }}>
-                  Le site web, le formulaire et l&apos;API de réception des candidatures sont hébergés sur les serveurs de [HOST_NAME] situés au sein de l&apos;Union Européenne.
+                  L&apos;application cliente web est hébergée et distribuée via {LEGAL_CONFIG.FRONTEND_HOST_NAME} avec points de présence en Union Européenne.
                 </p>
               </div>
               <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: "16px" }}>
-                <strong style={{ display: "block", fontSize: "13px", marginBottom: "6px" }}>Inférence GPU & Traitement Vidéo</strong>
+                <strong style={{ display: "block", fontSize: "13px", marginBottom: "6px" }}>API & Base de Données BETA</strong>
                 <p style={{ fontSize: "12.5px", color: "var(--muted)" }}>
-                  L&apos;exécution des modèles de vision par ordinateur (tracking, détection, calibration) s&apos;effectue sur station de calcul locale sécurisée sous contrôle direct de l&apos;opérateur. Les vidéos ne sont jamais transmises à des tiers d&apos;inférence en cloud public.
+                  L&apos;API d&apos;ingestion des candidatures est opérée sur {LEGAL_CONFIG.API_HOST_NAME} et les données stockées sur {LEGAL_CONFIG.DATABASE_HOST_NAME}.
+                </p>
+              </div>
+              <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: "16px", gridColumn: "1 / -1" }}>
+                <strong style={{ display: "block", fontSize: "13px", marginBottom: "6px" }}>Inférence GPU & Traitement Vidéo Dédié</strong>
+                <p style={{ fontSize: "12.5px", color: "var(--muted)" }}>
+                  {LEGAL_CONFIG.LOCAL_GPU_PROCESSOR}. Les séquences vidéo transmises ne transitent par aucun service mutualisé d&apos;inférence cloud public et restent confinées à l&apos;environnement d&apos;analyse local sous contrôle strict de l&apos;opérateur.
                 </p>
               </div>
             </div>
@@ -189,8 +196,8 @@ export default function PrivacyPage({ onNavigate }) {
             </ul>
             <p style={{ marginTop: "6px" }}>
               Pour exercer l&apos;un de ces droits, adressez simplement votre demande par courriel à :{" "}
-              <a href="mailto:[EMAIL]" style={{ textDecoration: "underline", fontWeight: "600" }}>
-                [EMAIL]
+              <a href={`mailto:${LEGAL_CONFIG.DPO_CONTACT_EMAIL}`} style={{ textDecoration: "underline", fontWeight: "600" }}>
+                {LEGAL_CONFIG.DPO_CONTACT_EMAIL}
               </a>. Nous vous répondrons dans un délai maximal de 30 jours.
             </p>
           </div>

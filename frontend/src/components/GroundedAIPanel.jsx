@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { API_BASE } from "../config/api";
 
 export default function GroundedAIPanel({
   analysisId = "SNMOT-068",
@@ -31,7 +32,7 @@ export default function GroundedAIPanel({
 
     // Otherwise attempt call to backend API
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/grounded-rag/query", {
+      const res = await fetch(`${API_BASE}/api/grounded-rag/query`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: q, analysis_id: analysisId }),

@@ -43,6 +43,7 @@ def test_production_settings_enforces_public_upload_disabled():
 def test_production_settings_valid_configuration():
     cfg = Settings(
         APP_ENV="production",
+        DATABASE_URL="postgresql://user:pass@ep-prod.railway.internal:5432/railway",
         ALLOWED_ORIGINS="https://app.vision-balling.fr",
         PUBLIC_UPLOAD_ENABLED=False,
     )
@@ -157,6 +158,7 @@ def test_public_upload_disabled_in_production():
 
     prod_settings = Settings(
         APP_ENV="production",
+        DATABASE_URL="postgresql://user:pass@ep-prod.railway.internal:5432/railway",
         ALLOWED_ORIGINS="https://app.vision-balling.fr",
         PUBLIC_UPLOAD_ENABLED=False,
     )
@@ -186,10 +188,12 @@ def test_frontend_legal_and_compliance_pages_exist():
         content = fpath.read_text(encoding="utf-8")
         assert len(content) > 200
 
-    # Ensure LegalPage contains mandatory LCEN placeholders
+    # Ensure LegalPage or legalConfig contains mandatory LCEN placeholders
     legal_content = (frontend_components / "LegalPage.jsx").read_text(encoding="utf-8")
+    config_file = frontend_components.parent / "config" / "legalConfig.js"
+    combined_content = legal_content + (("\n" + config_file.read_text(encoding="utf-8")) if config_file.is_file() else "")
     for placeholder in ["[LEGAL_NAME]", "[PROFESSIONAL_ADDRESS]", "[EMAIL]", "[HOST_NAME]", "[NAME]"]:
-        assert placeholder in legal_content, f"Missing placeholder in LegalPage: {placeholder}"
+        assert placeholder in combined_content, f"Missing placeholder in LegalPage / legalConfig: {placeholder}"
 
     # Ensure App.jsx wires all routes
     app_content = (repo_root / "frontend" / "src" / "App.jsx").read_text(encoding="utf-8")
